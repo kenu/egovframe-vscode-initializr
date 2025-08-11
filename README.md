@@ -66,14 +66,17 @@ egovframe-vscode-initializr/
 ├── 📁 webview-ui/          # React 웹뷰 UI
 ├── 📁 templates/           # 새로운 템플릿 루트 디렉토리
 │   ├── 📁 projects/        # 프로젝트 템플릿
-│   │   ├── 📁 examples/    # ZIP 템플릿 파일들
+│   │   ├── 📁 examples/    # ZIP 템플릿 파일들 (Git LFS 관리)
 │   │   └── 📁 pom/         # Maven POM 템플릿들
 │   ├── 📁 config/          # Spring 설정 템플릿
 │   └── 📁 code/            # CRUD 코드 템플릿
 ├── 📄 package.json         # Extension 메니페스트
 ├── 📄 esbuild.js          # Extension 빌드 설정
+├── 📄 .gitattributes      # Git LFS 설정 파일
 └── 📄 README.md           # 프로젝트 문서
 ```
+
+> **💡 Git LFS 관리 파일**: `templates/projects/examples/` 폴더의 ZIP 파일들은 Git LFS로 관리됩니다. 프로젝트 클론 후 `git lfs pull` 명령어로 다운로드하세요.
 
 ### Extension 소스 (`src/`)
 
@@ -441,10 +444,33 @@ CREATE TABLE users (
 ## 🔄 개발 워크플로우
 
 ### 1. 초기 설정
+
+#### Git LFS 설정 (필수)
+이 프로젝트는 큰 템플릿 파일들을 Git LFS(Large File Storage)로 관리합니다. 프로젝트를 클론하기 전에 Git LFS가 설치되어 있는지 확인하세요.
+
+```bash
+# Git LFS 설치 (macOS)
+brew install git-lfs
+
+# Git LFS 설치 (Ubuntu/Debian)
+curl -s https://packagecloud.io/install/repositories/github/git-lfs/script.deb.sh | sudo bash
+sudo apt-get install git-lfs
+
+# Git LFS 설치 (Windows)
+# https://git-lfs.github.com/ 에서 다운로드
+
+# Git LFS 초기화
+git lfs install
+```
+
+#### 프로젝트 클론 및 설정
 ```bash
 # 프로젝트 클론
 git clone <repository-url>
 cd egovframe-vscode-initializr
+
+# Git LFS 파일들 다운로드 (클론 후 필수)
+git lfs pull
 
 # 전체 의존성 설치
 npm run install:all
@@ -517,6 +543,36 @@ npm test
 
 # Webview UI 테스트
 cd webview-ui && npm run test
+```
+
+### 6. Git LFS 문제 해결
+
+#### 큰 파일 다운로드 실패 시
+```bash
+# Git LFS 파일들 강제 다운로드
+git lfs pull --include="*.zip"
+
+# 특정 파일만 다운로드
+git lfs pull --include="templates/projects/examples/*.zip"
+```
+
+#### Git LFS 상태 확인
+```bash
+# LFS로 추적되는 파일 목록 확인
+git lfs ls-files
+
+# LFS 설정 확인
+git lfs track
+```
+
+#### Git LFS 재설정
+```bash
+# LFS 설정 초기화
+git lfs uninstall
+git lfs install
+
+# LFS 파일들 다시 다운로드
+git lfs pull
 ```
 
 ## 📦 배포 및 퍼블리싱
@@ -676,7 +732,15 @@ VS Code > Help > Toggle Developer Tools > Console
 ### 개발 참여 절차
 1. **포크 및 클론**
    ```bash
+   # Git LFS 설치 확인
+   git lfs version
+   
+   # 프로젝트 클론
    git clone https://github.com/egovframework/egovframe-vscode-initializr.git
+   cd egovframe-vscode-initializr
+   
+   # Git LFS 파일들 다운로드
+   git lfs pull
    ```
 
 2. **브랜치 생성**
