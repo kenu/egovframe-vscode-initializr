@@ -4,6 +4,141 @@
 
 **eGovFrame VSCode Initializr**는 전자정부 표준프레임워크(eGovFrame) 프로젝트 생성 및 설정을 위한 Visual Studio Code 확장 프로그램입니다. 개발자가 eGovFrame 기반 프로젝트를 쉽고 빠르게 시작할 수 있도록 도와주는 통합 도구입니다.
 
+### 컨트리뷰션 참여 방법
+
+#### 1. Git LFS 설치(필수)
+
+Git LFS 패키지를 설치합니다.
+
+  -  **Windows**는 [Windows용 Git 배포판](https://gitforwindows.org/)에 Git LFS 패키지도 포함되어 있습니다. 설치 마법사에서 "Use Git from Windows Command Prompt" 옵션을 체크해야 합니다. 만약 Git LFS 패키지를 최신 버전으로 업그레이드 하기를 원한다면, Chocolatey 패키지 관리자를 사용할 수 있습니다.
+  ```bash
+  # Windows - Git LFS를 최신버전으로 설치하고 싶다면
+  choco install git-lfs.install
+  ```
+
+  - **macOS**는 Homebrew를 이용해 Git LFS 패키지를 설치할 수 있습니다.
+  ```bash
+  # macOS - Homebrew(권장)
+  brew install git-lfs
+  ```
+
+  - **Linux**는 packagecloud 레포지토리에서 제공하는 스크립트를 이용하여 설치합니다. 자세한 내용은 [Git LFS 레포지토리](https://github.com/git-lfs/git-lfs/blob/main/INSTALLING.md)에서 확인 가능합니다.
+  ```bash
+  # Ubuntu/Debian Linux
+  curl -s https://packagecloud.io/install/repositories/github/git-lfs/script.deb.sh | sudo bash
+  sudo apt-get install git-lfs
+
+  # RPM 계열 Linux
+  curl -s https://packagecloud.io/install/repositories/github/git-lfs/script.rpm.sh | sudo bash
+  sudo yum install git-lfs
+  ```
+
+Git LFS 패키지를 설치한 후, Git LFS 전역설정을 추가합니다. Git LFS 패키지 설치 후 다음 명령어를 최초 1회만 실행하면 됩니다.
+
+```bash
+git lfs install
+```
+
+위 명령을 실행하면 `.gitconfig` 설정 파일에 다음과 같은 키들이 추가됩니다.
+```
+[filter "lfs"]
+  filter.lfs.clean = git-lfs clean -- %f
+  filter.lfs.smudge = git-lfs smudge -- %f
+  filter.lfs.process = git-lfs filter-process
+  filter.lfs.required = true
+```
+> [!CAUTION] CAUTION
+> Git LFS와 관련한 Trouble Shooting은 ["Git LFS 문제 해결" 목차](#git-lfs-문제-해결)를 참고하기 바랍니다.
+
+#### 2. Fork & Clone & Upstream
+
+[Github Repository](https://github.com/eGovFramework/egovframe-vscode-initializr) 우측 상단에 "Fork" 버튼을 클릭하여 egovframe-vscode-initializr 레포지토리를 Fork합니다.
+
+Fork하여 생성된 개인 레포지토리를 로컬에 Clone하여 소스를 받아옵니다.
+
+```bash
+git clone {Fork하여 생성된 개인 레포지토리의 URL}.git
+```
+
+> [!CAUTION] CAUTION
+> Git LFS 패키지 설치와 전역설정에 문제가 없다면, `templates/projects/examples/` 디렉토리에 zip파일들의 size에 문제가 없어야 합니다.
+> Git LFS에 문제가 있다면 해당 zip파일들은 단순 포인터로서 개별 size가 약 매우 작고 압축해제도 오류가 발생합니다. Git LFS와 관련한 Trouble Shooting은 ["Git LFS 문제 해결" 목차](#git-lfs-문제-해결)를 참고하기 바랍니다.
+
+Upstream에 egovframe-vscode-initializr 레포지토리를 연결합니다.
+
+```bash
+cd path/to/repo
+
+git remote add upstream https://github.com/eGovFramework/egovframe-vscode-initializr.git.git
+```
+
+#### 3. 작업 시작 전
+
+```bash
+# 작업 시작 전에 upstream인 egovframe-vscode-initializr 레포지토리의 main 브랜치와 싱크를 맞춥니다.
+git fetch upstream main
+
+# 내 로컬의 메인 브랜치(main)로 이동합니다.
+git checkout main
+
+# upstream과 병합합니다(또는 리베이스).
+# - 병합
+git merge upstream/main
+# - (또는)리베이스
+git rebase upstream/main
+
+# 충돌 발생시 해결
+
+# (선택) 기여자님의 origin 레포지토리에도 동기화
+git push origin main
+
+# 작업 브랜치(예: feat/something)로 이동하여 진행
+git checkout -b feat/something
+
+# 작업 진행
+```
+
+#### 4. 작업
+
+워크플로우에 관한 내용은 ["🔄 개발 워크플로우" 목차](#-개발-워크플로우)를 참고하시기 바랍니다.
+
+#### 5. 커밋 및 Push
+
+```bash
+# 변경사항을 스테이징한 후 커밋합니다.
+git add .
+git commit -m "{커밋 메시지}"
+
+# push 하기 전에 upstream인 egovframe-vscode-initializr 레포지토리의 main 브랜치와 다시 한 번 싱크를 맞춥니다(충돌 방지 목적).
+git fetch upstream main
+
+# upstream과 병합합니다(또는 리베이스).
+# - 병합
+git merge upstream/main
+# - (또는)리베이스
+git rebase upstream/main
+
+# 충돌 해결
+
+# 충돌 해결사항을 스테이징합니다.
+git add .
+
+# 스테이징한 사항을 병합합니다(또는 리베이스).
+# - 병합
+git commit # 자동으로 커밋 메시지가 설정됨
+# - (또는) 리베이스
+git rebase --continue
+
+# 기여자님의 origin 레포지토리에 push
+git push origin main
+```
+
+#### 6. PR 생성
+
+- Github에서 기여자님의 개인 레포지토리(egovframe-docs를 포크한 레포지토리) 페이지로 이동합니다.
+- “Compare & pull request” 버튼을 클릭합니다.
+- 제목과 설명 입력 후 “Create pull request” 버튼을 클릭합니다.
+
 ### 주요 기능
 
 - 🚀 **프로젝트 생성**: eGovFrame 템플릿 기반 프로젝트 자동 생성
@@ -76,7 +211,8 @@ egovframe-vscode-initializr/
 └── 📄 README.md           # 프로젝트 문서
 ```
 
-> **💡 Git LFS 관리 파일**: `templates/projects/examples/` 폴더의 ZIP 파일들은 Git LFS로 관리됩니다. 프로젝트 클론 후 `git lfs pull` 명령어로 다운로드하세요.
+> [!Important] Important
+> **💡 Git LFS 관리 파일**: `"*.zip"` 파일들은 모두 Git LFS로 관리됩니다. `"*.zip"` 파일들은 모두 `templates/projects/examples/` 폴더에만 존재합니다. 프로젝트 클론 전이라면 `git lfs install` 명령어를 실행 후 클론을 하면 됩니다. 프로젝트 클론을 먼저 했다면 `git lfs pull` 명령어로 다운로드하세요.
 
 ### Extension 소스 (`src/`)
 
@@ -443,36 +579,15 @@ CREATE TABLE users (
 
 ## 🔄 개발 워크플로우
 
-### 1. 초기 설정
+이 목차는 [컨트리뷰션 참여 방법 목차에서 "4. 작업"](#4-작업)에 해당하는 내용입니다. 작업 전 후 과정은 [컨트리뷰션 참여 방법](#컨트리뷰션-참여-방법)을 참고 부탁드립니다.
 
-#### Git LFS 설정 (필수)
-이 프로젝트는 큰 템플릿 파일들을 Git LFS(Large File Storage)로 관리합니다. 프로젝트를 클론하기 전에 Git LFS가 설치되어 있는지 확인하세요.
+### 1. 전체 의존성 설치
+
+프로젝트의 의존성은 백엔드에 해당하는 `./package.json`과 프론트엔드에 해당하는 `./webview-ui/package.json`이 있습니다. 양 쪽 모두의 의존성을 설치합니다.
 
 ```bash
-# Git LFS 설치 (macOS)
-brew install git-lfs
-
-# Git LFS 설치 (Ubuntu/Debian)
-curl -s https://packagecloud.io/install/repositories/github/git-lfs/script.deb.sh | sudo bash
-sudo apt-get install git-lfs
-
-# Git LFS 설치 (Windows)
-# https://git-lfs.github.com/ 에서 다운로드
-
-# Git LFS 초기화
-git lfs install
-```
-
-#### 프로젝트 클론 및 설정
-```bash
-# 프로젝트 클론
-git clone <repository-url>
-cd egovframe-vscode-initializr
-
-# Git LFS 파일들 다운로드 (클론 후 필수)
-git lfs pull
-
 # 전체 의존성 설치
+cd path/to/repo
 npm run install:all
 ```
 
@@ -490,7 +605,7 @@ npm run install:all
 2. **JSON, MD, YAML 파일들**: `prettier --write`
 3. 수정된 파일들이 자동으로 스테이징되고 커밋됨
 
-#### 사용법
+#### 기본 사용법
 ```bash
 # 평소처럼 개발 후
 git add .
@@ -545,36 +660,6 @@ npm test
 cd webview-ui && npm run test
 ```
 
-### 6. Git LFS 문제 해결
-
-#### 큰 파일 다운로드 실패 시
-```bash
-# Git LFS 파일들 강제 다운로드
-git lfs pull --include="*.zip"
-
-# 특정 파일만 다운로드
-git lfs pull --include="templates/projects/examples/*.zip"
-```
-
-#### Git LFS 상태 확인
-```bash
-# LFS로 추적되는 파일 목록 확인
-git lfs ls-files
-
-# LFS 설정 확인
-git lfs track
-```
-
-#### Git LFS 재설정
-```bash
-# LFS 설정 초기화
-git lfs uninstall
-git lfs install
-
-# LFS 파일들 다시 다운로드
-git lfs pull
-```
-
 ## 📦 배포 및 퍼블리싱
 
 ### 1. Extension 패키징
@@ -586,14 +671,8 @@ vsce package
 # 생성된 파일: egovframe-initializr-{version}.vsix
 ```
 
-### 2. 마켓플레이스 배포
-```bash
-# VS Code 마켓플레이스 배포
-vsce publish
-
-# 특정 버전 배포
-vsce publish 1.0.1
-```
+### 2. 마켓플레이스에 배포 및 퍼블리싱
+VSCode의 [Publishing Extensions 문서](https://code.visualstudio.com/api/working-with-extensions/publishing-extension)를 참고하시기 바랍니다.
 
 ### 3. 배포 전 체크리스트
 - [ ] 모든 테스트 통과
@@ -684,6 +763,37 @@ VS Code > View > Output > eGovFrame Initializr
 # Webview 로그
 VS Code > Help > Toggle Developer Tools > Console
 ```
+
+### Git LFS 문제 해결
+
+#### 큰 파일 다운로드 실패 시
+```bash
+# Git LFS 파일들 강제 다운로드
+git lfs pull --include="*.zip"
+
+# 특정 파일만 다운로드
+git lfs pull --include="templates/projects/examples/*.zip"
+```
+
+#### Git LFS 추적 목록 확인
+```bash
+# LFS로 추적되는 파일 목록 확인
+git lfs ls-files
+
+# LFS 설정 확인
+git lfs track
+```
+
+#### `git lfs install` 명령 실행 전에 clone 한 경우
+```bash
+# LFS 설정 초기화
+git lfs uninstall
+git lfs install
+
+# LFS 파일들 다시 다운로드
+git lfs pull
+```
+
 
 ## 📈 성능 최적화
 

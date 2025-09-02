@@ -42,7 +42,7 @@ const aliasResolverPlugin = {
 							}
 						}
 					} else {
-						// It's a file that exists, so return it
+						// It's a file(= not a directory) that exists, so return it
 						return { path: importPath }
 					}
 				}
