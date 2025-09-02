@@ -4,140 +4,7 @@
 
 **eGovFrame VSCode Initializr**는 전자정부 표준프레임워크(eGovFrame) 프로젝트 생성 및 설정을 위한 Visual Studio Code 확장 프로그램입니다. 개발자가 eGovFrame 기반 프로젝트를 쉽고 빠르게 시작할 수 있도록 도와주는 통합 도구입니다.
 
-### 컨트리뷰션 참여 방법
-
-#### 1. Git LFS 설치(필수)
-
-Git LFS 패키지를 설치합니다.
-
-  -  **Windows**는 [Windows용 Git 배포판](https://gitforwindows.org/)에 Git LFS 패키지도 포함되어 있습니다. 설치 마법사에서 "Use Git from Windows Command Prompt" 옵션을 체크해야 합니다. 만약 Git LFS 패키지를 최신 버전으로 업그레이드 하기를 원한다면, Chocolatey 패키지 관리자를 사용할 수 있습니다.
-  ```bash
-  # Windows - Git LFS를 최신버전으로 설치하고 싶다면
-  choco install git-lfs.install
-  ```
-
-  - **macOS**는 Homebrew를 이용해 Git LFS 패키지를 설치할 수 있습니다.
-  ```bash
-  # macOS - Homebrew(권장)
-  brew install git-lfs
-  ```
-
-  - **Linux**는 packagecloud 레포지토리에서 제공하는 스크립트를 이용하여 설치합니다. 자세한 내용은 [Git LFS 레포지토리](https://github.com/git-lfs/git-lfs/blob/main/INSTALLING.md)에서 확인 가능합니다.
-  ```bash
-  # Ubuntu/Debian Linux
-  curl -s https://packagecloud.io/install/repositories/github/git-lfs/script.deb.sh | sudo bash
-  sudo apt-get install git-lfs
-
-  # RPM 계열 Linux
-  curl -s https://packagecloud.io/install/repositories/github/git-lfs/script.rpm.sh | sudo bash
-  sudo yum install git-lfs
-  ```
-
-Git LFS 패키지를 설치한 후, Git LFS 전역설정을 추가합니다. Git LFS 패키지 설치 후 다음 명령어를 최초 1회만 실행하면 됩니다.
-
-```bash
-git lfs install
-```
-
-위 명령을 실행하면 `.gitconfig` 설정 파일에 다음과 같은 키들이 추가됩니다.
-```
-[filter "lfs"]
-  filter.lfs.clean = git-lfs clean -- %f
-  filter.lfs.smudge = git-lfs smudge -- %f
-  filter.lfs.process = git-lfs filter-process
-  filter.lfs.required = true
-```
-> [!CAUTION] CAUTION
-> Git LFS와 관련한 Trouble Shooting은 ["Git LFS 문제 해결" 목차](#git-lfs-문제-해결)를 참고하기 바랍니다.
-
-#### 2. Fork & Clone & Upstream
-
-[Github Repository](https://github.com/eGovFramework/egovframe-vscode-initializr) 우측 상단에 "Fork" 버튼을 클릭하여 egovframe-vscode-initializr 레포지토리를 Fork합니다.
-
-Fork하여 생성된 개인 레포지토리를 로컬에 Clone하여 소스를 받아옵니다.
-
-```bash
-git clone {Fork하여 생성된 개인 레포지토리의 URL}.git
-```
-
-> [!CAUTION] CAUTION
-> Git LFS 패키지 설치와 전역설정에 문제가 없다면, `templates/projects/examples/` 디렉토리에 zip파일들의 size에 문제가 없어야 합니다.
-> Git LFS에 문제가 있다면 해당 zip파일들은 단순 포인터로서 개별 size가 약 매우 작고 압축해제도 오류가 발생합니다. Git LFS와 관련한 Trouble Shooting은 ["Git LFS 문제 해결" 목차](#git-lfs-문제-해결)를 참고하기 바랍니다.
-
-Upstream에 egovframe-vscode-initializr 레포지토리를 연결합니다.
-
-```bash
-cd path/to/repo
-
-git remote add upstream https://github.com/eGovFramework/egovframe-vscode-initializr.git.git
-```
-
-#### 3. 작업 시작 전
-
-```bash
-# 작업 시작 전에 upstream인 egovframe-vscode-initializr 레포지토리의 main 브랜치와 싱크를 맞춥니다.
-git fetch upstream main
-
-# 내 로컬의 메인 브랜치(main)로 이동합니다.
-git checkout main
-
-# upstream과 병합합니다(또는 리베이스).
-# - 병합
-git merge upstream/main
-# - (또는)리베이스
-git rebase upstream/main
-
-# 충돌 발생시 해결
-
-# (선택) 기여자님의 origin 레포지토리에도 동기화
-git push origin main
-
-# 작업 브랜치(예: feat/something)로 이동하여 진행
-git checkout -b feat/something
-
-# 작업 진행
-```
-
-#### 4. 작업
-
-워크플로우에 관한 내용은 ["🔄 개발 워크플로우" 목차](#-개발-워크플로우)를 참고하시기 바랍니다.
-
-#### 5. 커밋 및 Push
-
-```bash
-# 변경사항을 스테이징한 후 커밋합니다.
-git add .
-git commit -m "{커밋 메시지}"
-
-# push 하기 전에 upstream인 egovframe-vscode-initializr 레포지토리의 main 브랜치와 다시 한 번 싱크를 맞춥니다(충돌 방지 목적).
-git fetch upstream main
-
-# upstream과 병합합니다(또는 리베이스).
-# - 병합
-git merge upstream/main
-# - (또는)리베이스
-git rebase upstream/main
-
-# 충돌 해결
-
-# 충돌 해결사항을 스테이징합니다.
-git add .
-
-# 스테이징한 사항을 병합합니다(또는 리베이스).
-# - 병합
-git commit # 자동으로 커밋 메시지가 설정됨
-# - (또는) 리베이스
-git rebase --continue
-
-# 기여자님의 origin 레포지토리에 push
-git push origin main
-```
-
-#### 6. PR 생성
-
-- Github에서 기여자님의 개인 레포지토리(egovframe-docs를 포크한 레포지토리) 페이지로 이동합니다.
-- “Compare & pull request” 버튼을 클릭합니다.
-- 제목과 설명 입력 후 “Create pull request” 버튼을 클릭합니다.
+**컨트리뷰션 참여에 앞서 [컨트리뷰션 참여 방법 목차](#컨트리뷰션-참여-방법)를 반드시 확인 부탁드립니다.**
 
 ### 주요 기능
 
@@ -660,6 +527,13 @@ npm test
 cd webview-ui && npm run test
 ```
 
+### 6. 코드 품질 검사
+```bash
+npm run lint
+npm run format:fix
+npm run check-types
+```
+
 ## 📦 배포 및 퍼블리싱
 
 ### 1. Extension 패키징
@@ -839,40 +713,144 @@ git lfs pull
 
 ## 🤝 기여 가이드
 
-### 개발 참여 절차
-1. **포크 및 클론**
-   ```bash
-   # Git LFS 설치 확인
-   git lfs version
-   
-   # 프로젝트 클론
-   git clone https://github.com/egovframework/egovframe-vscode-initializr.git
-   cd egovframe-vscode-initializr
-   
-   # Git LFS 파일들 다운로드
-   git lfs pull
-   ```
+### 컨트리뷰션 참여 방법
 
-2. **브랜치 생성**
-   ```bash
-   git checkout -b feature/new-feature
-   ```
+#### 1. Git LFS 설치(필수)
 
-3. **개발 및 테스트**
-   ```bash
-   npm run install:all
-   npm run watch
-   npm run dev:webview
-   ```
+Git LFS 패키지를 설치합니다.
 
-4. **코드 품질 검사**
-   ```bash
-   npm run lint
-   npm run format:fix
-   npm run check-types
-   ```
+  -  **Windows**는 [Windows용 Git 배포판](https://gitforwindows.org/)에 Git LFS 패키지도 포함되어 있습니다. 설치 마법사에서 "Use Git from Windows Command Prompt" 옵션을 체크해야 합니다. 만약 Git LFS 패키지를 최신 버전으로 업그레이드 하기를 원한다면, Chocolatey 패키지 관리자를 사용할 수 있습니다.
+  ```bash
+  # Windows - Git LFS를 최신버전으로 설치하고 싶다면
+  choco install git-lfs.install
+  ```
 
-5. **풀 리퀘스트 생성**
+  - **macOS**는 Homebrew를 이용해 Git LFS 패키지를 설치할 수 있습니다.
+  ```bash
+  # macOS - Homebrew(권장)
+  brew install git-lfs
+  ```
+
+  - **Linux**는 packagecloud 레포지토리에서 제공하는 스크립트를 이용하여 설치합니다. 자세한 내용은 [Git LFS 레포지토리](https://github.com/git-lfs/git-lfs/blob/main/INSTALLING.md)에서 확인 가능합니다.
+  ```bash
+  # Ubuntu/Debian Linux
+  curl -s https://packagecloud.io/install/repositories/github/git-lfs/script.deb.sh | sudo bash
+  sudo apt-get install git-lfs
+
+  # RPM 계열 Linux
+  curl -s https://packagecloud.io/install/repositories/github/git-lfs/script.rpm.sh | sudo bash
+  sudo yum install git-lfs
+  ```
+
+Git LFS 패키지를 설치한 후, Git LFS 전역설정을 추가합니다. Git LFS 패키지 설치 후 다음 명령어를 최초 1회만 실행하면 됩니다.
+
+```bash
+git lfs install
+```
+
+위 명령을 실행하면 `.gitconfig` 설정 파일에 다음과 같은 키들이 추가됩니다.
+```
+[filter "lfs"]
+  filter.lfs.clean = git-lfs clean -- %f
+  filter.lfs.smudge = git-lfs smudge -- %f
+  filter.lfs.process = git-lfs filter-process
+  filter.lfs.required = true
+```
+
+> ⚠️ **주의**
+> 
+> Git LFS와 관련한 Trouble Shooting은 ["Git LFS 문제 해결" 목차](#git-lfs-문제-해결)를 참고하기 바랍니다.
+
+#### 2. Fork & Clone & Upstream
+
+[Github Repository](https://github.com/eGovFramework/egovframe-vscode-initializr) 우측 상단에 "Fork" 버튼을 클릭하여 egovframe-vscode-initializr 레포지토리를 Fork합니다.
+
+Fork하여 생성된 개인 레포지토리를 로컬에 Clone하여 소스를 받아옵니다.
+
+```bash
+git clone {Fork하여 생성된 개인 레포지토리의 URL}.git
+```
+
+> ⚠️ **주의**
+> 
+> Git LFS 패키지 설치와 전역설정에 문제가 없다면, `templates/projects/examples/` 디렉토리에 zip파일들의 size에 문제가 없어야 합니다.
+>
+> Git LFS에 문제가 있다면 해당 zip파일들은 단순 포인터로서 개별 size가 약 매우 작고 압축해제도 오류가 발생합니다. Git LFS와 관련한 Trouble Shooting은 ["Git LFS 문제 해결" 목차](#git-lfs-문제-해결)를 참고하기 바랍니다.
+
+Upstream에 egovframe-vscode-initializr 레포지토리를 연결합니다.
+
+```bash
+cd path/to/repo
+
+git remote add upstream https://github.com/eGovFramework/egovframe-vscode-initializr.git.git
+```
+
+#### 3. 작업 시작 전
+
+```bash
+# 작업 시작 전에 upstream인 egovframe-vscode-initializr 레포지토리의 main 브랜치와 싱크를 맞춥니다.
+git fetch upstream main
+
+# 내 로컬의 메인 브랜치(main)로 이동합니다.
+git checkout main
+
+# upstream과 병합합니다(또는 리베이스).
+# - 병합
+git merge upstream/main
+# - (또는)리베이스
+git rebase upstream/main
+
+# 충돌 발생시 해결
+
+# (선택) 기여자님의 origin 레포지토리에도 동기화
+git push origin main
+
+# 작업 브랜치(예: feat/something)로 이동하여 진행
+git checkout -b feat/something
+
+# 작업 진행
+```
+
+#### 4. 작업
+
+워크플로우에 관한 내용은 ["🔄 개발 워크플로우" 목차](#-개발-워크플로우)를 참고하시기 바랍니다.
+
+#### 5. 커밋 및 Push
+
+```bash
+# 변경사항을 스테이징한 후 커밋합니다.
+git add .
+git commit -m "{커밋 메시지}"
+
+# push 하기 전에 upstream인 egovframe-vscode-initializr 레포지토리의 main 브랜치와 다시 한 번 싱크를 맞춥니다(충돌 방지 목적).
+git fetch upstream main
+
+# upstream과 병합합니다(또는 리베이스).
+# - 병합
+git merge upstream/main
+# - (또는)리베이스
+git rebase upstream/main
+
+# 충돌 해결
+
+# 충돌 해결사항을 스테이징합니다.
+git add .
+
+# 스테이징한 사항을 병합합니다(또는 리베이스).
+# - 병합
+git commit # 자동으로 커밋 메시지가 설정됨
+# - (또는) 리베이스
+git rebase --continue
+
+# 기여자님의 origin 레포지토리에 push
+git push origin main
+```
+
+#### 6. PR 생성
+
+- Github에서 기여자님의 개인 레포지토리(egovframe-docs를 포크한 레포지토리) 페이지로 이동합니다.
+- “Compare & pull request” 버튼을 클릭합니다.
+- 제목과 설명 입력 후 “Create pull request” 버튼을 클릭합니다.
 
 ### 코딩 컨벤션
 - **TypeScript**: strict 모드 사용
