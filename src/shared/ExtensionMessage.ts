@@ -1,3 +1,9 @@
+/**
+ * ExtensionMessage.ts
+ *
+ * 익스텐션이 웹뷰로 보내는 메시지 타입
+ */
+
 export type ExtensionMessage =
 	| {
 			type: "action"
@@ -44,4 +50,16 @@ export type ExtensionMessage =
 			previews?: { [key: string]: string }
 			packageName?: string
 			error?: string
+	  }
+	| {
+			type: "sampleDDLs"
+			data: { [key: string]: { name: string; ddl: string } }
+	  }
+	| {
+			type: "currentTheme"
+			theme: "light" | "vs-dark"
+	  }
+	| {
+			type: "themeChanged"
+			theme: "light" | "vs-dark"
 	  }

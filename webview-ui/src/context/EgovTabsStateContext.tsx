@@ -17,6 +17,8 @@ interface CodeViewState {
 	previewError: string
 	// 자동 미리보기 업데이트 옵션
 	autoUpdatePreview: boolean
+	// 샘플 DDL 목록
+	sampleDDLs: { [key: string]: { name: string; ddl: string } } | null
 }
 
 // ProjectsView 상태
@@ -60,16 +62,7 @@ interface EgovTabsStateContextType {
 
 // 초기 상태 - Code View
 const initialCodeViewState: CodeViewState = {
-	ddlContent: `
-CREATE TABLE board (
-  id INT PRIMARY KEY AUTO_INCREMENT COMMENT '게시글 번호',
-  title VARCHAR(200) NOT NULL COMMENT '제목',
-  content TEXT COMMENT '내용',
-  author VARCHAR(100) NOT NULL COMMENT '작성자',
-  view_count INT DEFAULT 0 COMMENT '조회수',
-  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP COMMENT '작성일시',
-  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '수정일시'
-) COMMENT '게시판 테이블';`,
+	ddlContent: "",
 	parsedDDL: null,
 	isValid: false,
 	isLoading: false,
@@ -83,6 +76,8 @@ CREATE TABLE board (
 	previewError: "",
 	// 자동 미리보기 업데이트 옵션 (기본값: false)
 	autoUpdatePreview: false,
+	// 샘플 DDL 목록
+	sampleDDLs: null, // 초기값 설정은 다음 코드에서 set됨 CodeView.tsx - CodeView - useEffect - handleMessage - case "sampleDDLs"
 }
 
 // 초기 상태 - Projects View

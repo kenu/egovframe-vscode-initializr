@@ -42,6 +42,14 @@ export interface ValidateDDLOnlyMessage {
 	packageName?: string
 }
 
+export interface GetCurrentThemeMessage {
+	type: "getCurrentTheme"
+}
+
+export interface GetSampleDDLsMessage {
+	type: "getSampleDDLs"
+}
+
 export type WebviewMessage =
 	| GenerateCodeMessage
 	| UploadTemplatesMessage
@@ -51,6 +59,8 @@ export type WebviewMessage =
 	| SelectOutputPathMessage
 	| ValidateAndPreviewMessage
 	| ValidateDDLOnlyMessage
+	| GetSampleDDLsMessage
+	| GetCurrentThemeMessage
 
 export interface ErrorResponse {
 	type: "error"
@@ -85,6 +95,21 @@ export interface ValidationResultResponse {
 	error?: string
 }
 
+export interface SampleDDLsResponse {
+	type: "sampleDDLs"
+	data: { [key: string]: { name: string; ddl: string } }
+}
+
+export interface CurrentThemeResponse {
+	type: "currentTheme"
+	theme: "light" | "vs-dark"
+}
+
+export interface ThemeChangedResponse {
+	type: "themeChanged"
+	theme: "light" | "vs-dark"
+}
+
 export type ExtensionResponse =
 	| ErrorResponse
 	| SuccessResponse
@@ -92,3 +117,6 @@ export type ExtensionResponse =
 	| SelectedOutputPathResponse
 	| CurrentWorkspacePathResponse
 	| ValidationResultResponse
+	| SampleDDLsResponse
+	| CurrentThemeResponse
+	| ThemeChangedResponse

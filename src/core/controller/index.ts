@@ -12,6 +12,38 @@ export class Controller {
 	) {
 		this.outputChannel.appendLine("eGovFrame Controller instantiated")
 		this.postMessage = postMessage
+		// 테마 변경 이벤트 리스너 등록
+		this.setupThemeChangeListener()
+	}
+
+	// 테마 변경 이벤트 리스너
+	private setupThemeChangeListener() {
+		// 테마 변경 이벤트 감지
+		vscode.window.onDidChangeActiveColorTheme(async (colorTheme) => {
+			const themeName = vscode.workspace.getConfiguration("workbench").get<string>("colorTheme")
+			const monacoTheme = this.getMonacoThemeFromVSCodeTheme(colorTheme.kind)
+
+			console.log(`Theme changed: ${themeName} (kind: ${colorTheme.kind}) -> Monaco: ${monacoTheme}`)
+
+			// 웹뷰에 테마 변경 알림
+			await this.postMessageToWebview({
+				type: "themeChanged",
+				theme: monacoTheme,
+			})
+		})
+	}
+
+	// Monaco Editor에 적용할 테마로 변환
+	private getMonacoThemeFromVSCodeTheme(themeKind: vscode.ColorThemeKind): "light" | "vs-dark" {
+		switch (themeKind) {
+			case vscode.ColorThemeKind.Light: // 1
+			case vscode.ColorThemeKind.HighContrastLight: // 4
+				return "light"
+			case vscode.ColorThemeKind.Dark: // 2
+			case vscode.ColorThemeKind.HighContrast: // 3
+			default:
+				return "vs-dark"
+		}
 	}
 
 	async dispose() {
@@ -369,6 +401,27 @@ export class Controller {
 				} catch (error) {
 					console.error("Controller: Error in selectOutputFolder:", error)
 				}
+				break
+			}
+
+			case "getSampleDDLs": {
+				const { SAMPLE_DDLS } = await import("../../utils/SampleDDLs")
+				await this.postMessageToWebview({
+					type: "sampleDDLs",
+					data: SAMPLE_DDLS,
+				})
+				break
+			}
+
+			// 초기 테마 요청 처리
+			case "getCurrentTheme": {
+				const colorTheme = vscode.window.activeColorTheme
+				const monacoTheme = this.getMonacoThemeFromVSCodeTheme(colorTheme.kind)
+
+				await this.postMessageToWebview({
+					type: "currentTheme",
+					theme: monacoTheme,
+				})
 				break
 			}
 

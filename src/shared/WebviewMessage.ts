@@ -1,3 +1,9 @@
+/**
+ * WebviewMessage.ts
+ *
+ * 익스텐션이 웹뷰로부터 수신하는 메시지 타입
+ */
+
 export interface WebviewMessage {
 	type: string
 	value?: any
