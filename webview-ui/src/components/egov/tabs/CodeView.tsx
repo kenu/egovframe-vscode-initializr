@@ -124,6 +124,48 @@ const CodeView = () => {
 	const setPreviewError = (value: string) => updateState({ previewError: value })
 	const setAutoUpdatePreview = (value: boolean) => updateState({ autoUpdatePreview: value })
 
+	// 통신 흐름
+	//
+	// 1. getWorkspacePath → currentWorkspacePath
+	// 요청: CodeView 마운트 시 vscode.postMessage({ type: "getWorkspacePath" })
+	// 응답: Controller가 type: "currentWorkspacePath"로 워크스페이스 경로 전송
+	// 처리: setOutputPath(message.text)로 기본 출력 경로 설정
+	//
+	// 2. selectOutputPath → selectedOutputPath
+	// 요청: Browse 버튼 클릭 시 vscode.postMessage(createSelectOutputPathMessage()) (type: "selectOutputPath")
+	// 응답: Controller가 폴더 선택 후 type: "selectedOutputPath"로 경로 전송
+	// 처리: setOutputPath(message.text)로 선택된 경로 설정
+	//
+	// 3. validateDDLOnly → validationResult
+	// 요청: DDL 변경 시 디바운스로 vscode.postMessage({ type: "validateDDLOnly" })
+	// 응답: Controller가 type: "validationResult"로 검증 결과 전송
+	// 처리: setIsValid, setError 등으로 상태 업데이트
+	//
+	// 4. validateAndPreview → validationResult
+	// 요청: 미리보기 요청 시 vscode.postMessage({ type: "validateAndPreview" })
+	// 응답: Controller가 type: "validationResult"로 검증 + 미리보기 결과 전송
+	// 처리: setPreviews, setIsValid 등으로 상태 업데이트
+	//
+	// 5. generateCode → success/error
+	// 요청: Generate 버튼 클릭 시 vscode.postMessage({ type: "generateCode" })
+	// 응답: Controller가 type: "success" 또는 type: "error"로 결과 전송
+	// 처리: setError("") 또는 setError(message.message)로 상태 업데이트
+	//
+	// 6. uploadTemplates → success/error
+	// 요청: Custom Templates 버튼 클릭 시 vscode.postMessage({ type: "uploadTemplates" })
+	// 응답: Controller가 type: "success" 또는 type: "error"로 결과 전송
+	// 처리: setError 상태 업데이트
+	//
+	// 7. downloadTemplateContext → success/error
+	// 요청: Template Context 버튼 클릭 시 vscode.postMessage({ type: "downloadTemplateContext" })
+	// 응답: Controller가 type: "success" 또는 type: "error"로 결과 전송
+	// 처리: setError 상태 업데이트
+	//
+	// 8. 외부 요청 → transferDDLToCodeView
+	// 요청: 다른 컴포넌트나 채팅에서 vscode.postMessage({ type: "transferDDLToCodeView" })
+	// 응답: Controller가 그대로 type: "transferDDLToCodeView"로 전달
+	// 처리: setDdlContent(message.ddl)로 DDL 내용 설정
+
 	// DDL 유효성 검사 및 파싱 (빠른 검증만 수행)
 	useEffect(() => {
 		console.log("DDL validation effect running...", ddlContent.length)
@@ -280,7 +322,9 @@ const CodeView = () => {
 
 	const handleGenerateCode = () => {
 		console.log("Generate code clicked")
-		if (!isValid || !ddlContent.trim()) {return}
+		if (!isValid || !ddlContent.trim()) {
+			return
+		}
 
 		// Validate required fields
 		if (!packageName.trim()) {
@@ -310,7 +354,9 @@ const CodeView = () => {
 
 	const handleUploadTemplates = () => {
 		console.log("Upload templates clicked")
-		if (!isValid || !ddlContent.trim()) {return}
+		if (!isValid || !ddlContent.trim()) {
+			return
+		}
 
 		setIsLoading(true)
 		setError("")
@@ -369,7 +415,9 @@ const CodeView = () => {
 
 	// 미리보기 요청 함수
 	const handleRequestPreview = () => {
-		if (!isValid || !ddlContent.trim()) {return}
+		if (!isValid || !ddlContent.trim()) {
+			return
+		}
 
 		setIsPreviewLoading(true)
 		setPreviewError("")

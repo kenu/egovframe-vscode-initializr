@@ -25,9 +25,7 @@ interface ExtensionStateContextType {
 
 const ExtensionStateContext = createContext<ExtensionStateContextType | undefined>(undefined)
 
-export const ExtensionStateContextProvider: React.FC<{
-	children: React.ReactNode
-}> = ({ children }) => {
+export const ExtensionStateProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
 	// UI view state - only eGov related
 	const [showEgov, setShowEgov] = useState(true)
 	const [egovTab, setEgovTab] = useState<EgovViewTab | undefined>(undefined)
@@ -36,23 +34,15 @@ export const ExtensionStateContextProvider: React.FC<{
 	const hideEgov = useCallback(() => setShowEgov(false), [setShowEgov])
 
 	// Navigation functions - only eGov
-	const navigateToEgov = useCallback(() => {
-		setShowEgov(true)
-	}, [setShowEgov])
+	const navigateToEgov = useCallback(() => setShowEgov(true), [setShowEgov])
 
 	// Minimal state for eGov functionality
 	const handleMessage = useCallback(
 		(event: MessageEvent) => {
 			const message: ExtensionMessage = event.data
-			switch (message.type) {
-				case "action": {
-					switch (message.action!) {
-						case "egovButtonClicked":
-							navigateToEgov()
-							break
-					}
-					break
-				}
+
+			if (message.type === "action" && message.action === "egovButtonClicked") {
+				navigateToEgov()
 			}
 		},
 		[navigateToEgov],
@@ -60,7 +50,7 @@ export const ExtensionStateContextProvider: React.FC<{
 
 	useEvent("message", handleMessage)
 
-	// Send webviewDidLaunch message
+	// Send webviewDidLaunch message to extension when webview mounts
 	useEffect(() => {
 		vscode.postMessage({ type: "webviewDidLaunch" })
 	}, [])
@@ -89,7 +79,7 @@ export const ExtensionStateContextProvider: React.FC<{
 export const useExtensionState = () => {
 	const context = useContext(ExtensionStateContext)
 	if (context === undefined) {
-		throw new Error("useExtensionState must be used within an ExtensionStateContextProvider")
+		throw new Error("useExtensionState must be used within an ExtensionStateProvider")
 	}
 	return context
 }

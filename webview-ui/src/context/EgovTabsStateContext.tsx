@@ -58,7 +58,7 @@ interface EgovTabsStateContextType {
 	resetConfigViewState: () => void
 }
 
-// 초기 상태
+// 초기 상태 - Code View
 const initialCodeViewState: CodeViewState = {
 	ddlContent: `
 CREATE TABLE board (
@@ -85,6 +85,7 @@ CREATE TABLE board (
 	autoUpdatePreview: false,
 }
 
+// 초기 상태 - Projects View
 const initialProjectsViewState: ProjectsViewState = {
 	selectedCategory: "All",
 	selectedTemplate: null,
@@ -98,12 +99,14 @@ const initialProjectsViewState: ProjectsViewState = {
 	generationMode: "form",
 }
 
+// 초기 상태 - Config View
 const initialConfigViewState: ConfigViewState = {
 	selectedCategory: "",
 	selectedTemplate: null,
 	loading: false,
 }
 
+// 초기 상태 - 전체
 const initialState: EgovTabsState = {
 	codeView: initialCodeViewState,
 	projectsView: initialProjectsViewState,
