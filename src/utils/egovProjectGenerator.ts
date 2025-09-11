@@ -37,6 +37,11 @@ export interface ProjectGenerationResult {
 	error?: string
 }
 
+/*
+ * Generate eGovFrame project
+ *
+ * Form-based Project Generation
+ */
 export async function generateEgovProject(
 	config: EgovProjectConfig,
 	extensionPath: string,
@@ -117,6 +122,7 @@ export async function generateEgovProject(
 	}
 }
 
+// Internal function for Form-based Project Generation
 async function processTemplateFiles(projectRoot: string, config: EgovProjectConfig): Promise<void> {
 	const placeholders = {
 		"{{PROJECT_NAME}}": config.projectName,
@@ -132,6 +138,7 @@ async function processTemplateFiles(projectRoot: string, config: EgovProjectConf
 	await processFilesRecursively(projectRoot, placeholders, textFileExtensions)
 }
 
+// Internal function for processTemplateFiles
 async function processFilesRecursively(dir: string, placeholders: Record<string, string>, extensions: string[]): Promise<void> {
 	const entries = await fs.readdir(dir, { withFileTypes: true })
 
@@ -157,6 +164,7 @@ async function processFilesRecursively(dir: string, placeholders: Record<string,
 	}
 }
 
+// Internal function for Form-based Project Generation
 async function generatePomFile(
 	config: EgovProjectConfig,
 	projectRoot: string,
@@ -200,6 +208,7 @@ async function generatePomFile(
 	}
 }
 
+// Internal function for Form-based Project Generation
 async function updatePackageNames(
 	projectRoot: string,
 	packageName: string,
@@ -246,6 +255,7 @@ async function updatePackageNames(
 	}
 }
 
+// Internal function for updatePackageNames and updateDirectoryStructure
 async function findFilesByExtension(dir: string, extension: string): Promise<string[]> {
 	const files: string[] = []
 	const entries = await fs.readdir(dir, { withFileTypes: true })
@@ -263,6 +273,7 @@ async function findFilesByExtension(dir: string, extension: string): Promise<str
 	return files
 }
 
+// Internal function for updatePackageNames
 async function updateDirectoryStructure(projectRoot: string, packageName: string): Promise<void> {
 	const srcMainJava = path.join(projectRoot, "src", "main", "java")
 
@@ -306,6 +317,8 @@ export async function openProjectInVSCode(projectPath: string): Promise<void> {
 
 /**
  * Start interactive project generation
+ *
+ * Command-based Project Generation
  */
 export async function startInteractiveProjectGeneration(context: vscode.ExtensionContext): Promise<void> {
 	try {
@@ -504,6 +517,7 @@ function getDefaultTemplates(): EgovProjectTemplate[] {
 	]
 }
 
+// 쓰이는 곳 없음
 /**
  * Get project size information
  */
@@ -512,8 +526,11 @@ export async function getProjectSize(projectPath: string): Promise<{ files: numb
 		const getFolderSize = require("get-folder-size")
 		const size = await new Promise<number>((resolve, reject) => {
 			getFolderSize(projectPath, (err: Error | null, size: number) => {
-				if (err) {reject(err)}
-				else {resolve(size)}
+				if (err) {
+					reject(err)
+				} else {
+					resolve(size)
+				}
 			})
 		})
 
@@ -525,6 +542,7 @@ export async function getProjectSize(projectPath: string): Promise<{ files: numb
 	}
 }
 
+// getProjectSize 외에 쓰이는 곳 없음
 async function countFiles(dir: string): Promise<number> {
 	let count = 0
 	try {

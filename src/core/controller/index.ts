@@ -94,6 +94,7 @@ export class Controller {
 				break
 			}
 
+			// Form-based Project Generation
 			case "generateProject": {
 				if (message.projectConfig && message.method) {
 					const { generateEgovProject, openProjectInVSCode } = await import("../../utils/egovProjectGenerator")
@@ -151,6 +152,7 @@ export class Controller {
 				break
 			}
 
+			// Command-based Project Generation
 			case "generateProjectByCommand": {
 				// Start interactive project generation workflow
 				try {

@@ -47,7 +47,7 @@
 	{
 		"displayName": "eGovFrame Boot Template Project > Simple Homepage (Backend)",
 		"fileName": "egovframe-template-simple-backend.zip",
-		"pomFile": "template-Web-Boot-Simple-Homepage-pom.xml"
+		"pomFile": "egovframe-template-simple-backend-pom.xml"
 	},
 	{
 		"displayName": "eGovFrame Boot Template Project > Simple Homepage (Frontend)",

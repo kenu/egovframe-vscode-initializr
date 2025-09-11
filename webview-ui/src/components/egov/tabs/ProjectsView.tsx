@@ -238,11 +238,10 @@ export const ProjectsView = () => {
 				</div>
 			)}
 
-			{/* Generation Method Selection */}
-			<div style={{ marginBottom: "20px" }}>
+			{/* Generation Method Selection - Hide 처리 - Command-based Generation 제외 목적 */}
+			<div style={{ display: "none", marginBottom: "20px" }}>
 				<h4 style={{ color: "var(--vscode-foreground)", marginBottom: "10px", marginTop: 0 }}>Generation Method</h4>
 				<RadioGroup
-					label="Generation Method"
 					name="generationMethod"
 					value={generationMethod}
 					onChange={(value: string) => setGenerationMethod(value as "form" | "command")}
