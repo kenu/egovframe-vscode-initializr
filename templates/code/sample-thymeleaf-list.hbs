@@ -1,5 +1,5 @@
 {{~setVar "DQ" "\""~}}
-{{~setVar "listPath" (concat "/" classNameFirstCharLower "/" className "List.do")~}}
+{{~setVar "listPath" (concat "/" classNameFirstCharLower "/" classNameFirstCharLower "List.do")~}}
 {{~setVar "addViewPath" (concat "/" classNameFirstCharLower "/add" className "View.do")~}}
 {{~setVar "updateViewPath" (concat "/" classNameFirstCharLower "/update" className "View.do")~}}
 {{~setVar "listPageName" (concat className "List.html")~}}
@@ -34,7 +34,7 @@
       if (notNullCheck($('#searchKeyword').val())) {
         $.ajax({
           url: contextPath + '{{listPath}}',
-          type: 'post',
+          type: 'get',
           data: {
             searchCondition: $('#searchCondition option:selected').val(),
             searchKeyword: $('#searchKeyword').val()
@@ -50,7 +50,7 @@
     function fn_egov_link_page(pageIndex) {
       $.ajax({
         url: contextPath + '{{listPath}}',
-        type: 'post',
+        type: 'get',
         data: {
           pageIndex: pageIndex,
           searchCondition: $('#searchCondition option:selected').val(),
@@ -73,7 +73,7 @@
       {{else}}
       $('#{{attributes.[0].ccName}}').val({{attributes.[0].ccName}});
       {{/if}}
-      $('#detailForm').attr('method', 'post').attr('action', contextPath + '{{updateViewPath}}').submit();
+      $('#detailForm').attr('method', 'get').attr('action', contextPath + '{{updateViewPath}}').submit();
     }
   </script>
 </head>

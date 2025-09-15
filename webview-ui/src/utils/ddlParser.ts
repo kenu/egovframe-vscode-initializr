@@ -50,6 +50,8 @@ const predefinedDataTypes: { [key: string]: string } = {
 	BOOLEAN: "java.lang.Boolean",
 	BIT: "java.lang.Boolean",
 	MEDIUMTEXT: "java.lang.String",
+	ENUM: "java.lang.String",
+	SET: "java.lang.String",
 }
 
 export function getJavaClassName(dataType: string): string {

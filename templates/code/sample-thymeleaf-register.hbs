@@ -1,6 +1,6 @@
 {{~setVar "Q" "\""~}}
 {{~setVar "voInstanceName" (concat classNameFirstCharLower "VO")~}}
-{{~setVar "listPath" (concat "/" classNameFirstCharLower "/" className "List.do")~}}
+{{~setVar "listPath" (concat "/" classNameFirstCharLower "/" classNameFirstCharLower "List.do")~}}
 {{~setVar "addViewPath" (concat "/" classNameFirstCharLower "/add" className "View.do")~}}
 {{~setVar "updateViewPath" (concat "/" classNameFirstCharLower "/update" className "View.do")~}}
 {{~setVar "addPath" (concat "/" classNameFirstCharLower "/add" className ".do")~}}
@@ -92,34 +92,33 @@
 				</colgroup>
 				
 				{{!-- 모든 컬럼을 동일한 방식으로 처리 --}}
-        {{#each attributes}}
-        <tr>
-          <td class="tbtd_caption">
-            <label for="{{ccName}}"><span>{{pcName}}{{#unless ../pkAttributes.length}}{{#if @first}}(egovframe-Warning: PK 컬럼 역할 수행){{/if}}{{/unless}}</span></label>
-          </td>
-          <td class="tbtd_content">
-            {{#if isPrimaryKey}}
-            <!-- PK 컬럼: 수정 모드에서는 readonly -->
-            <th:block th:if="${registerFlag == 'modify'}">
-              <input type="text" th:field="{{concat "*{" ccName "}"}}" readonly="readonly" class="essentiality" />
-            </th:block>
-            <!-- PK 컬럼: 등록 모드에서는 입력란 없음 -->
-            {{!-- 등록 모드에서는 PK 컬럼 입력란 렌더링 삭제 처리 --}}
-            {{!--
-            <th:block th:if="${registerFlag == 'create'}">
-              <input type="text" th:field="{{concat "*{" ccName "}"}}" class="essentiality" />
-            </th:block>
-            --}}
-            {{else}}
-            <!-- 일반 컬럼: 항상 수정 가능 -->
-            <input type="text" th:field="{{concat "*{" ccName "}"}}" class="txt" />
-            <!-- egovframe-Todo: Validator 적용시 아래 주석 코드 참고 -->
-            <!-- <span th:if="${#fields.hasErrors('{{ccName}}')}" th:errors="*{{{ccName}}}">{{pcName}} Error</span> -->
-            {{/if}}
-        
-          </td>
-        </tr>
-        {{/each}}
+				{{#each attributes}}
+				<tr>
+					<td class="tbtd_caption">
+						<label for="{{ccName}}"><span>{{pcName}}{{#unless ../pkAttributes.length}}{{#if @first}}(egovframe-Warning: PK 컬럼 역할 수행){{/if}}{{/unless}}</span></label>
+					</td>
+					<td class="tbtd_content">
+						{{#if isPrimaryKey}}
+						<!-- PK 컬럼: 수정 모드에서는 readonly -->
+						<th:block th:if="${registerFlag == 'modify'}">
+							<input type="text" th:field="{{concat "*{" ccName "}"}}" readonly="readonly" class="essentiality" />
+						</th:block>
+						<!-- PK 컬럼: 등록 모드에서는 입력란 없음 -->
+						{{!-- 등록 모드에서는 PK 컬럼 입력란 렌더링 삭제 처리 --}}
+						{{!--
+						<th:block th:if="${registerFlag == 'create'}">
+						<input type="text" th:field="{{concat "*{" ccName "}"}}" class="essentiality" />
+						</th:block>
+						--}}
+						{{else}}
+						<!-- 일반 컬럼: 항상 수정 가능 -->
+						<input type="text" th:field="{{concat "*{" ccName "}"}}" class="txt" />
+						<!-- egovframe-Todo: Validator 적용시 아래 주석 코드 참고 -->
+						<!-- <span th:if="${#fields.hasErrors('{{ccName}}')}" th:errors="*{{{ccName}}}">{{pcName}} Error</span> -->
+						{{/if}}
+					</td>
+				</tr>
+				{{/each}}
 			</table>
 		</div>
 

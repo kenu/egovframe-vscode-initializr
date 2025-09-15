@@ -12,7 +12,7 @@ export interface TextFieldProps extends React.InputHTMLAttributes<HTMLInputEleme
 }
 
 export const TextField = React.forwardRef<HTMLInputElement, TextFieldProps>(
-	({ label, error, hint, leftIcon, rightIcon, isRequired, className, id, ...props }, ref) => {
+	({ label, error, hint, leftIcon, rightIcon, isRequired, className, id, style, ...props }, ref) => {
 		const theme = useVSCodeTheme()
 		const inputId = id || `input-${Math.random().toString(36).substr(2, 9)}`
 
@@ -30,6 +30,7 @@ export const TextField = React.forwardRef<HTMLInputElement, TextFieldProps>(
 			borderColor: error ? "#f87171" : theme.colors.inputBorder,
 			borderRadius: theme.borderRadius.sm,
 			fontSize: theme.fontSize.sm,
+			...style, // 커스텀 스타일 병합
 		})
 
 		const getFocusStyles = () => ({

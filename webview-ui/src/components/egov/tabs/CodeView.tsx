@@ -614,14 +614,14 @@ const CodeView = () => {
 
 						{/* Output Path */}
 						<div style={{ marginBottom: "15px" }}>
-							<label style={{ display: "block", marginBottom: "5px", fontSize: "12px" }}>Output Path *</label>
-							<div style={{ display: "flex", gap: "10px", maxWidth: "100%" }}>
-								<div style={{ flex: 1 }}>
+							<div style={{ display: "flex", gap: "10px", alignItems: "end" }}>
+								<div style={{ flex: 1, marginRight: "10px" }}>
 									<TextField
-										label=""
+										label="Output Path"
 										value={outputPath}
 										onChange={(e: any) => setOutputPath(e.target.value)}
 										placeholder="Select output directory"
+										isRequired
 									/>
 								</div>
 								<button

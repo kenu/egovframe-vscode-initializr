@@ -2,7 +2,7 @@
 export const SAMPLE_DDLS = {
 	board: {
 		name: "게시판 테이블",
-		ddl: `CREATE TABLE board (
+		ddl: `CREATE TABLE board(
   id INT PRIMARY KEY AUTO_INCREMENT COMMENT '게시글 번호',
   title VARCHAR(200) NOT NULL COMMENT '제목',
   content TEXT COMMENT '내용',
@@ -15,7 +15,7 @@ export const SAMPLE_DDLS = {
 
 	user: {
 		name: "사용자 테이블",
-		ddl: `CREATE TABLE users (
+		ddl: `CREATE TABLE users(
   id INT PRIMARY KEY AUTO_INCREMENT COMMENT '사용자 번호',
   username VARCHAR(50) UNIQUE NOT NULL COMMENT '사용자명',
   email VARCHAR(100) UNIQUE NOT NULL COMMENT '이메일',
@@ -30,7 +30,7 @@ export const SAMPLE_DDLS = {
 
 	product: {
 		name: "상품 테이블",
-		ddl: `CREATE TABLE products (
+		ddl: `CREATE TABLE products(
   id INT PRIMARY KEY AUTO_INCREMENT COMMENT '상품 번호',
   name VARCHAR(200) NOT NULL COMMENT '상품명',
   description TEXT COMMENT '상품 설명',
@@ -46,7 +46,7 @@ export const SAMPLE_DDLS = {
 
 	order: {
 		name: "주문 테이블",
-		ddl: `CREATE TABLE orders (
+		ddl: `CREATE TABLE orders(
   id INT PRIMARY KEY AUTO_INCREMENT COMMENT '주문 번호',
   user_id INT NOT NULL COMMENT '사용자 번호',
   order_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP COMMENT '주문일시',
@@ -62,7 +62,7 @@ export const SAMPLE_DDLS = {
 
 	comment: {
 		name: "댓글 테이블",
-		ddl: `CREATE TABLE comments (
+		ddl: `CREATE TABLE comments(
   id INT PRIMARY KEY AUTO_INCREMENT COMMENT '댓글 번호',
   board_id INT NOT NULL COMMENT '게시글 번호',
   user_id INT NOT NULL COMMENT '사용자 번호',
