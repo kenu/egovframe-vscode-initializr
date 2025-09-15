@@ -908,13 +908,27 @@ const CodeView = () => {
 									fontFamily: "monospace",
 								}}>
 								<div>src/main/java/{packageName.replace(/\./g, "/")}/</div>
-								<div style={{ paddingLeft: "10px" }}>├── web/ - Controllers</div>
-								<div style={{ paddingLeft: "10px" }}>├── service/ - Services & VOs</div>
-								<div style={{ paddingLeft: "10px" }}>└── service/impl/ - Service Implementations & DAOs</div>
+								<div style={{ paddingLeft: "10px" }}>
+									├── web/ - <b>Controller</b>
+								</div>
+								<div style={{ paddingLeft: "10px" }}>
+									├── service/ - <b>Service & VOs</b>
+								</div>
+								<div style={{ paddingLeft: "10px" }}>
+									└── service/impl/ - <b>Service Impl & DAOs</b>
+								</div>
 								<div>src/main/resources/</div>
-								<div style={{ paddingLeft: "10px" }}>├── egovframework/mapper/ - MyBatis XML</div>
-								<div style={{ paddingLeft: "10px" }}>└── templates/ - Thymeleaf HTML</div>
-								<div>src/main/webapp/WEB-INF/jsp/ - JSP Views</div>
+								<div style={{ paddingLeft: "10px" }}>
+									├── mapper/ - <b>MyBatis XML</b>
+								</div>
+								<div style={{ paddingLeft: "10px" }}>
+									└── templates/{parsedDDL?.tableName[0].toLowerCase()}
+									{parsedDDL?.tableName.slice(1)} - <b>Thymeleaf HTML</b>
+								</div>
+								<div>src/main/webapp/WEB-INF/jsp/</div>
+								<div style={{ paddingLeft: "10px" }}>
+									└── {packageName.replace(/\./g, "/")} - <b>JSP Views</b>
+								</div>
 							</div>
 						</div>
 					)}

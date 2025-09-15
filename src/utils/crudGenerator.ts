@@ -16,6 +16,8 @@ interface TemplateFileInfo {
 function getTemplateFilesConfig(context: any): TemplateFileInfo[] {
 	const { tableName, packagePath } = context
 
+	const tableNameCamelCase = tableName[0]?.toLowerCase() + tableName?.slice(1)
+
 	return [
 		{
 			templateFile: "sample-vo-template.hbs",
@@ -34,7 +36,7 @@ function getTemplateFilesConfig(context: any): TemplateFileInfo[] {
 		},
 		{
 			templateFile: "sample-mapper-template.hbs",
-			outputPath: `src/main/resources/egovframework/mapper/${tableName}_SQL.xml`,
+			outputPath: `src/main/resources/mapper/${tableName}_SQL.xml`, // 생성 경로 고민해보기 : `src/main/resources/mapper/${packagePath}/${tableName}_SQL.xml`, `src/main/resources/mapper/${tableNameCamelCase}/${tableName}_SQL.xml`
 			fileName: `${tableName}_SQL.xml`,
 		},
 		{
@@ -53,24 +55,24 @@ function getTemplateFilesConfig(context: any): TemplateFileInfo[] {
 			fileName: `${tableName}ServiceImpl.java`,
 		},
 		{
-			templateFile: "sample-jsp-list.hbs",
-			outputPath: `src/main/webapp/WEB-INF/jsp/egovframework/example/${tableName.toLowerCase()}/${tableName.toLowerCase()}List.jsp`,
-			fileName: `${tableName.toLowerCase()}List.jsp`,
+			templateFile: "sample-jsp-list.hbs", // Todo : outputPath 수정
+			outputPath: `src/main/webapp/WEB-INF/jsp/${packagePath}/${tableNameCamelCase}List.jsp`, // 생성 경로 고민해보기
+			fileName: `${tableNameCamelCase}List.jsp`,
 		},
 		{
-			templateFile: "sample-jsp-register.hbs",
-			outputPath: `src/main/webapp/WEB-INF/jsp/egovframework/example/${tableName.toLowerCase()}/${tableName.toLowerCase()}Register.jsp`,
-			fileName: `${tableName.toLowerCase()}Register.jsp`,
+			templateFile: "sample-jsp-register.hbs", // Todo : outputPath 수정
+			outputPath: `src/main/webapp/WEB-INF/jsp/${packagePath}/${tableNameCamelCase}Register.jsp`, // 생성 경로 고민해보기
+			fileName: `${tableNameCamelCase}Register.jsp`,
 		},
 		{
 			templateFile: "sample-thymeleaf-list.hbs",
-			outputPath: `src/main/resources/templates/${tableName.toLowerCase()}/${tableName.toLowerCase()}List.html`,
-			fileName: `${tableName.toLowerCase()}List.html`,
+			outputPath: `src/main/resources/templates/${tableNameCamelCase}/${tableNameCamelCase}List.html`, // 생성 경로 고민해보기
+			fileName: `${tableNameCamelCase}List.html`,
 		},
 		{
-			templateFile: "sample-thymeleaf-register.hbs",
-			outputPath: `src/main/resources/templates/${tableName.toLowerCase()}/${tableName.toLowerCase()}Register.html`,
-			fileName: `${tableName.toLowerCase()}Register.html`,
+			templateFile: "sample-thymeleaf-register.hbs", // Todo : outputPath 수정
+			outputPath: `src/main/resources/templates/${tableNameCamelCase}/${tableNameCamelCase}Register.html`, // 생성 경로 고민해보기
+			fileName: `${tableNameCamelCase}Register.html`,
 		},
 		{
 			templateFile: "sample-dao-template.hbs",

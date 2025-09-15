@@ -177,7 +177,7 @@ export function getTemplateContext(
 	return {
 		// MyBatis 설정
 		namespace: `${packageName}.service.impl.${tableName}Mapper`, // MyBatis 네임스페이스
-		resultMapId: `${tableName}Result`, // ResultMap ID
+		resultMapId: `${tableName[0].toLowerCase()}${tableName.slice(1)}Result`, // ResultMap ID
 		resultMapType: `${packageName}.service.${tableName}VO`, // ResultMap 타입
 		//parameterType: `${packageName}.service.${tableName}VO`,      // 파라미터 타입
 		//resultType: "egovMap",                                       // 결과 타입 (전자정부 표준)
