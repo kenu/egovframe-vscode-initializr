@@ -48,7 +48,11 @@ export const ProjectsView = () => {
 	const setSelectedTemplate = (template: ProjectTemplate | null) => updateState({ selectedTemplate: template })
 	const setOutputPath = (value: string) => updateState({ outputPath: value })
 
+	// 카테고리에 해당하는 템플릿 배열
 	const filteredTemplates = getTemplatesByCategory(selectedCategory)
+
+	// Sample 버튼(handleInsertSample)을 위해 초기 출력 경로 설정
+	const [initialPath, setInitialPath] = useState("")
 
 	useEffect(() => {
 		// Initialize with sample project name
@@ -70,6 +74,7 @@ export const ProjectsView = () => {
 					// Set workspace path as default output path
 					if (message.text) {
 						setOutputPath(message.text)
+						setInitialPath(message.text) // useState로 관리, Sample 버튼(handleInsertSample)을 위해 초기 출력 경로 설정
 					}
 					break
 				case "projectGenerationResult":
@@ -98,6 +103,7 @@ export const ProjectsView = () => {
 		const category = event.target.value
 		setSelectedCategory(category)
 		setSelectedTemplate(null) // Reset template selection when category changes
+		setGenerationStatus("") // Clear previous status
 	}
 
 	const handleTemplateSelect = (template: ProjectTemplate) => {
@@ -165,15 +171,25 @@ export const ProjectsView = () => {
 	}
 
 	const handleInsertSample = () => {
+		if (PROJECT_TEMPLATES.length > 0) {
+			if (!selectedCategory || selectedCategory === "All") {
+				// 카테고리가 선택되지 않거나 All인 경우
+				setSelectedCategory(PROJECT_TEMPLATES[0].category || "Web")
+				setSelectedTemplate(PROJECT_TEMPLATES[0])
+			} else if (!selectedTemplate) {
+				// 카테고리는 선택되었는데 템플릿은 선택되지 않은 경우
+				setSelectedTemplate(filteredTemplates[0])
+			}
+		}
 		setProjectName(generateSampleProjectName())
 		setGroupID(getDefaultGroupId())
-		if (PROJECT_TEMPLATES.length > 0) {
-			setSelectedTemplate(PROJECT_TEMPLATES[0])
-		}
-		setGenerationStatus("")
+		setOutputPath(initialPath)
+		setGenerationStatus("") // Clear previous status
 	}
 
 	const handleProjectNameChange = (event: any) => {
+		setGenerationStatus("") // Clear previous status
+
 		const value = event.target.value
 		setProjectName(value)
 
@@ -387,6 +403,8 @@ export const ProjectsView = () => {
 												: "var(--vscode-foreground)",
 									}}
 									onClick={() => handleTemplateSelect(template)}>
+									{" "}
+									{/* => setSelectedTemplate(template) */}
 									<div style={{ fontWeight: "bold", fontSize: "13px" }}>{template.displayName}</div>
 									<div style={{ fontSize: "11px", opacity: 0.8, marginTop: "2px" }}>{template.description}</div>
 									<div style={{ fontSize: "10px", opacity: 0.6, marginTop: "2px" }}>
@@ -404,27 +422,27 @@ export const ProjectsView = () => {
 
 							{/* Project Name */}
 							<div style={{ width: "calc(100% - 24px)", marginBottom: "15px" }}>
-								<label style={{ display: "block", marginBottom: "5px", fontSize: "12px" }}>Project Name *</label>
 								<TextField
-									label=""
+									label="Project Name"
 									value={projectName}
 									onChange={handleProjectNameChange}
 									placeholder="Enter project name (letters, numbers, hyphens, underscores)"
+									isRequired
 								/>
 								<div style={{ fontSize: "10px", color: "var(--vscode-descriptionForeground)", marginTop: "2px" }}>
-									Will be used as the project folder name
+									Will be used as the project folder name and the artifactId & name in pom.xml
 								</div>
 							</div>
 
 							{/* Group ID (only if template has pomFile) */}
 							{selectedTemplate.pomFile && (
 								<div style={{ width: "calc(100% - 24px)", marginBottom: "15px" }}>
-									<label style={{ display: "block", marginBottom: "5px", fontSize: "12px" }}>Group ID *</label>
 									<TextField
-										label=""
+										label="Group ID"
 										value={groupID}
 										onChange={(e: any) => setGroupID(e.target.value)}
-										placeholder="e.g., egovframework.example.sample"
+										placeholder="e.g., com.company.project"
+										isRequired
 									/>
 									<div
 										style={{
@@ -432,21 +450,21 @@ export const ProjectsView = () => {
 											color: "var(--vscode-descriptionForeground)",
 											marginTop: "2px",
 										}}>
-										Java package naming convention (e.g., com.company.project)
+										Will be used as the groupId in pom.xml
 									</div>
 								</div>
 							)}
 
 							{/* Output Path */}
 							<div style={{ marginBottom: "15px" }}>
-								<label style={{ display: "block", marginBottom: "5px", fontSize: "12px" }}>Output Path *</label>
-								<div style={{ display: "flex", gap: "10px", maxWidth: "100%" }}>
-									<div style={{ flex: 1 }}>
+								<div style={{ display: "flex", gap: "10px", alignItems: "end" }}>
+									<div style={{ flex: 1, marginRight: "10px" }}>
 										<TextField
-											label=""
+											label="Output Path"
 											value={outputPath}
 											onChange={(e: any) => setOutputPath(e.target.value)}
 											placeholder="Select output directory"
+											isRequired
 										/>
 									</div>
 									<button
@@ -544,6 +562,7 @@ export const ProjectsView = () => {
 
 					{/* Action Buttons */}
 					<div style={{ display: "flex", gap: "10px", marginBottom: "20px" }}>
+						{/* Generate Project Button */}
 						<button
 							disabled={isGenerating || !selectedTemplate || !projectName || !outputPath}
 							onClick={handleGenerateProject}
@@ -595,6 +614,8 @@ export const ProjectsView = () => {
 								</>
 							)}
 						</button>
+
+						{/* Insert Sample Button */}
 						<button
 							onClick={handleInsertSample}
 							style={{

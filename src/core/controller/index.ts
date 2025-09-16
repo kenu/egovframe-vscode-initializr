@@ -66,15 +66,18 @@ export class Controller {
 				console.log("Webview launched successfully")
 				break
 
-			// eGovFrame project generation cases
+			// Output path selection in eGovFrame project generation progress
 			case "selectOutputPath": {
 				console.log("Received selectOutputPath message")
+				const { getHomeDirectoryUri } = await import("../../utils/path")
+
 				try {
 					const folders = await vscode.window.showOpenDialog({
 						canSelectFolders: true,
 						canSelectFiles: false,
 						canSelectMany: false,
 						openLabel: "Select Output Directory",
+						defaultUri: vscode.workspace.workspaceFolders?.[0].uri || getHomeDirectoryUri() || undefined, // 워크스페이스 경로 또는 사용자 홈 디렉터리를 기본 경로로 설정
 						title: "Select Directory for eGovFrame Project",
 					})
 
@@ -109,7 +112,11 @@ export class Controller {
 						}
 
 						// Generate the project
-						const result = await generateEgovProject(message.projectConfig, this.context.extensionPath, sendProgress)
+						const result = await generateEgovProject(
+							message.projectConfig, // { projectName: string, groupID: string, outputPath: string, template: {displayName: string, fileName: string, pomFile: string} }
+							this.context.extensionPath,
+							sendProgress,
+						)
 
 						// Send result to webview
 						await this.postMessageToWebview({
@@ -153,6 +160,7 @@ export class Controller {
 			}
 
 			// Command-based Project Generation
+			/*
 			case "generateProjectByCommand": {
 				// Start interactive project generation workflow
 				try {
@@ -163,6 +171,7 @@ export class Controller {
 				}
 				break
 			}
+			*/
 
 			case "getWorkspacePath": {
 				const workspaceFolders = vscode.workspace.workspaceFolders

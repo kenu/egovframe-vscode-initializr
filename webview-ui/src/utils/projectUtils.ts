@@ -15,140 +15,140 @@ export interface ProjectConfig {
 
 export const PROJECT_TEMPLATES: ProjectTemplate[] = [
 	{
-		displayName: "eGovFrame Web Project",
+		displayName: "Web Project", // eGovFrame Web Project
 		fileName: "example-web.zip",
 		pomFile: "example-web-pom.xml",
 		description: "Basic eGovFrame web application project",
 		category: "Web",
 	},
 	{
-		displayName: "eGovFrame Template Project > Simple Homepage",
+		displayName: "Template >Simple Homepage", // eGovFrame Template Project > Simple Homepage
 		fileName: "example-template-simple.zip",
 		pomFile: "example-template-simple-pom.xml",
 		description: "Simple homepage template with basic functionalities",
 		category: "Template",
 	},
 	{
-		displayName: "eGovFrame Template Project > Portal Site",
+		displayName: "Template > Portal Site", // eGovFrame Template Project > Portal Site
 		fileName: "example-template-portal.zip",
 		pomFile: "example-template-portal-pom.xml",
 		description: "Portal site template for enterprise applications",
 		category: "Template",
 	},
 	{
-		displayName: "eGovFrame Template Project > Enterprise Business",
+		displayName: "Template > Enterprise Business", // eGovFrame Template Project > Enterprise Business
 		fileName: "example-template-enterprise.zip",
 		pomFile: "example-template-enterprise-pom.xml",
 		description: "Enterprise business application template",
 		category: "Template",
 	},
 	{
-		displayName: "eGovFrame Template Project > Common All-in-one",
+		displayName: "Template > Common All-in-one", // eGovFrame Template Project > Common All-in-one
 		fileName: "egovframework-all-in-oneAllNew_wizard.zip",
 		pomFile: "egovframework-all-in-oneAllNew_wizard-pom.xml",
 		description: "Comprehensive all-in-one project template",
 		category: "Template",
 	},
 	{
-		displayName: "eGovFrame Mobile Project",
+		displayName: "Mobile Project", // eGovFrame Mobile Project
 		fileName: "example-mbl-web.zip",
 		pomFile: "mobile-web-pom.xml",
 		description: "Mobile web application project",
 		category: "Mobile",
 	},
 	{
-		displayName: "eGovFrame Mobile Template Project",
+		displayName: "Mobile Template Project", // eGovFrame Mobile Template Project
 		fileName: "egovframework-all-in-one-mobile-4.3.0.zip",
 		pomFile: "mobile-template-pom.xml",
 		description: "Mobile template project with hybrid app support",
 		category: "Mobile",
 	},
 	{
-		displayName: "eGovFrame DeviceAPI Web Project",
+		displayName: "DeviceAPI Web Project", // eGovFrame DeviceAPI Web Project
 		fileName: "DeviceAPI_WEBService_Guide_V4.3.0.zip",
 		pomFile: "",
 		description: "Device API integration web project",
 		category: "Mobile",
 	},
 	{
-		displayName: "eGovFrame Boot Web Project",
+		displayName: "Boot Web Project", // eGovFrame Boot Web Project
 		fileName: "example-boot-web.zip",
 		pomFile: "example-boot-web-pom.xml",
 		description: "Spring Boot based web project",
 		category: "Boot",
 	},
 	{
-		displayName: "eGovFrame Boot Template Project > Simple Homepage (Backend)",
+		displayName: "Boot Template > Simple Homepage (Backend)", // eGovFrame Boot Template Project > Simple Homepage (Backend)
 		fileName: "egovframe-template-simple-backend.zip",
 		pomFile: "egovframe-template-simple-backend-pom.xml",
 		description: "Spring Boot simple homepage backend",
 		category: "Boot",
 	},
 	{
-		displayName: "eGovFrame Boot Template Project > Simple Homepage (Frontend)",
+		displayName: "Boot Template > Simple Homepage (Frontend)", // eGovFrame Boot Template Project > Simple Homepage (Frontend)
 		fileName: "egovframe-template-simple-react.zip",
 		pomFile: "",
 		description: "React-based frontend for simple homepage",
 		category: "Boot",
 	},
 	{
-		displayName: "eGovFrame MSA Boot Template Project > Common Components (KRDS)",
+		displayName: "MSA Boot Template > Common Components (KRDS)", // eGovFrame MSA Boot Template Project > Common Components (KRDS)
 		fileName: "egovframe-common-components-msa-krds-4.3.1.zip",
 		pomFile: "",
 		description: "MSA common components with KRDS integration",
 		category: "MSA",
 	},
 	{
-		displayName: "eGovFrame MSA Boot Template Project > Portal (Backend)",
+		displayName: "MSA Boot Template > Portal (Backend)", // eGovFrame MSA Boot Template Project > Portal (Backend)
 		fileName: "egovframe-msa-portal-backend.zip",
 		pomFile: "",
 		description: "MSA portal backend services",
 		category: "MSA",
 	},
 	{
-		displayName: "eGovFrame MSA Boot Template Project > Portal (Frontend)",
+		displayName: "MSA Boot Template > Portal (Frontend)", // eGovFrame MSA Boot Template Project > Portal (Frontend)
 		fileName: "egovframe-msa-portal-frontend.zip",
 		pomFile: "",
 		description: "MSA portal frontend application",
 		category: "MSA",
 	},
 	{
-		displayName: "eGovFrame Boot Batch Template Project > Scheduler (File)",
+		displayName: "Boot Batch Template > Scheduler (File)", // eGovFrame Boot Batch Template Project > Scheduler (File)
 		fileName: "egovframework.rte.bat.template.sam.scheduler.zip",
 		pomFile: "batch-sam-scheduler-pom.xml",
 		description: "File-based batch scheduler project",
 		category: "Batch",
 	},
 	{
-		displayName: "eGovFrame Boot Batch Template Project > CommandLine (File)",
+		displayName: "Boot Batch Template > CommandLine (File)", // eGovFrame Boot Batch Template Project > CommandLine (File)
 		fileName: "egovframework.rte.bat.template.sam.commandline.zip",
 		pomFile: "batch-sam-commandline-pom.xml",
 		description: "File-based command line batch project",
 		category: "Batch",
 	},
 	{
-		displayName: "eGovFrame Boot Batch Template Project > Web (File)",
+		displayName: "Boot Batch Template > Web (File)", // eGovFrame Boot Batch Template Project > Web (File)
 		fileName: "egovframework.rte.bat.template.sam.web.zip",
 		pomFile: "batch-sam-web-pom.xml",
 		description: "File-based web batch project",
 		category: "Batch",
 	},
 	{
-		displayName: "eGovFrame Boot Batch Template Project > Scheduler (DB)",
+		displayName: "Boot Batch Template > Scheduler (DB)", // eGovFrame Boot Batch Template Project > Scheduler (DB)
 		fileName: "egovframework.rte.bat.template.db.scheduler.zip",
 		pomFile: "batch-db-scheduler-pom.xml",
 		description: "Database-based batch scheduler project",
 		category: "Batch",
 	},
 	{
-		displayName: "eGovFrame Boot Batch Template Project > CommandLine (DB)",
+		displayName: "Boot Batch Template > CommandLine (DB)", // eGovFrame Boot Batch Template Project > CommandLine (DB)
 		fileName: "egovframework.rte.bat.template.db.commandline.zip",
 		pomFile: "batch-db-commandline-pom.xml",
 		description: "Database-based command line batch project",
 		category: "Batch",
 	},
 	{
-		displayName: "eGovFrame Boot Batch Template Project > Web (DB)",
+		displayName: "Boot Batch Template > Web (DB)", // eGovFrame Boot Batch Template Project > Web (DB)
 		fileName: "egovframework.rte.bat.template.db.web.zip",
 		pomFile: "batch-db-web-pom.xml",
 		description: "Database-based web batch project",
@@ -156,8 +156,28 @@ export const PROJECT_TEMPLATES: ProjectTemplate[] = [
 	},
 ]
 
-export const PROJECT_CATEGORIES = ["All", "Web", "Template", "Mobile", "Boot", "MSA", "Batch"]
+//export const PROJECT_CATEGORIES =// ["All", "Web", "Template", "Mobile", "Boot", "MSA", "Batch"]
+function categoriesFromProjectTemplates(templates: ProjectTemplate[]): string[] {
+	const categories = new Set<string>() // Set은 요소의 첫 등장 순서를 보존하므로, PROJECT_TEMPLATES 배열에서 카테고리 등장 순서에 주의가 필요하다
+	categories.add("All")
+	templates.forEach((template) => {
+		if (template.category) {
+			categories.add(template.category)
+		}
+	})
+	return Array.from(categories)
+}
 
+// 카테고리 배열 반환 : ["All", "Web", "Template", "Mobile", "Boot", "MSA", "Batch"]
+export const PROJECT_CATEGORIES: string[] = Array.from(categoriesFromProjectTemplates(PROJECT_TEMPLATES))
+
+/*
+ * getTemplatesByCategory
+ *
+ * 카테고리에 해당하는 템플릿 배열 반환
+ * type: (category: string) => ProjectTemplate[]
+ * return: ProjectTemplate[]
+ */
 export function getTemplatesByCategory(category: string): ProjectTemplate[] {
 	if (category === "All") {
 		return PROJECT_TEMPLATES
@@ -192,10 +212,11 @@ export function validateProjectConfig(config: Partial<ProjectConfig>): string[] 
 }
 
 export function getDefaultGroupId(): string {
-	return "egovframework.example.sample"
+	return "com.example"
 }
 
 export function generateSampleProjectName(): string {
 	const timestamp = new Date().toISOString().slice(0, 10).replace(/-/g, "")
-	return `egov-project-${timestamp}`
+	const randomSuffix = Math.random().toString(36).substring(2, 8)
+	return `egov-project-${timestamp}-${randomSuffix}`
 }

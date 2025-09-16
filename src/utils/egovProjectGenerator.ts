@@ -19,6 +19,7 @@ export interface EgovProjectTemplate {
 
 export interface EgovProjectConfig {
 	projectName: string
+	groupID: string // 선언 안 할 경우 타입오류 발생
 	outputPath: string
 	packageName: string
 	template: EgovProjectTemplate
@@ -43,7 +44,7 @@ export interface ProjectGenerationResult {
  * Form-based Project Generation
  */
 export async function generateEgovProject(
-	config: EgovProjectConfig,
+	config: EgovProjectConfig, // { projectName: string, groupID: string, outputPath: string, template: {displayName: string, fileName: string, pomFile: string} }
 	extensionPath: string,
 	progressCallback?: (message: string) => void,
 ): Promise<ProjectGenerationResult> {
@@ -82,18 +83,24 @@ export async function generateEgovProject(
 		// Extract template ZIP
 		await extractZip(zipFilePath, { dir: projectRoot })
 
+		// processTemplateFiles를 적용할만한 zip파일이 없음 => 아래 processTemplateFiles, processFilesRecursively 함수 주석처리
+		/*
 		progressCallback?.("📝 Processing template files...")
 
 		// Process template files (replace placeholders)
 		await processTemplateFiles(projectRoot, config)
+		*/
 
 		// Generate POM file if needed
 		if (config.template.pomFile) {
 			await generatePomFile(config, projectRoot, extensionPath, progressCallback)
 		}
 
+		// updatePackageNames 함수 주석처리
+		/*
 		// Update package names in Java files
 		await updatePackageNames(projectRoot, config.packageName, progressCallback)
+		*/
 
 		progressCallback?.("✅ Project generated successfully!")
 
@@ -122,14 +129,17 @@ export async function generateEgovProject(
 	}
 }
 
+// generateEgovProject 함수에서 processTemplateFiles 함수 주석처리
+/*
 // Internal function for Form-based Project Generation
-async function processTemplateFiles(projectRoot: string, config: EgovProjectConfig): Promise<void> {
+async function processTemplateFiles(projectRoot: string, config: EgovProjectConfig): Promise<void> { // config = { projectName: string, groupID: string, outputPath: string, template: {displayName: string, fileName: string, pomFile: string} }
 	const placeholders = {
-		"{{PROJECT_NAME}}": config.projectName,
-		"{{PACKAGE_NAME}}": config.packageName,
-		"{{AUTHOR}}": config.author || "eGovFrame Developer",
-		"{{DESCRIPTION}}": config.description || `eGovFrame project: ${config.projectName}`,
-		"{{FRAMEWORK_VERSION}}": config.template.frameworkVersion || "4.3.0",
+		"{{projectName}}": config.projectName,
+		"{{groupID}}": config.groupID,
+		//"{{PACKAGE_NAME}}": config.packageName,
+		//"{{AUTHOR}}": config.author || "eGovFrame Developer",
+		//"{{DESCRIPTION}}": config.description || `eGovFrame project: ${config.projectName}`,
+		//"{{FRAMEWORK_VERSION}}": config.template.frameworkVersion || "4.3.0",
 	}
 
 	// Find all text files to process
@@ -139,15 +149,20 @@ async function processTemplateFiles(projectRoot: string, config: EgovProjectConf
 }
 
 // Internal function for processTemplateFiles
-async function processFilesRecursively(dir: string, placeholders: Record<string, string>, extensions: string[]): Promise<void> {
-	const entries = await fs.readdir(dir, { withFileTypes: true })
+async function processFilesRecursively(projectRoot: string, placeholders: Record<string, string>, extensions: string[]): Promise<void> {
+	const entries = await fs.readdir(projectRoot, { withFileTypes: true })
+	// If called with `withFileTypes: true`, the result data will be an array of Dirent (after path = projectRoot)
+	// fs.Dirent object : 디렉터리 내 파일 및 하위 디렉터리에 대한 정보를 담은 구조체
+	// 예) projectroot.file-a, projectroot.forder-B.fild-b → entries = [a, B.b]
 
 	for (const entry of entries) {
-		const fullPath = path.join(dir, entry.name)
+		const fullPath = path.join(projectRoot, entry.name)
 
 		if (entry.isDirectory()) {
+			// 디렉터리면 하위 디렉터리를 재귀적으로 처리
 			await processFilesRecursively(fullPath, placeholders, extensions)
 		} else if (entry.isFile() && extensions.includes(path.extname(entry.name))) {
+			// 파일이면 파일 내용을 읽어서 플레이스홀더를 대체
 			try {
 				let content = await fs.readFile(fullPath, "utf8")
 
@@ -156,6 +171,7 @@ async function processFilesRecursively(dir: string, placeholders: Record<string,
 					content = content.replace(new RegExp(placeholder, "g"), value)
 				}
 
+				// Replace file's content with the replaced content
 				await fs.writeFile(fullPath, content, "utf8")
 			} catch (error) {
 				console.warn(`Warning: Could not process file ${fullPath}:`, error)
@@ -163,10 +179,11 @@ async function processFilesRecursively(dir: string, placeholders: Record<string,
 		}
 	}
 }
+*/
 
 // Internal function for Form-based Project Generation
 async function generatePomFile(
-	config: EgovProjectConfig,
+	config: EgovProjectConfig, // { projectName: string, groupID: string, outputPath: string, template: {displayName: string, fileName: string, pomFile: string} }
 	projectRoot: string,
 	extensionPath: string,
 	progressCallback?: (message: string) => void,
@@ -183,23 +200,24 @@ async function generatePomFile(
 		}
 
 		// Read POM template
-		let pomContent = await fs.readFile(templatePath, "utf8")
+		let content = await fs.readFile(templatePath, "utf8")
 
 		// Replace placeholders
 		const placeholders = {
-			"{{PROJECT_NAME}}": config.projectName,
-			"{{PACKAGE_NAME}}": config.packageName,
-			"{{DESCRIPTION}}": config.description || `eGovFrame project: ${config.projectName}`,
-			"{{FRAMEWORK_VERSION}}": config.template.frameworkVersion || "4.3.0",
-			"{{VERSION}}": "1.0.0",
+			"{{projectName}}": config.projectName,
+			"{{groupID}}": config.groupID,
+			//"{{PACKAGE_NAME}}": config.packageName,
+			//"{{DESCRIPTION}}": config.description || `eGovFrame project: ${config.projectName}`,
+			//"{{FRAMEWORK_VERSION}}": config.template.frameworkVersion || "4.3.0",
+			//"{{VERSION}}": "1.0.0",
 		}
 
 		for (const [placeholder, value] of Object.entries(placeholders)) {
-			pomContent = pomContent.replace(new RegExp(placeholder, "g"), value)
+			content = content.replace(new RegExp(placeholder, "g"), value)
 		}
 
 		// Write POM file
-		await fs.writeFile(outputPath, pomContent, "utf8")
+		await fs.writeFile(outputPath, content, "utf8")
 
 		progressCallback?.("📝 Maven POM file generated successfully!")
 	} catch (error) {
@@ -208,6 +226,8 @@ async function generatePomFile(
 	}
 }
 
+// generateEgovProject 함수에서 updatePackageNames 함수 주석처리
+/*
 // Internal function for Form-based Project Generation
 async function updatePackageNames(
 	projectRoot: string,
@@ -302,6 +322,7 @@ async function updateDirectoryStructure(projectRoot: string, packageName: string
 		await fs.move(javaFile, newFilePath, { overwrite: true })
 	}
 }
+*/
 
 /**
  * Open project in VSCode
@@ -320,6 +341,7 @@ export async function openProjectInVSCode(projectPath: string): Promise<void> {
  *
  * Command-based Project Generation
  */
+/*
 export async function startInteractiveProjectGeneration(context: vscode.ExtensionContext): Promise<void> {
 	try {
 		// Get available templates
@@ -441,10 +463,10 @@ export async function startInteractiveProjectGeneration(context: vscode.Extensio
 		vscode.window.showErrorMessage(`Interactive generation failed: ${error}`)
 	}
 }
+*/
 
-/**
- * Get available eGovFrame project templates
- */
+/*
+// Internal function for Command-based Project Generation
 export async function getAvailableTemplates(extensionPath: string): Promise<EgovProjectTemplate[]> {
 	try {
 		const templatesConfigPath = path.join(extensionPath, "templates", "templates-projects.json")
@@ -462,6 +484,7 @@ export async function getAvailableTemplates(extensionPath: string): Promise<Egov
 	}
 }
 
+// Internal function for getAvailableTemplates
 function getDefaultTemplates(): EgovProjectTemplate[] {
 	return [
 		{
@@ -516,6 +539,7 @@ function getDefaultTemplates(): EgovProjectTemplate[] {
 		},
 	]
 }
+*/
 
 // 쓰이는 곳 없음
 /**

@@ -128,3 +128,10 @@ export const isLocatedInWorkspace = (pathToCheck: string = ""): boolean => {
 
 	return !relativePath.startsWith("..") && !path.isAbsolute(relativePath)
 }
+
+/**
+ * 사용자 홈 디렉토리의 URI를 반환
+ */
+export function getHomeDirectoryUri(): vscode.Uri {
+	return vscode.Uri.file(os.homedir())
+}
