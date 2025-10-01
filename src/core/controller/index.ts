@@ -329,11 +329,13 @@ export class Controller {
 
 			case "generateConfig": {
 				console.log("Received generateConfig message:", message)
-				console.log("Message value:", message.value)
 
-				const template = message.value?.template || message.template
-				const formData = message.value?.formData || message.formData
-				const outputFolder = message.value?.outputFolder
+				//const template = message.value?.template || message.template
+				//const formData = message.value?.formData || message.formData
+				//const outputFolder = message.value?.outputFolder
+				const template = message.template
+				const formData = message.formData
+				const outputFolder = message.formData.outputFolder // outputFolder는 formData에 포함되어 있음
 
 				console.log("Template:", template)
 				console.log("FormData:", formData)
@@ -388,6 +390,8 @@ export class Controller {
 
 			case "selectOutputFolder": {
 				console.log("Controller: Received selectOutputFolder message")
+				const { getHomeDirectoryUri } = await import("../../utils/path")
+
 				try {
 					console.log("Controller: Opening folder selection dialog...")
 					const folders = await vscode.window.showOpenDialog({
@@ -395,17 +399,37 @@ export class Controller {
 						canSelectFiles: false,
 						canSelectMany: false,
 						openLabel: "Select Output Directory",
+						defaultUri: vscode.workspace.workspaceFolders?.[0].uri || getHomeDirectoryUri() || undefined, // 워크스페이스 경로 또는 사용자 홈 디렉터리를 기본 경로로 설정
 						title: "Select Directory for Configuration Files",
 					})
 
 					console.log("Controller: Selected folders:", folders)
 					if (folders && folders.length > 0) {
-						console.log("Controller: Sending selectedOutputFolder response:", folders[0].fsPath)
-						const result = await this.postMessageToWebview({
-							type: "selectedOutputFolder",
-							text: folders[0].fsPath,
-						})
-						console.log("Controller: Message sent result:", result)
+						const selectedOutputFolderPath = folders[0].fsPath
+						const { checkFileExistence } = await import("../../utils/configGenerator")
+
+						// 파일 중복 검사
+						const fileExists = await checkFileExistence(selectedOutputFolderPath, message.formData)
+
+						if (fileExists) {
+							// 중복 파일이 존재하면
+							console.log("Controller: Duplicate file exists:", message.formData.txtFileName)
+
+							await this.postMessageToWebview({
+								type: "selectedOutputFolderDuplicate",
+								text: "Duplicate file exists:" + message.formData.txtFileName,
+							})
+						} else {
+							// 중복 파일이 존재하지 않으면
+							console.log("Controller: Sending selectedOutputFolder response:", selectedOutputFolderPath)
+
+							await this.postMessageToWebview({
+								type: "selectedOutputFolder",
+								text: selectedOutputFolderPath,
+							})
+						}
+
+						console.log("Controller: Message sent to webview")
 					} else {
 						console.log("Controller: No folder selected by user")
 					}
@@ -433,6 +457,52 @@ export class Controller {
 					type: "currentTheme",
 					theme: monacoTheme,
 				})
+				break
+			}
+
+			// file path selection in eGovFrame Configuration Generation - Especially for EhcacheForm
+			case "selectConfigFilePath": {
+				console.log("Received selectConfigFilePath message")
+				const { getHomeDirectoryUri } = await import("../../utils/path")
+				const { processConfigPath } = await import("../../utils/configGenerator")
+
+				try {
+					const files = await vscode.window.showOpenDialog({
+						canSelectFolders: false,
+						canSelectFiles: true,
+						canSelectMany: false,
+						openLabel: "Select File",
+						defaultUri: vscode.workspace.workspaceFolders?.[0].uri || getHomeDirectoryUri() || undefined, // 워크스페이스 경로 또는 사용자 홈 디렉터리를 기본 경로로 설정
+						title: "Select Configuration File",
+						filters: {
+							"All Files": ["*"],
+							"XML Files": ["xml"],
+							"Properties Files": ["properties"],
+							"JSON Files": ["json", "jsonc"],
+							"YAML Files": ["yaml", "yml"],
+							"Java Files": ["java"],
+						},
+					})
+
+					console.log("Selected files:", files)
+					if (files && files.length > 0) {
+						const selectedPath = files[0].fsPath
+						console.log("Selected file path:", selectedPath)
+
+						// 경로 처리: src/main/resources 이후 경로만 추출
+						const processedPath = processConfigPath(selectedPath)
+						console.log("Processed path:", processedPath)
+
+						await this.postMessageToWebview({
+							type: "selectedConfigFilePath",
+							text: processedPath,
+						})
+					} else {
+						console.log("No file selected")
+					}
+				} catch (error) {
+					console.error("Error in selectConfigFilePath:", error)
+				}
 				break
 			}
 

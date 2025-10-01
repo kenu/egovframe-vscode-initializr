@@ -1,4 +1,4 @@
-package {{defaultPackageName}}.config;
+package {{txtConfigPackage}};
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -27,10 +27,12 @@ import com.atomikos.icatch.jta.UserTransactionImp;
 import com.atomikos.icatch.jta.UserTransactionManager;
 
 @Configuration
-@EnableAspectJAutoProxy(proxyTargetClass = true)
-{{#if chkAnnotationTransactionManagement}}
-@EnableTransactionManagement
-{{/if}}
+{{#if (eq transactionManagementType "aopConfigTransaction")}}
+@EnableAspectJAutoProxy(proxyTargetClass = true) // 포인트컷/어드바이저 동작
+{{/if~}}
+{{#if (eq transactionManagementType "annotationTransaction")}}
+@EnableTransactionManagement // 어노테이션(@Transactional) 기반 트랜잭션 관리
+{{/if~}}
 public class {{txtFileName}} {
 
     @Bean
@@ -60,6 +62,8 @@ public class {{txtFileName}} {
         return transactionManager;
     }
 
+    {{#if (eq transactionManagementType "aopConfigTransaction")}}
+    //AOP 설정 - 트랜잭온 관리 및 포인트컷 설정
     @Bean(name = "{{txtAdviceName}}")
     public TransactionInterceptor txAdvice(PlatformTransactionManager transactionManager) {
         TransactionInterceptor txAdvice = new TransactionInterceptor();
@@ -80,18 +84,23 @@ public class {{txtFileName}} {
         RuleBasedTransactionAttribute txAttribute = new RuleBasedTransactionAttribute();
         txAttribute.setPropagationBehavior(TransactionDefinition.PROPAGATION_{{cmbPropagation}});
         txAttribute.setIsolationLevel(TransactionDefinition.ISOLATION_{{cmbIsolation}});
+        {{#if chkReadOnly}}
         txAttribute.setReadOnly({{chkReadOnly}});
+        {{/if}}
 
+        {{#if (or (trim txtRollbackFor) (trim txtNoRollbackFor))}}
         List<RollbackRuleAttribute> rollbackRules = new ArrayList<>();
-        {{#if chkRollbackFor}}
+            {{#if (trim txtRollbackFor)}}
         rollbackRules.add(new RollbackRuleAttribute({{txtRollbackFor}}.class));
-        {{/if}}
-        {{#if chkNoRollbackFor}}
+            {{/if}}
+            {{#if (trim txtNoRollbackFor)}}
         rollbackRules.add(new NoRollbackRuleAttribute({{txtNoRollbackFor}}.class));
-        {{/if}}
+            {{/if}}
+
         txAttribute.setRollbackRules(rollbackRules);
+        {{/if}}
         
-        {{#if chkTimeout}}
+        {{#if (trim txtTimeout)}}
         txAttribute.setTimeout({{txtTimeout}});
         {{/if}}
 
@@ -99,10 +108,12 @@ public class {{txtFileName}} {
         return txMethods;
     }
 
+    // TransactionAdvisor 설정
     @Bean
     public Advisor txAdvisor(PlatformTransactionManager txManager) {
         AspectJExpressionPointcut pointcut = new AspectJExpressionPointcut();
         pointcut.setExpression("{{txtPointCutExpression}}");
         return new DefaultPointcutAdvisor(pointcut, txAdvice(txManager));
     }
+    {{/if}}
 }

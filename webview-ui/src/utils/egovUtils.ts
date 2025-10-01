@@ -79,3 +79,10 @@ export function generateUniqueProjectName(baseName: string, existingNames: strin
 	}
 	return uniqueName
 }
+
+// file path selection in eGovFrame Configuration Generation - Especially for EhcacheForm
+export function createSelectConfigFilePathMessage() {
+	return {
+		type: "selectConfigFilePath" as const,
+	}
+}

@@ -1,5 +1,5 @@
 {{#*inline "c3p0"}}
-package {{defaultPackageName}}.config;
+package {{txtConfigPackage}};
 
 import com.mchange.v2.c3p0.ComboPooledDataSource;
 import org.springframework.beans.factory.annotation.Value;
@@ -54,7 +54,7 @@ public class {{txtFileName}} {
 }
 {{/inline}}
 {{#*inline "dbcp"}}
-package {{defaultPackageName}}.config;
+package {{txtConfigPackage}};
 
 import org.apache.commons.dbcp2.BasicDataSource;
 import org.springframework.beans.factory.annotation.Value;
@@ -105,7 +105,7 @@ public class {{txtFileName}} {
 }
 {{/inline}}
 {{#*inline "jdbc"}}
-package {{defaultPackageName}}.config;
+package {{txtConfigPackage}};
 
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
 import org.springframework.beans.factory.annotation.Value;

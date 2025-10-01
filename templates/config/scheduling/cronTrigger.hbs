@@ -5,7 +5,7 @@
 
 	<bean id="{{txtTriggerName}}" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
 		<property name="jobDetail" ref="{{txtJobName}}" />
-		<property name="cronExpression" value="{{txtExpression}}" />
+		<property name="cronExpression" value="{{txtCronExpression}}" />
 	</bean>
 
 </beans>

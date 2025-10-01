@@ -8,8 +8,8 @@ Configuration:
         pattern: "{{txtConversionPattern}}"
       Policies:
         TimeBasedTriggeringPolicy:
-          interval: 1 # 매 시간 주기 마다 롤링
-          modulate: {{cboModulate}} # 매 시간 정각에 처리
+          interval: {{txtInterval}}
+          modulate: {{cboModulate}}
 
   Loggers:
     Logger:

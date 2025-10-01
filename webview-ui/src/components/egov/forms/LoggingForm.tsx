@@ -1,67 +1,118 @@
 import { useState, useEffect } from "react"
-import { Button, TextField, TextArea, Select, RadioGroup, ProgressRing, Link, Divider } from "../../ui"
-import { ConfigGenerationType, ConfigFormData } from "../types/templates"
+import { Button, TextField, TextArea, Select, RadioGroup, Checkbox, ProgressRing, Link, Divider } from "../../ui"
+import { ConfigGenerationType, ConfigFormData, FormComponentProps } from "../types/templates"
 import { vscode } from "../../../utils/vscode"
 
-interface LoggingFormProps {
-	onSubmit: (data: ConfigFormData) => void
-	onCancel: () => void
-	loggingType?: "console" | "file" | "rollingFile"
-}
-
-const LoggingForm: React.FC<LoggingFormProps> = ({ onSubmit, onCancel, loggingType = "console" }) => {
+const LoggingForm: React.FC<FormComponentProps> = ({ onSubmit, onCancel, template, initialData, formType }) => {
 	const getDefaultFileName = (type: ConfigGenerationType) => {
-		switch (loggingType) {
+		switch (formType) {
 			case "console":
-				return type === ConfigGenerationType.XML ? "logback-console" : "EgovLoggingConsoleConfig"
+				return type === ConfigGenerationType.JAVA_CONFIG ? "EgovLog4j2ConsoleConfig" : "log4j2-console"
 			case "file":
-				return type === ConfigGenerationType.XML ? "logback-file" : "EgovLoggingFileConfig"
+				return type === ConfigGenerationType.JAVA_CONFIG ? "EgovLog4j2FileConfig" : "log4j2-file"
 			case "rollingFile":
-				return type === ConfigGenerationType.XML ? "logback-rollingFile" : "EgovLoggingRollingFileConfig"
+				return type === ConfigGenerationType.JAVA_CONFIG ? "EgovLog4j2RollingFileConfig" : "log4j2-rollingFile"
+			case "timeBasedRollingFile":
+				return type === ConfigGenerationType.JAVA_CONFIG
+					? "EgovLog4j2TimeBasedRollingFileConfig"
+					: "log4j2-timeBasedRollingFile"
+			case "jdbc":
+				return type === ConfigGenerationType.JAVA_CONFIG ? "EgovLog4j2JdbcConfig" : "log4j2-jdbc"
 			default:
-				return "logback-console"
+				return "log4j2"
 		}
 	}
 
-	const [formData, setFormData] = useState({
+	const [formData, setFormData] = useState<ConfigFormData>({
+		// 아래는 입력값들에 대한 초기값
 		generationType: ConfigGenerationType.XML,
+		txtConfigPackage: "egovframework.example.config",
 		txtFileName: getDefaultFileName(ConfigGenerationType.XML),
-		txtAppenderName: "CONSOLE",
-		txtLevel: "INFO",
-		txtPattern: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n",
-		txtLoggerName: "egovframework",
-		txtLoggerLevel: "DEBUG",
+
+		// 공통 필드
+		txtAppenderName:
+			formType === "console"
+				? "console"
+				: formType === "file"
+					? "file"
+					: formType === "rollingFile"
+						? "rolling-file"
+						: formType === "timeBasedRollingFile"
+							? "rolling-file-time"
+							: formType === "jdbc"
+								? "jdbc"
+								: "console",
+
+		// JDBC 제외 Console, File, Rolling File, Time-Based Rolling File 관련 필드
+		txtConversionPattern: "%d %5p [%c] %m%n",
+
+		// File 관련 필드
+		txtLogFileName:
+			formType === "file"
+				? "./logs/file/sample.log"
+				: formType === "rollingFile"
+					? "./logs/rolling/rollingSample.log"
+					: formType === "timeBasedRollingFile"
+						? "./logs/time/timeBasedRollingSample.log"
+						: "",
+		cboAppend: true, // File 타입에서 사용, boolean 타입
+
+		// Rolling File 관련 필드
+		txtLogFileNamePattern:
+			formType === "rollingFile"
+				? "./logs/rolling/rollingSample.%i.log"
+				: formType === "timeBasedRollingFile"
+					? "./logs/time/timeBasedRollingSample.%d{yyyy-MM-dd_HH-mm}.log"
+					: "",
+		txtMaxIndex: "20", // Rolling File에서 사용
+		txtMaxFileSize: "3000", // Rolling File에서 사용
+
+		// Time-Based Rolling File 관련 필드
+		txtInterval: "1",
+		cboModulate: true,
+
+		// JDBC 관련 필드
+		txtTableName: "LOG",
+		rdoConnectionType: "DriverManager", // DriverManager 또는 ConnectionFactory
+		txtDriver: "com.mysql.cj.jdbc.Driver",
+		txtUrl: "jdbc:mysql://localhost:3306/log",
+		txtUser: "log",
+		txtPasswrd: "log01",
+		txtConnectionFactoryClass: "org.egovframe.rte.fdl.logging.db.EgovConnectionFactory",
+		txtConnectionFactoryMethod: "getDatabaseConnection",
+
+		...initialData,
 	})
-	const [selectedOutputFolder, setSelectedOutputFolder] = useState<string | null>(null)
 	const [pendingFormData, setPendingFormData] = useState<ConfigFormData | null>(null)
+
+	const [validationError, setValidationError] = useState<string>("")
 
 	// Message listener for folder selection response
 	useEffect(() => {
-		console.log("LoggingForm: Setting up message listener")
-
 		const handleMessage = (event: any) => {
-			console.log("LoggingForm: Received message:", event.data)
 			const message = event.data
-			if (message.type === "selectedOutputFolder") {
-				console.log("LoggingForm: Received selectedOutputFolder:", message.text)
-				setSelectedOutputFolder(message.text)
-				// If we have pending form data, submit it now
-				if (pendingFormData) {
-					console.log("LoggingForm: Submitting with pending data:", pendingFormData)
-					onSubmit({
-						...pendingFormData,
-						outputFolder: message.text,
-					})
-					setPendingFormData(null)
-				} else {
-					console.log("LoggingForm: No pending form data")
-				}
+			switch (message.type) {
+				// Generate 버튼 클릭 - 중복 파일 검사 통과 시
+				case "selectedOutputFolder":
+					if (pendingFormData) {
+						onSubmit({
+							...pendingFormData,
+							outputFolder: message.text,
+						})
+						setPendingFormData(null)
+					}
+					break
+
+				// Generate 버튼 클릭 - 중복 파일 검사 실패 시
+				case "selectedOutputFolderDuplicate":
+					console.log("LoggingForm: Received selectedOutputFolderDuplicate message:", message.text)
+					setValidationError(message.text) // Duplicate file exists: + formData.txtFileName
+					break
 			}
 		}
 
 		window.addEventListener("message", handleMessage)
 		return () => {
-			console.log("LoggingForm: Cleaning up message listener")
 			window.removeEventListener("message", handleMessage)
 		}
 	}, [pendingFormData, onSubmit])
@@ -72,61 +123,121 @@ const LoggingForm: React.FC<LoggingFormProps> = ({ onSubmit, onCancel, loggingTy
 			generationType: type,
 			txtFileName: getDefaultFileName(type),
 		}))
+		// 타입 변경 시 에러 클리어
+		setValidationError("")
 	}
 
 	const handleSubmit = (e: React.FormEvent) => {
 		e.preventDefault()
-		console.log("LoggingForm handleSubmit called")
-		console.log("Form data:", formData)
 
 		// Validate required fields
-		const requiredFields = [
-			{ field: "txtFileName" as keyof typeof formData, label: "File Name" },
+		const requiredFields: { field: keyof typeof formData; label: string }[] = [
+			{ field: "generationType" as keyof typeof formData, label: "Generation Type" },
 			{ field: "txtAppenderName" as keyof typeof formData, label: "Appender Name" },
-			{ field: "txtPattern" as keyof typeof formData, label: "Log Pattern" },
 		]
 
-		const missingFields = requiredFields.filter(({ field }) => !formData[field]?.trim())
+		// JDBC 제외 Conversion Pattern 필드
+		if (formType !== "jdbc") {
+			requiredFields.push({ field: "txtConversionPattern" as keyof typeof formData, label: "Conversion Pattern" })
+		}
+
+		// 조건부로 txtFileName, txtConfigPackage 필드 추가
+		if (formData.generationType === ConfigGenerationType.JAVA_CONFIG) {
+			requiredFields.push(
+				{ field: "txtFileName" as keyof typeof formData, label: "Class Name" },
+				{ field: "txtConfigPackage" as keyof typeof formData, label: "Package Name" },
+			)
+		} else {
+			requiredFields.push({ field: "txtFileName" as keyof typeof formData, label: "File Name" })
+		}
+
+		// formType별 필수 필드 추가
+		switch (formType) {
+			case "file":
+				requiredFields.push({ field: "txtLogFileName" as keyof typeof formData, label: "Log File Name" })
+				break
+			case "rollingFile":
+				requiredFields.push(
+					{ field: "txtLogFileName" as keyof typeof formData, label: "Log File Name" },
+					{ field: "txtLogFileNamePattern" as keyof typeof formData, label: "Log File Name Pattern" },
+					{ field: "txtMaxIndex" as keyof typeof formData, label: "Max Index" },
+					{ field: "txtMaxFileSize" as keyof typeof formData, label: "Max File Size" },
+				)
+				break
+			case "timeBasedRollingFile":
+				requiredFields.push(
+					{ field: "txtLogFileName" as keyof typeof formData, label: "Log File Name" },
+					{ field: "txtLogFileNamePattern" as keyof typeof formData, label: "Log File Name Pattern" },
+					{ field: "txtInterval" as keyof typeof formData, label: "Interval" },
+				)
+				break
+			case "jdbc":
+				requiredFields.push(
+					{ field: "txtTableName" as keyof typeof formData, label: "Table Name" },
+					{ field: "rdoConnectionType" as keyof typeof formData, label: "Connection Type" },
+				)
+				if (formData.rdoConnectionType === "DriverManager") {
+					requiredFields.push(
+						{ field: "txtDriver" as keyof typeof formData, label: "Driver" },
+						{ field: "txtUrl" as keyof typeof formData, label: "URL" },
+						{ field: "txtUser" as keyof typeof formData, label: "User" },
+						{ field: "txtPasswrd" as keyof typeof formData, label: "Password" },
+					)
+				} else if (formData.rdoConnectionType === "ConnectionFactory") {
+					requiredFields.push(
+						{ field: "txtConnectionFactoryClass" as keyof typeof formData, label: "Connection Factory Class" },
+						{ field: "txtConnectionFactoryMethod" as keyof typeof formData, label: "Connection Factory Method" },
+					)
+				}
+				break
+		}
+
+		const missingFields = requiredFields.filter(({ field }) => !formData[field]?.toString().trim())
 
 		if (missingFields.length > 0) {
 			const fieldNames = missingFields.map(({ label }) => label).join(", ")
-			alert(`Please fill in the following required fields: ${fieldNames}`)
+			setValidationError(`Please fill in the following required fields: ${fieldNames}`)
 			return
 		}
 
-		// Check if vscode API is available
+		// 성공 시 에러 클리어
+		setValidationError("")
+
 		if (!vscode) {
 			console.error("VSCode API is not available")
 			return
 		}
 
-		// Store form data and request folder selection
 		setPendingFormData(formData)
-		console.log("Pending form data set:", formData)
-		console.log("Requesting folder selection...")
 
 		try {
 			vscode.postMessage({
 				type: "selectOutputFolder",
+				formData: formData, // formData를 전달하여 파일명 중복 검사
 			})
-			console.log("Message sent successfully")
 		} catch (error) {
 			console.error("Error sending message:", error)
 		}
 	}
 
-	const handleInputChange = (field: string, value: string) => {
+	const handleInputChange = (field: string, value: string | boolean) => {
 		setFormData((prev) => ({ ...prev, [field]: value }))
+		// 입력 시 에러 클리어
+		setValidationError("")
 	}
 
 	const getFormTitle = () => {
-		switch (loggingType) {
+		switch (formType) {
 			case "console":
 				return "Create Console Appender"
 			case "file":
 				return "Create File Appender"
 			case "rollingFile":
 				return "Create Rolling File Appender"
+			case "timeBasedRollingFile":
+				return "Create Time Based Rolling File Appender"
+			case "jdbc":
+				return "Create JDBC Appender"
 			default:
 				return "Create Logging Configuration"
 		}
@@ -136,38 +247,80 @@ const LoggingForm: React.FC<LoggingFormProps> = ({ onSubmit, onCancel, loggingTy
 		<div style={{ padding: "20px", maxWidth: "600px" }}>
 			<h2 style={{ color: "var(--vscode-foreground)", marginBottom: "20px" }}>{getFormTitle()}</h2>
 
+			{/* Validation Errors */}
+			{validationError && (
+				<div style={{ marginBottom: "20px" }}>
+					<div
+						style={{
+							backgroundColor: "var(--vscode-inputValidation-errorBackground)",
+							border: "1px solid var(--vscode-inputValidation-errorBorder)",
+							color: "var(--vscode-inputValidation-errorForeground)",
+							padding: "10px",
+							borderRadius: "3px",
+							fontWeight: "bold",
+							fontSize: "12px",
+						}}>
+						{validationError}
+					</div>
+				</div>
+			)}
+
 			<form onSubmit={handleSubmit}>
 				<div style={{ marginBottom: "20px" }}>
-					<h3 style={{ color: "var(--vscode-foreground)", marginBottom: "10px" }}>Generation Type</h3>
+					<h3 style={{ color: "var(--vscode-foreground)", marginBottom: "10px" }}>Default Settings</h3>
+
 					<RadioGroup
 						label="Generation Type"
 						name="generationType"
 						value={formData.generationType}
 						onChange={(value: string) => handleGenerationTypeChange(value as ConfigGenerationType)}
 						orientation="horizontal"
-						options={[
-							{ value: ConfigGenerationType.XML, label: "XML" },
-							{ value: ConfigGenerationType.YAML, label: "YAML" },
-							{ value: ConfigGenerationType.PROPERTIES, label: "Properties" },
-						]}
+						options={
+							formType === "jdbc"
+								? [
+										{ value: ConfigGenerationType.XML, label: "XML" },
+										{ value: ConfigGenerationType.YAML, label: "YAML" },
+									]
+								: [
+										{ value: ConfigGenerationType.XML, label: "XML" },
+										{ value: ConfigGenerationType.YAML, label: "YAML" },
+										{ value: ConfigGenerationType.PROPERTIES, label: "Properties" },
+										//{ value: ConfigGenerationType.JAVA_CONFIG, label: "JavaConfig" },
+									]
+						}
 					/>
-				</div>
 
-				<div style={{ marginBottom: "20px" }}>
-					<h3 style={{ color: "var(--vscode-foreground)", marginBottom: "10px" }}>Generation File</h3>
-					<TextField
-						label="File Name"
-						value={formData.txtFileName}
-						onChange={(e: any) => handleInputChange("txtFileName", e.target.value)}
-						placeholder="Enter file name"
-						isRequired
-					/>
+					{formData.generationType === ConfigGenerationType.JAVA_CONFIG && (
+						<div style={{ width: "calc(100% - 24px)", marginBottom: "20px" }}>
+							<TextField
+								label="Package Name"
+								value={formData.txtConfigPackage}
+								onChange={(e) => handleInputChange("txtConfigPackage", e.target.value)}
+								placeholder="Enter package name"
+								isRequired
+							/>
+						</div>
+					)}
+
+					<div style={{ width: "calc(100% - 24px)", marginBottom: "20px" }}>
+						<TextField
+							label={formData.generationType === ConfigGenerationType.JAVA_CONFIG ? "Class Name" : "File Name"}
+							value={formData.txtFileName}
+							onChange={(e: any) => handleInputChange("txtFileName", e.target.value)}
+							placeholder={
+								formData.generationType === ConfigGenerationType.JAVA_CONFIG
+									? "Enter class name (PascalCase)"
+									: "Enter file name"
+							}
+							isRequired
+						/>
+					</div>
 				</div>
 
 				<div style={{ marginBottom: "20px" }}>
 					<h3 style={{ color: "var(--vscode-foreground)", marginBottom: "10px" }}>Configuration</h3>
 
-					<div style={{ marginBottom: "15px" }}>
+					<div style={{ width: "calc(100% - 24px)", marginBottom: "15px" }}>
 						<TextField
 							label="Appender Name"
 							value={formData.txtAppenderName}
@@ -177,54 +330,228 @@ const LoggingForm: React.FC<LoggingFormProps> = ({ onSubmit, onCancel, loggingTy
 						/>
 					</div>
 
-					<div style={{ marginBottom: "15px" }}>
-						<Select
-							label="Log Level"
-							value={formData.txtLevel}
-							onChange={(e: any) => handleInputChange("txtLevel", e.target.value)}
-							options={[
-								{ value: "TRACE", label: "TRACE" },
-								{ value: "DEBUG", label: "DEBUG" },
-								{ value: "INFO", label: "INFO" },
-								{ value: "WARN", label: "WARN" },
-								{ value: "ERROR", label: "ERROR" },
-							]}
-						/>
-					</div>
+					{/* JDBC 제외 Conversion Pattern 필드 */}
+					{formType !== "jdbc" && (
+						<div style={{ width: "calc(100% - 24px)", marginBottom: "15px" }}>
+							<TextField
+								label="Conversion Pattern"
+								value={formData.txtConversionPattern}
+								placeholder="Enter conversion pattern"
+								onChange={(e: any) => handleInputChange("txtConversionPattern", e.target.value)}
+								isRequired
+							/>
+						</div>
+					)}
 
-					<div style={{ marginBottom: "15px" }}>
-						<TextField
-							label="Log Pattern"
-							value={formData.txtPattern}
-							placeholder="Enter log pattern"
-							onChange={(e: any) => handleInputChange("txtPattern", e.target.value)}
-							isRequired
-						/>
-					</div>
+					{/* File 타입 특화 필드들 */}
+					{formType === "file" && (
+						<>
+							<div style={{ width: "calc(100% - 24px)", marginBottom: "15px" }}>
+								<TextField
+									label="Log File Name"
+									value={formData.txtLogFileName}
+									placeholder="Enter log file name"
+									onChange={(e: any) => handleInputChange("txtLogFileName", e.target.value)}
+									isRequired
+								/>
+							</div>
 
-					<div style={{ marginBottom: "15px" }}>
-						<TextField
-							label="Logger Name"
-							value={formData.txtLoggerName}
-							placeholder="Enter logger name"
-							onChange={(e: any) => handleInputChange("txtLoggerName", e.target.value)}
-						/>
-					</div>
+							<div style={{ marginBottom: "15px" }}>
+								<Checkbox
+									label="Append"
+									checked={formData.cboAppend}
+									onChange={(e) => handleInputChange("cboAppend", e.target.checked)}
+									description="Append to existing log file"
+								/>
+							</div>
+						</>
+					)}
 
-					<div style={{ marginBottom: "20px" }}>
-						<Select
-							label="Logger Level"
-							value={formData.txtLoggerLevel}
-							onChange={(e: any) => handleInputChange("txtLoggerLevel", e.target.value)}
-							options={[
-								{ value: "TRACE", label: "TRACE" },
-								{ value: "DEBUG", label: "DEBUG" },
-								{ value: "INFO", label: "INFO" },
-								{ value: "WARN", label: "WARN" },
-								{ value: "ERROR", label: "ERROR" },
-							]}
-						/>
-					</div>
+					{/* Rolling File 타입 특화 필드들 */}
+					{formType === "rollingFile" && (
+						<>
+							<div style={{ width: "calc(100% - 24px)", marginBottom: "15px" }}>
+								<TextField
+									label="Log File Name"
+									value={formData.txtLogFileName}
+									placeholder="Enter log file name"
+									onChange={(e: any) => handleInputChange("txtLogFileName", e.target.value)}
+									isRequired
+								/>
+							</div>
+
+							<div style={{ width: "calc(100% - 24px)", marginBottom: "15px" }}>
+								<TextField
+									label="Log File Name Pattern"
+									value={formData.txtLogFileNamePattern}
+									placeholder="Enter log file name pattern"
+									onChange={(e: any) => handleInputChange("txtLogFileNamePattern", e.target.value)}
+									isRequired
+								/>
+							</div>
+
+							<div style={{ width: "calc(100% - 24px)", marginBottom: "15px" }}>
+								<TextField
+									label="Max Index"
+									value={formData.txtMaxIndex}
+									placeholder="Enter max index"
+									onChange={(e: any) => handleInputChange("txtMaxIndex", e.target.value)}
+									isRequired
+								/>
+							</div>
+
+							<div style={{ width: "calc(100% - 24px)", marginBottom: "15px" }}>
+								<TextField
+									label="Max File Size"
+									value={formData.txtMaxFileSize}
+									placeholder="Enter max file size"
+									onChange={(e: any) => handleInputChange("txtMaxFileSize", e.target.value)}
+									isRequired
+								/>
+							</div>
+						</>
+					)}
+
+					{/* Time-Based Rolling File 타입 특화 필드들 */}
+					{formType === "timeBasedRollingFile" && (
+						<>
+							<div style={{ width: "calc(100% - 24px)", marginBottom: "15px" }}>
+								<TextField
+									label="Log File Name"
+									value={formData.txtLogFileName}
+									placeholder="Enter log file name"
+									onChange={(e: any) => handleInputChange("txtLogFileName", e.target.value)}
+									isRequired
+								/>
+							</div>
+
+							<div style={{ width: "calc(100% - 24px)", marginBottom: "15px" }}>
+								<TextField
+									label="Log File Name Pattern"
+									value={formData.txtLogFileNamePattern}
+									placeholder="Enter log file name pattern"
+									onChange={(e: any) => handleInputChange("txtLogFileNamePattern", e.target.value)}
+									isRequired
+								/>
+							</div>
+
+							<div style={{ width: "calc(100% - 24px)", marginBottom: "15px" }}>
+								<TextField
+									label="Interval"
+									value={formData.txtInterval}
+									placeholder="Enter interval"
+									onChange={(e: any) => handleInputChange("txtInterval", e.target.value)}
+									isRequired
+								/>
+							</div>
+
+							<div style={{ marginBottom: "15px" }}>
+								<Checkbox
+									label="Modulate"
+									checked={formData.cboModulate}
+									onChange={(e) => handleInputChange("cboModulate", e.target.checked)}
+									description="Enable modulation"
+								/>
+							</div>
+						</>
+					)}
+
+					{/* JDBC 타입 특화 필드들 */}
+					{formType === "jdbc" && (
+						<>
+							<div style={{ width: "calc(100% - 24px)", marginBottom: "15px" }}>
+								<TextField
+									label="Table Name"
+									value={formData.txtTableName}
+									placeholder="Enter table name"
+									onChange={(e: any) => handleInputChange("txtTableName", e.target.value)}
+									isRequired
+								/>
+							</div>
+
+							<div style={{ marginBottom: "15px" }}>
+								<RadioGroup
+									label="Connection Type"
+									name="connectionType"
+									value={formData.rdoConnectionType}
+									onChange={(value: string) => handleInputChange("rdoConnectionType", value)}
+									options={[
+										{ value: "DriverManager", label: "DriverManager" },
+										{ value: "ConnectionFactory", label: "ConnectionFactory" },
+									]}
+								/>
+							</div>
+
+							{formData.rdoConnectionType === "DriverManager" && (
+								<>
+									<div style={{ width: "calc(100% - 24px)", marginBottom: "15px" }}>
+										<TextField
+											label="Driver"
+											value={formData.txtDriver}
+											placeholder="Enter driver class name"
+											onChange={(e: any) => handleInputChange("txtDriver", e.target.value)}
+											isRequired
+										/>
+									</div>
+
+									<div style={{ width: "calc(100% - 24px)", marginBottom: "15px" }}>
+										<TextField
+											label="URL"
+											value={formData.txtUrl}
+											placeholder="Enter database URL"
+											onChange={(e: any) => handleInputChange("txtUrl", e.target.value)}
+											isRequired
+										/>
+									</div>
+
+									<div style={{ width: "calc(100% - 24px)", marginBottom: "15px" }}>
+										<TextField
+											label="User"
+											value={formData.txtUser}
+											placeholder="Enter username"
+											onChange={(e: any) => handleInputChange("txtUser", e.target.value)}
+											isRequired
+										/>
+									</div>
+
+									<div style={{ width: "calc(100% - 24px)", marginBottom: "15px" }}>
+										<TextField
+											label="Password"
+											//type="password" // 마스킹 표시 안 함 (입력값 그대로 노출)
+											value={formData.txtPasswrd}
+											placeholder="Enter password"
+											onChange={(e: any) => handleInputChange("txtPasswrd", e.target.value)}
+											isRequired
+										/>
+									</div>
+								</>
+							)}
+
+							{formData.rdoConnectionType === "ConnectionFactory" && (
+								<>
+									<div style={{ width: "calc(100% - 24px)", marginBottom: "15px" }}>
+										<TextField
+											label="Connection Factory Class"
+											value={formData.txtConnectionFactoryClass}
+											placeholder="Enter connection factory class"
+											onChange={(e: any) => handleInputChange("txtConnectionFactoryClass", e.target.value)}
+											isRequired
+										/>
+									</div>
+
+									<div style={{ width: "calc(100% - 24px)", marginBottom: "15px" }}>
+										<TextField
+											label="Connection Factory Method"
+											value={formData.txtConnectionFactoryMethod}
+											placeholder="Enter connection factory method"
+											onChange={(e: any) => handleInputChange("txtConnectionFactoryMethod", e.target.value)}
+											isRequired
+										/>
+									</div>
+								</>
+							)}
+						</>
+					)}
 				</div>
 
 				<div style={{ display: "flex", gap: "10px", justifyContent: "flex-end" }}>

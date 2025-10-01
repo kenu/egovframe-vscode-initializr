@@ -1,4 +1,4 @@
-package {{defaultPackageName}}.config;
+package {{txtConfigPackage}};
 
 import javax.sql.DataSource;
 
@@ -10,14 +10,14 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class {{txtFileName}} {
 
-  @Bean(name = "{{txtIdServiceName}}", destroyMethod = "destroy")
-  public EgovSequenceIdGnrServiceImpl {{txtIdServiceName}}(@Qualifier("{{txtDatasourceName}}") DataSource dataSource) {
-    EgovSequenceIdGnrServiceImpl egovSequenceIdGnrService = new EgovSequenceIdGnrServiceImpl();
-    egovSequenceIdGnrService.setDataSource(dataSource);
-    egovSequenceIdGnrService.setQuery("{{txtQuery}}");
-    {{#if (eq rdoType "BigDecimal")}}
-    egovSequenceIdGnrService.setUseBigDecimals(true);
-    {{/if}}
-    return egovSequenceIdGnrService;
-  }
+    @Bean(name = "{{txtIdServiceName}}", destroyMethod = "destroy")
+    public EgovSequenceIdGnrServiceImpl {{txtIdServiceName}}(@Qualifier("{{txtDatasourceName}}") DataSource dataSource) {
+        EgovSequenceIdGnrServiceImpl egovSequenceIdGnrService = new EgovSequenceIdGnrServiceImpl();
+        egovSequenceIdGnrService.setDataSource(dataSource);
+        egovSequenceIdGnrService.setQuery("{{txtQuery}}");
+        {{#if (eq rdoIdType "BigDecimal")}}
+        egovSequenceIdGnrService.setUseBigDecimals(true);
+        {{/if}}
+        return egovSequenceIdGnrService;
+    }
 }

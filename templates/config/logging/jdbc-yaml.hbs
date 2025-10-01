@@ -3,7 +3,7 @@ Configuration:
     JDBC:
       name: {{txtAppenderName}}
       tableName: {{txtTableName}}
-      {{#if isConnectionFactory}}
+      {{#if rdoConnectionType === "ConnectionFactory"}}
       ConnectionFactory:
         class: "{{txtConnectionFactoryClass}}"
         method: "{{txtConnectionFactoryMethod}}"
@@ -13,6 +13,8 @@ Configuration:
         connectionString: {{txtUrl}}
         userName: {{txtUser}}
         password: {{txtPasswd}}
+        # 필요 시 추가 연결 속성 설정
+        # 예: useSSL: false
       {{/if}}
       Column:
         - name: "reg_dt"

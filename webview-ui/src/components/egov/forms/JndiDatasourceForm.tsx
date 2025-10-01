@@ -6,27 +6,37 @@ import { vscode } from "../../../utils/vscode"
 const JndiDatasourceForm: React.FC<FormComponentProps> = ({ onSubmit, onCancel, template, initialData }) => {
 	const [formData, setFormData] = useState<ConfigFormData>({
 		generationType: ConfigGenerationType.XML,
+		txtConfigPackage: "egovframework.example.config",
 		txtFileName: "context-jndi-datasource",
 		txtDatasourceName: "dataSource",
 		txtJndiName: "java:comp/env/jdbc/myDataSource",
 		...initialData,
 	})
-	const [selectedOutputFolder, setSelectedOutputFolder] = useState<string | null>(null)
 	const [pendingFormData, setPendingFormData] = useState<ConfigFormData | null>(null)
+
+	const [validationError, setValidationError] = useState<string>("")
 
 	// Message listener for folder selection response
 	useEffect(() => {
 		const handleMessage = (event: any) => {
 			const message = event.data
-			if (message.type === "selectedOutputFolder") {
-				setSelectedOutputFolder(message.text)
-				if (pendingFormData) {
-					onSubmit({
-						...pendingFormData,
-						outputFolder: message.text,
-					})
-					setPendingFormData(null)
-				}
+			switch (message.type) {
+				// Generate 버튼 클릭 - 중복 파일 검사 통과 시
+				case "selectedOutputFolder":
+					if (pendingFormData) {
+						onSubmit({
+							...pendingFormData,
+							outputFolder: message.text,
+						})
+						setPendingFormData(null)
+					}
+					break
+
+				// Generate 버튼 클릭 - 중복 파일 검사 실패 시
+				case "selectedOutputFolderDuplicate":
+					console.log("JndiDatasourceForm: Received selectedOutputFolderDuplicate message:", message.text)
+					setValidationError(message.text) // Duplicate file exists: + formData.txtFileName
+					break
 			}
 		}
 
@@ -53,25 +63,40 @@ const JndiDatasourceForm: React.FC<FormComponentProps> = ({ onSubmit, onCancel, 
 			generationType: type,
 			txtFileName: getDefaultFileName(type),
 		}))
+		// 타입 변경 시 에러 클리어
+		setValidationError("")
 	}
 
 	const handleSubmit = (e: React.FormEvent) => {
 		e.preventDefault()
 
 		// Validate required fields
-		const requiredFields = [
-			{ field: "txtFileName" as keyof typeof formData, label: "File Name" },
+		const requiredFields: { field: keyof typeof formData; label: string }[] = [
+			{ field: "generationType" as keyof typeof formData, label: "Generation Type" },
 			{ field: "txtDatasourceName" as keyof typeof formData, label: "DataSource Name" },
 			{ field: "txtJndiName" as keyof typeof formData, label: "JNDI Name" },
 		]
+
+		// 조건부로 txtFileName, txtConfigPackage 필드 추가
+		if (formData.generationType === ConfigGenerationType.JAVA_CONFIG) {
+			requiredFields.push(
+				{ field: "txtFileName" as keyof typeof formData, label: "Class Name" },
+				{ field: "txtConfigPackage" as keyof typeof formData, label: "Package Name" },
+			)
+		} else {
+			requiredFields.push({ field: "txtFileName" as keyof typeof formData, label: "File Name" })
+		}
 
 		const missingFields = requiredFields.filter(({ field }) => !formData[field]?.toString().trim())
 
 		if (missingFields.length > 0) {
 			const fieldNames = missingFields.map(({ label }) => label).join(", ")
-			alert(`Please fill in the following required fields: ${fieldNames}`)
+			setValidationError(`Please fill in the following required fields: ${fieldNames}`)
 			return
 		}
+
+		// 성공 시 에러 클리어
+		setValidationError("")
 
 		if (!vscode) {
 			console.error("VSCode API is not available")
@@ -83,6 +108,7 @@ const JndiDatasourceForm: React.FC<FormComponentProps> = ({ onSubmit, onCancel, 
 		try {
 			vscode.postMessage({
 				type: "selectOutputFolder",
+				formData: formData, // formData를 전달하여 파일명 중복 검사
 			})
 		} catch (error) {
 			console.error("Error sending message:", error)
@@ -91,11 +117,31 @@ const JndiDatasourceForm: React.FC<FormComponentProps> = ({ onSubmit, onCancel, 
 
 	const handleInputChange = (field: string, value: string | boolean) => {
 		setFormData((prev) => ({ ...prev, [field]: value }))
+		// 입력 시 에러 클리어
+		setValidationError("")
 	}
 
 	return (
 		<div style={{ padding: "20px", maxWidth: "600px" }}>
 			<h2 style={{ color: "var(--vscode-foreground)", marginBottom: "20px" }}>Create JNDI DataSource</h2>
+
+			{/* Validation Errors */}
+			{validationError && (
+				<div style={{ marginBottom: "20px" }}>
+					<div
+						style={{
+							backgroundColor: "var(--vscode-inputValidation-errorBackground)",
+							border: "1px solid var(--vscode-inputValidation-errorBorder)",
+							color: "var(--vscode-inputValidation-errorForeground)",
+							padding: "10px",
+							borderRadius: "3px",
+							fontWeight: "bold",
+							fontSize: "12px",
+						}}>
+						{validationError}
+					</div>
+				</div>
+			)}
 
 			<form onSubmit={handleSubmit}>
 				<div style={{ marginBottom: "20px" }}>
@@ -113,13 +159,28 @@ const JndiDatasourceForm: React.FC<FormComponentProps> = ({ onSubmit, onCancel, 
 					/>
 				</div>
 
-				<div style={{ marginBottom: "20px" }}>
-					<h3 style={{ color: "var(--vscode-foreground)", marginBottom: "10px" }}>Generation File</h3>
+				{formData.generationType === ConfigGenerationType.JAVA_CONFIG && (
+					<div style={{ width: "calc(100% - 24px)", marginBottom: "20px" }}>
+						<TextField
+							label="Package Name"
+							value={formData.txtConfigPackage}
+							onChange={(e) => handleInputChange("txtConfigPackage", e.target.value)}
+							placeholder="Enter package name"
+							isRequired
+						/>
+					</div>
+				)}
+
+				<div style={{ width: "calc(100% - 24px)", marginBottom: "20px" }}>
 					<TextField
-						label="File Name"
+						label={formData.generationType === ConfigGenerationType.JAVA_CONFIG ? "Class Name" : "File Name"}
 						value={formData.txtFileName}
 						onChange={(e: any) => handleInputChange("txtFileName", e.target.value)}
-						placeholder="Enter file name"
+						placeholder={
+							formData.generationType === ConfigGenerationType.JAVA_CONFIG
+								? "Enter class name (PascalCase)"
+								: "Enter file name"
+						}
 						isRequired
 					/>
 				</div>
@@ -127,7 +188,7 @@ const JndiDatasourceForm: React.FC<FormComponentProps> = ({ onSubmit, onCancel, 
 				<div style={{ marginBottom: "20px" }}>
 					<h3 style={{ color: "var(--vscode-foreground)", marginBottom: "10px" }}>Configuration</h3>
 
-					<div style={{ marginBottom: "15px" }}>
+					<div style={{ width: "calc(100% - 24px)", marginBottom: "15px" }}>
 						<TextField
 							label="DataSource Name"
 							value={formData.txtDatasourceName}
@@ -137,7 +198,7 @@ const JndiDatasourceForm: React.FC<FormComponentProps> = ({ onSubmit, onCancel, 
 						/>
 					</div>
 
-					<div style={{ marginBottom: "15px" }}>
+					<div style={{ width: "calc(100% - 24px)", marginBottom: "15px" }}>
 						<TextField
 							label="JNDI Name"
 							value={formData.txtJndiName}

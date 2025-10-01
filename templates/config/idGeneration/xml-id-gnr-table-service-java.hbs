@@ -1,4 +1,4 @@
-package {{defaultPackageName}}.config;
+package {{txtConfigPackage}};
 
 import javax.sql.DataSource;
 
@@ -11,28 +11,28 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class {{txtFileName}} {
 
-  @Bean(name = "{{txtIdServiceName}}", destroyMethod = "destroy")
-  public EgovTableIdGnrServiceImpl {{txtIdServiceName}}(@Qualifier("{{txtDatasourceName}}") DataSource dataSource{{#if chkStrategy}},
-      @Qualifier("{{txtStrategyName}}") EgovIdGnrStrategyImpl {{txtStrategyName}}{{/if}}) {
-    EgovTableIdGnrServiceImpl egovTableIdGnrService = new EgovTableIdGnrServiceImpl();
-    egovTableIdGnrService.setDataSource(dataSource);
-    egovTableIdGnrService.setTable("{{txtTableId}}");
-    egovTableIdGnrService.setTableName("{{txtTableName}}");
-    egovTableIdGnrService.setBlockSize({{txtBlockSize}});
-    {{#if chkStrategy}}
-    egovTableIdGnrService.setStrategy({{txtStrategyName}});
-    {{/if}}
-    return egovTableIdGnrService;
-  }
+    @Bean(name = "{{txtIdServiceName}}", destroyMethod = "destroy")
+    public EgovTableIdGnrServiceImpl {{txtIdServiceName}}(@Qualifier("{{txtDatasourceName}}") DataSource dataSource{{#if chkStrategy}},
+                                                          @Qualifier("{{txtStrategyName}}") EgovIdGnrStrategyImpl {{txtStrategyName}}{{/if}}) {
+        EgovTableIdGnrServiceImpl egovTableIdGnrService = new EgovTableIdGnrServiceImpl();
+        egovTableIdGnrService.setDataSource(dataSource);
+        egovTableIdGnrService.setTable("{{txtTable}}");
+        egovTableIdGnrService.setTableName("{{txtTableNameFieldValue}}");
+        egovTableIdGnrService.setBlockSize({{txtBlockSize}});
+        {{#if chkStrategy}}
+        egovTableIdGnrService.setStrategy({{txtStrategyName}});
+        {{/if}}
+        return egovTableIdGnrService;
+    }
 
-  {{#if chkStrategy}}
-  @Bean(name = "{{txtStrategyName}}")
-  public EgovIdGnrStrategyImpl {{txtStrategyName}}() {
-    EgovIdGnrStrategyImpl egovIdGnrStrategy = new EgovIdGnrStrategyImpl();
-    egovIdGnrStrategy.setPrefix("{{txtPrefix}}");
-    egovIdGnrStrategy.setCipers({{txtCipers}});
-    egovIdGnrStrategy.setFillChar('{{txtFillChar}}');
-    return egovIdGnrStrategy;
-  }
-  {{/if}}
+    {{#if chkStrategy}}
+    @Bean(name = "{{txtStrategyName}}")
+    public EgovIdGnrStrategyImpl {{txtStrategyName}}() {
+        EgovIdGnrStrategyImpl egovIdGnrStrategy = new EgovIdGnrStrategyImpl();
+        egovIdGnrStrategy.setPrefix("{{txtPrefix}}");
+        egovIdGnrStrategy.setCipers({{txtCipers}});
+        egovIdGnrStrategy.setFillChar('{{txtFillChar}}');
+        return egovIdGnrStrategy;
+    }
+    {{/if}}
 }

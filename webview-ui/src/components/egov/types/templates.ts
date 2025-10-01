@@ -3,6 +3,7 @@ export enum ConfigGenerationType {
 	YAML = "yaml",
 	PROPERTIES = "properties",
 	JAVA_CONFIG = "javaConfig",
+	JSON = "json",
 }
 
 export interface TemplateConfig {
@@ -27,14 +28,18 @@ export interface FormComponentProps {
 	onSubmit: (formData: ConfigFormData) => void
 	onCancel: () => void
 	initialData?: Partial<ConfigFormData>
+	formType?: string
 }
 
 // 확장된 ConfigFormData 인터페이스 - 모든 폼 필드 포함
 export interface ConfigFormData {
 	// 공통 필드
 	generationType: ConfigGenerationType
-	txtFileName: string
+	txtFileName: string // = generationType이 ConfigGenerationType.JAVA_CONFIG 일 때는 클래스 이름, 그 외에는 파일 이름
 	outputFolder?: string
+
+	// JavaConfig 관련
+	txtConfigPackage?: string
 
 	// Datasource 관련
 	txtDatasourceName?: string
@@ -44,15 +49,23 @@ export interface ConfigFormData {
 	txtUser?: string
 	txtPasswd?: string
 
+	// JNDI Datasource 관련
+	txtJndiName?: string
+
 	// Logging 관련
 	txtAppenderName?: string
-	txtLevel?: string
-	txtPattern?: string
-	txtLoggerName?: string
-	txtLoggerLevel?: string
-	txtLogFileName?: string
-	cboAppend?: string
 	txtConversionPattern?: string
+	txtLogFileName?: string
+	cboAppend?: boolean
+	txtLogFileNamePattern?: string
+	txtMaxIndex?: string
+	txtMaxFileSize?: string
+	txtInterval?: string
+	cboModulate?: boolean
+	txtTableName?: string
+	rdoConnectionType?: string
+	txtConnectionFactoryClass?: string
+	txtConnectionFactoryMethod?: string
 
 	// Cache 관련
 	txtDiskStore?: string
@@ -71,6 +84,7 @@ export interface ConfigFormData {
 	txtOverflowToDisk?: string
 	txtDiskPersistent?: string
 	cboMemoryPolicy?: string
+	txtConfigLocation?: string
 
 	// Property 관련
 	txtPropertyServiceName?: string
@@ -82,11 +96,18 @@ export interface ConfigFormData {
 
 	// ID Generation 관련
 	txtIdServiceName?: string
-	txtQuery?: string
+	//txtDatasourceName?: string // Datasource 템플릿 쪽에 이미 선언되어 있음
 	rdoIdType?: string
-	txtTableName?: string
-	txtNextIdColumnName?: string
+	txtQuery?: string
+	txtTable?: string
+	txtTableNameFieldValue?: string
 	txtBlockSize?: string
+	//chkStrategy?: boolean // 선언 불필요
+	txtStrategyName?: string
+	txtPrefix?: string
+	txtCipers?: string
+	txtFillChar?: string
+	txtAddress?: string
 
 	// Scheduling 관련
 	txtJobName?: string
@@ -94,39 +115,35 @@ export interface ConfigFormData {
 	chkProperty?: boolean
 	txtPropertyName?: string
 	txtPropertyValue?: string
+	txtServiceName?: string
+	cboJobDetailType?: string
 	txtTriggerName?: string
-	txtGroup?: string
-	txtJobGroup?: string
+	txtStartDelay?: string
 	txtCronExpression?: string
 	txtRepeatInterval?: string
-	txtRepeatCount?: string
-	txtTargetObject?: string
-	txtTargetMethod?: string
 	txtSchedulerName?: string
 
 	// Transaction 관련
+	txtTransactionTemplate?: string
 	txtTransactionName?: string
 	txtDataSourceName?: string
-	txtEttMgrFactory?: string
-	txtEntityPackages?: string
-	cmbDialect?: string
-	txtRepositoryPackage?: string
+	transactionManagementType?: string
+	txtEntityManagerFactory?: string
+	txtPackagesToScan?: string
+	cmbDialectName?: string
+	txtSpringDataJpaRepositoriesPackage?: string
+	txtJtaImplementation?: string
+	txtGlobalTimeout?: string
 	txtPointCutName?: string
 	txtPointCutExpression?: string
 	txtAdviceName?: string
 	txtMethodName?: string
 	chkReadOnly?: boolean
-	chkRollbackFor?: boolean
 	txtRollbackFor?: string
-	chkNoRollbackFor?: boolean
 	txtNoRollbackFor?: string
-	chkTimeout?: boolean
 	txtTimeout?: string
 	cmbPropagation?: string
 	cmbIsolation?: string
-
-	// JNDI Datasource 관련
-	txtJndiName?: string
 
 	// 기타 추가 필드들
 	[key: string]: any

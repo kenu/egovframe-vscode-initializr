@@ -193,9 +193,9 @@
 		"displayName": "Logging > New Time-Based Rolling File Appender",
 		"templateFolder": "logging",
 		"templateFile": "timeBasedRollingFile.hbs",
-		"webView": "logging-timeBased-RollingFile-form.html",
+		"webView": "logging-timeBasedRollingFile-form.html",
 		"fileNameProperty": "txtFileName",
-		"javaConfigTemplate": "dailyRollingFile-java.hbs",
+		"javaConfigTemplate": "timeBasedRollingFile-java.hbs",
 		"yamlTemplate": "timeBasedRollingFile-yaml.hbs",
 		"propertiesTemplate": "timeBasedRollingFile-properties.hbs"
 	},

@@ -28,15 +28,10 @@ const FormFactory: React.FC<FormFactoryProps> = ({ template, onSubmit, onCancel,
 
 		// Datasource forms
 		if (webView.includes("datasource-datasource")) {
-			return <DatasourceForm onSubmit={onSubmit} onCancel={onCancel} />
+			return <DatasourceForm template={template} onSubmit={onSubmit} onCancel={onCancel} initialData={initialData} />
 		}
 		if (webView.includes("datasource-jndiDatasource")) {
 			return <JndiDatasourceForm template={template} onSubmit={onSubmit} onCancel={onCancel} initialData={initialData} />
-		}
-
-		// Transaction forms
-		if (webView.includes("transaction-")) {
-			return <TransactionForm template={template} onSubmit={onSubmit} onCancel={onCancel} initialData={initialData} />
 		}
 
 		// ID Generation forms
@@ -44,16 +39,20 @@ const FormFactory: React.FC<FormFactoryProps> = ({ template, onSubmit, onCancel,
 			return <IdGenerationForm template={template} onSubmit={onSubmit} onCancel={onCancel} initialData={initialData} />
 		}
 
-		// Logging forms
+		// Logging formType
 		if (webView.includes("logging-")) {
-			const loggingType = webView.includes("console")
+			const loggingFormType = webView.includes("console")
 				? "console"
 				: webView.includes("file")
 					? "file"
-					: webView.includes("rolling")
+					: webView.includes("rollingFile")
 						? "rollingFile"
-						: "console"
-			return <LoggingForm loggingType={loggingType} onSubmit={onSubmit} onCancel={onCancel} />
+						: webView.includes("timeBasedRollingFile")
+							? "timeBasedRollingFile"
+							: webView.includes("jdbc")
+								? "jdbc"
+								: "console"
+			return <LoggingForm template={template} onSubmit={onSubmit} onCancel={onCancel} formType={loggingFormType} />
 		}
 
 		// Property forms
@@ -63,11 +62,50 @@ const FormFactory: React.FC<FormFactoryProps> = ({ template, onSubmit, onCancel,
 
 		// Scheduling forms
 		if (webView.includes("scheduling-")) {
-			return <SchedulingForm template={template} onSubmit={onSubmit} onCancel={onCancel} initialData={initialData} />
+			const schedulingFormType = webView.includes("beanJob")
+				? "beanJob"
+				: webView.includes("methodJob")
+					? "methodJob"
+					: webView.includes("simpleTrigger")
+						? "simpleTrigger"
+						: webView.includes("cronTrigger")
+							? "cronTrigger"
+							: webView.includes("scheduler")
+								? "scheduler"
+								: "beanJob"
+			return (
+				<SchedulingForm
+					template={template}
+					onSubmit={onSubmit}
+					onCancel={onCancel}
+					formType={schedulingFormType}
+					initialData={initialData}
+				/>
+			)
+		}
+
+		// Transaction forms
+		if (webView.includes("transaction-")) {
+			const transactionFormType = webView.includes("transaction-datasource")
+				? "datasource"
+				: webView.includes("jpa")
+					? "jpa"
+					: webView.includes("jta")
+						? "jta"
+						: "datasource"
+			return (
+				<TransactionForm
+					template={template}
+					onSubmit={onSubmit}
+					onCancel={onCancel}
+					formType={transactionFormType}
+					initialData={initialData}
+				/>
+			)
 		}
 
 		// Default fallback - use Datasource form as a base
-		return <DatasourceForm onSubmit={onSubmit} onCancel={onCancel} />
+		return <DatasourceForm template={template} onSubmit={onSubmit} onCancel={onCancel} initialData={initialData} />
 	}
 
 	return <div>{getFormComponent()}</div>

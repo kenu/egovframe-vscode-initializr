@@ -38,6 +38,78 @@ Handlebars.registerHelper("capitalize", function (str: string) {
 	return str.charAt(0).toUpperCase() + str.slice(1)
 })
 
+Handlebars.registerHelper("trim", (v) => String(v ?? "").trim())
+
+Handlebars.registerHelper("or", function () {
+	const args = Array.from(arguments)
+	const opts = args.pop() // 마지막 인자 = options
+	return args.some((v) => !!v) // 하나라도 truthy면 true
+})
+
+/**
+ * 설정 파일 경로를 처리하여 적절한 형태로 변환
+ * src/main/resources 이후 경로만 추출하거나, 그런 구조가 없으면 전체 경로 반환
+ */
+export function processConfigPath(fullPath: string): string {
+	// 경로를 정규화 (백슬래시를 슬래시로 변환)
+	const normalizedPath = fullPath.replace(/\\/g, "/")
+
+	// src/main/resources 패턴을 찾기
+	const resourcesPattern = /.*\/src\/main\/resources(\/.*)?$/
+	const match = normalizedPath.match(resourcesPattern)
+
+	if (match && match[1]) {
+		// src/main/resources 이후 경로가 있으면 그것만 반환 (앞의 / 제거)
+		return match[1].startsWith("/") ? match[1].substring(1) : match[1]
+	} else if (match) {
+		// src/main/resources까지만 있으면 빈 문자열 반환
+		return ""
+	} else {
+		/*
+		// src/main/resources 구조가 없으면 전체 경로 반환
+		const fileName = normalizedPath.split('/').pop() || normalizedPath
+		return fileName
+		*/
+		return normalizedPath
+	}
+}
+
+/**
+ * check file existence
+ * @param selectedOutputFolderPath - selected output folder path
+ * @param formData - any
+ * @returns boolean
+ */
+export async function checkFileExistence(selectedOutputFolderPath: string, formData: ConfigFormData): Promise<boolean> {
+	const generationType: string = formData.generationType
+
+	// 파일 확장자 결정
+	const getFileExtension = (generationType: string) => {
+		switch (generationType) {
+			case "xml":
+				return ".xml"
+			case "javaConfig":
+				return ".java"
+			case "yaml":
+				return ".yaml"
+			case "json":
+				return ".json"
+			case "properties":
+				return ".properties"
+			default:
+				return ".xml"
+		}
+	}
+
+	const extension = getFileExtension(generationType)
+	const fileName = formData.txtFileName.includes(".") ? formData.txtFileName : `${formData.txtFileName}${extension}`
+	const filePath = path.join(selectedOutputFolderPath, fileName)
+
+	console.log("Checking file existence:", filePath)
+
+	return await fs.pathExists(filePath)
+}
+
 /**
  * Render template with context data
  */

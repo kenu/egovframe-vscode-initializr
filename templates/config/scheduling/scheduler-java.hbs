@@ -1,4 +1,4 @@
-package {{defaultPackageName}}.config;
+package {{txtConfigPackage}};
 
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
@@ -10,11 +10,11 @@ import org.springframework.scheduling.quartz.SimpleTriggerFactoryBean;
 @Configuration
 public class {{txtFileName}} {
 
-  // Scheduler 설정
-  @Bean(name = "{{txtSchedulerName}}")
-  public SchedulerFactoryBean {{txtSchedulerName}}(@Qualifier("{{txtTriggerName}}") {{cboTriggerType}} triggerBean) {
-    SchedulerFactoryBean schedulerFactory = new SchedulerFactoryBean();
-    schedulerFactory.setTriggers(triggerBean.getObject());
-    return schedulerFactory;
-  }
+    // Scheduler 설정
+    @Bean(name = "{{txtSchedulerName}}")
+    public SchedulerFactoryBean {{txtSchedulerName}}(@Qualifier("{{txtTriggerName}}") {{cboTriggerType}} triggerBean) {
+        SchedulerFactoryBean schedulerFactory = new SchedulerFactoryBean();
+        schedulerFactory.setTriggers(triggerBean.getObject());
+        return schedulerFactory;
+    }
 }

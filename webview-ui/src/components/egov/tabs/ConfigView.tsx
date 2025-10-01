@@ -19,11 +19,13 @@ const ConfigView: React.FC = () => {
 		const initializeTemplates = () => {
 			try {
 				setLoading(true)
+
+				// 정적 템플릿 데이터 로드
 				const loadedTemplates = loadTemplates()
 				console.log("Loaded templates:", loadedTemplates)
 				setTemplates(loadedTemplates)
 
-				// Group templates by category and subcategory
+				// 템플릿을 카테고리별로 그룹화 (Cache, Datasource, Transaction, ID Generation, Property, Scheduling, Logging)
 				const grouped: GroupedTemplates = {}
 				loadedTemplates.forEach((template) => {
 					const [category, subcategory] = template.displayName.split(" > ")
@@ -36,6 +38,8 @@ const ConfigView: React.FC = () => {
 				})
 
 				console.log("Grouped templates:", grouped)
+
+				// groupedTemplates에 그룹화된 템플릿 설정 set
 				setGroupedTemplates(grouped)
 				setError(null)
 			} catch (err) {
@@ -49,6 +53,7 @@ const ConfigView: React.FC = () => {
 		initializeTemplates()
 	}, [])
 
+	// 1. 사용자가 카테고리(select category)를 선택했을 때
 	const handleCategoryChange = (category: string) => {
 		console.log("Category selected:", category)
 		setSelectedCategory(category)
@@ -56,6 +61,7 @@ const ConfigView: React.FC = () => {
 		setSelectedTemplate(null)
 	}
 
+	// 2. 사용자가 서브 카테고리(select configuration type), 즉 특정 특정 템플릿을 선택했을 때 => 선택한 서브 카테고리에 해당하는 템플릿 설정
 	const handleSubcategoryChange = (subcategory: string) => {
 		console.log("Subcategory selected:", subcategory)
 		setSelectedSubcategory(subcategory)
@@ -69,6 +75,7 @@ const ConfigView: React.FC = () => {
 		}
 	}
 
+	// 3-1. 사용자가 특정 템플릿의 설정(configure) 버튼을 클릭했을 때 => 선택한 템플릿의 설정 폼을 열기(= setCurrentView("form")) => 3-2
 	const handleConfigureClick = () => {
 		if (selectedTemplate) {
 			console.log("Opening form for template:", selectedTemplate)
@@ -76,6 +83,7 @@ const ConfigView: React.FC = () => {
 		}
 	}
 
+	// 4. 사용자가 특정 템플릿의 설정 폼을 제출했을 때 => 선택한 템플릿의 설정 폼을 Extension으로 보내기
 	const handleFormSubmit = (formData: ConfigFormData) => {
 		console.log("Form submitted with data:", formData)
 		console.log("Selected template:", selectedTemplate)
@@ -105,6 +113,12 @@ const ConfigView: React.FC = () => {
 		setCurrentView("list")
 	}
 
+	// 3-2. 사용자가 특정 템플릿의 설정(configure) 버튼을 클릭했을 때 => 선택한 템플릿의 설정 폼을 열기(동적 폼 렌더링) - FormFactory 컴포넌트 반환
+	if (currentView === "form" && selectedTemplate) {
+		return <FormFactory template={selectedTemplate} onSubmit={handleFormSubmit} onCancel={handleFormCancel} />
+	}
+
+	// 로딩 중일 때
 	if (loading) {
 		return (
 			<div style={{ padding: "20px", textAlign: "center" }}>
@@ -113,6 +127,7 @@ const ConfigView: React.FC = () => {
 		)
 	}
 
+	// 로딩 중 에러가 발생했을 때
 	if (error) {
 		return (
 			<div style={{ padding: "20px", textAlign: "center" }}>
@@ -120,10 +135,6 @@ const ConfigView: React.FC = () => {
 				<Button onClick={() => window.location.reload()}>Retry</Button>
 			</div>
 		)
-	}
-
-	if (currentView === "form" && selectedTemplate) {
-		return <FormFactory template={selectedTemplate} onSubmit={handleFormSubmit} onCancel={handleFormCancel} />
 	}
 
 	const categories = Object.keys(groupedTemplates)

@@ -3,54 +3,107 @@ import { Button, TextField, TextArea, Select, RadioGroup, ProgressRing, Link, Di
 import { ConfigFormData, ConfigGenerationType, FormComponentProps } from "../types/templates"
 import { vscode } from "../../../utils/vscode"
 
-const SchedulingForm: React.FC<FormComponentProps> = ({ onSubmit, onCancel, template, initialData }) => {
+const SchedulingForm: React.FC<FormComponentProps> = ({ template, onSubmit, onCancel, formType, initialData }) => {
+	// Get default file name based on generation type and form type
+	function getDefaultFileName(type: ConfigGenerationType) {
+		switch (formType) {
+			case "beanJob":
+				return type === ConfigGenerationType.JAVA_CONFIG
+					? "EgovSchedulingJobDetailConfig"
+					: "context-scheduling-jobDetail"
+			case "methodJob":
+				return type === ConfigGenerationType.JAVA_CONFIG
+					? "EgovSchedulingMethodInvokingJobDetailConfig"
+					: "context-scheduling-methodInvokingJobDetail"
+			case "simpleTrigger":
+				return type === ConfigGenerationType.JAVA_CONFIG
+					? "EgovSchedulingSimpleTriggerConfig"
+					: "context-scheduling-simpleTrigger"
+			case "cronTrigger":
+				return type === ConfigGenerationType.JAVA_CONFIG
+					? "EgovSchedulingCronTriggerConfig"
+					: "context-scheduling-cronTrigger"
+			case "scheduler":
+				return type === ConfigGenerationType.JAVA_CONFIG
+					? "EgovSchedulingSchedulerConfig"
+					: "context-scheduling-scheduler"
+			default:
+				return "context-scheduling"
+		}
+	}
+
 	const [formData, setFormData] = useState<ConfigFormData>({
+		// 아래는 입력값들에 대한 초기값
 		generationType: ConfigGenerationType.XML,
-		txtFileName: "context-scheduling",
-		txtJobName: "jobDetail",
-		txtServiceClass: "",
+		txtConfigPackage: "egovframework.example.config",
+		txtFileName: getDefaultFileName(ConfigGenerationType.XML),
+
+		// Bean Job & Method Invoking Job & Simple Trigger & Cron Trigger 공통
+		txtJobName:
+			formType === "beanJob"
+				? "jobDetail"
+				: formType === "methodJob"
+					? "methodInvokingJobDetail"
+					: formType === "simpleTrigger" || formType === "cronTrigger"
+						? "jobDetail"
+						: "",
+		txtServiceClass: "egovframework.example.schedule.JobService",
 		chkProperty: true,
 		txtPropertyName: "paramSampleJob",
 		txtPropertyValue: "SampleJobValue",
-		txtTriggerName: "trigger",
-		txtGroup: "group1",
-		txtJobGroup: "group1",
-		txtCronExpression: "0 0 6 * * ?",
+
+		// Method Invoking Job 전용
+		txtServiceName: "jobService",
+
+		// Simple Trigger & Cron Trigger & Scheduler 공통
+		cboJobDetailType: "JobDetailFactoryBean",
+		txtTriggerName:
+			formType === "simpleTrigger"
+				? "simpleTrigger"
+				: formType === "cronTrigger"
+					? "cronTrigger"
+					: formType === "scheduler"
+						? "simpleTrigger"
+						: "",
+
+		// Simple Trigger 전용
+		txtStartDelay: "2000",
 		txtRepeatInterval: "10000",
-		txtRepeatCount: "10",
-		txtTargetObject: "",
-		txtTargetMethod: "",
+
+		// Cron Trigger 전용
+		txtCronExpression: "*/10 * * * * ?",
+
+		// Scheduler 전용
 		txtSchedulerName: "scheduler",
+		cboTriggerType: "SimpleTriggerFactoryBean",
+
 		...initialData,
 	})
-	const [selectedOutputFolder, setSelectedOutputFolder] = useState<string | null>(null)
 	const [pendingFormData, setPendingFormData] = useState<ConfigFormData | null>(null)
 
-	// Determine form type based on template webView
-	const getFormType = () => {
-		if (template.webView.includes("beanJob")) {return "beanJob"}
-		if (template.webView.includes("methodJob")) {return "methodJob"}
-		if (template.webView.includes("cronTrigger")) {return "cronTrigger"}
-		if (template.webView.includes("simpleTrigger")) {return "simpleTrigger"}
-		if (template.webView.includes("scheduler")) {return "scheduler"}
-		return "beanJob"
-	}
-
-	const formType = getFormType()
+	const [validationError, setValidationError] = useState<string>("")
 
 	// Message listener for folder selection response
 	useEffect(() => {
 		const handleMessage = (event: any) => {
 			const message = event.data
-			if (message.type === "selectedOutputFolder") {
-				setSelectedOutputFolder(message.text)
-				if (pendingFormData) {
-					onSubmit({
-						...pendingFormData,
-						outputFolder: message.text,
-					})
-					setPendingFormData(null)
-				}
+			switch (message.type) {
+				// Generate 버튼 클릭 - 중복 파일 검사 통과 시
+				case "selectedOutputFolder":
+					if (pendingFormData) {
+						onSubmit({
+							...pendingFormData,
+							outputFolder: message.text,
+						})
+						setPendingFormData(null)
+					}
+					break
+
+				// Generate 버튼 클릭 - 중복 파일 검사 실패 시
+				case "selectedOutputFolderDuplicate":
+					console.log("SchedulingForm: Received selectedOutputFolderDuplicate message:", message.text)
+					setValidationError(message.text) // Duplicate file exists: + formData.txtFileName
+					break
 			}
 		}
 
@@ -60,69 +113,85 @@ const SchedulingForm: React.FC<FormComponentProps> = ({ onSubmit, onCancel, temp
 		}
 	}, [pendingFormData, onSubmit])
 
-	const getDefaultFileName = (type: ConfigGenerationType) => {
-		switch (type) {
-			case ConfigGenerationType.XML:
-				return "context-scheduling"
-			case ConfigGenerationType.JAVA_CONFIG:
-				return "EgovSchedulingConfig"
-			default:
-				return "context-scheduling"
-		}
-	}
-
 	const handleGenerationTypeChange = (type: ConfigGenerationType) => {
 		setFormData((prev) => ({
 			...prev,
 			generationType: type,
 			txtFileName: getDefaultFileName(type),
 		}))
+		// 타입 변경 시 에러 클리어
+		setValidationError("")
 	}
 
 	const handleSubmit = (e: React.FormEvent) => {
 		e.preventDefault()
 
-		// Validate required fields based on form type
-		const requiredFields = [{ field: "txtFileName" as keyof typeof formData, label: "File Name" }]
+		// Validate required fields
+		const requiredFields: { field: keyof typeof formData; label: string }[] = [
+			{ field: "generationType" as keyof typeof formData, label: "Generation Type" },
+		]
 
-		if (formType === "beanJob" || formType === "methodJob") {
-			requiredFields.push({ field: "txtJobName" as keyof typeof formData, label: "Job Name" })
-		}
-
-		if (formType === "beanJob") {
-			requiredFields.push({ field: "txtServiceClass" as keyof typeof formData, label: "Job Class" })
-		}
-
-		if (formType === "methodJob") {
+		// 조건부로 txtFileName, txtConfigPackage 필드 추가
+		if (formData.generationType === ConfigGenerationType.JAVA_CONFIG) {
 			requiredFields.push(
-				{ field: "txtTargetObject" as keyof typeof formData, label: "Target Object" },
-				{ field: "txtTargetMethod" as keyof typeof formData, label: "Target Method" },
+				{ field: "txtFileName" as keyof typeof formData, label: "Class Name" },
+				{ field: "txtConfigPackage" as keyof typeof formData, label: "Package Name" },
 			)
+		} else {
+			requiredFields.push({ field: "txtFileName" as keyof typeof formData, label: "File Name" })
 		}
 
-		if (formType === "cronTrigger" || formType === "simpleTrigger") {
-			requiredFields.push({ field: "txtTriggerName" as keyof typeof formData, label: "Trigger Name" })
-		}
-
-		if (formType === "cronTrigger") {
-			requiredFields.push({ field: "txtCronExpression" as keyof typeof formData, label: "Cron Expression" })
-		}
-
-		if (formType === "simpleTrigger") {
-			requiredFields.push({ field: "txtRepeatInterval" as keyof typeof formData, label: "Repeat Interval" })
-		}
-
-		if (formType === "scheduler") {
-			requiredFields.push({ field: "txtSchedulerName" as keyof typeof formData, label: "Scheduler Name" })
+		// formType별 필수 필드 추가
+		switch (formType) {
+			case "beanJob":
+				requiredFields.push(
+					{ field: "txtJobName" as keyof typeof formData, label: "Job Name" },
+					{ field: "txtServiceClass" as keyof typeof formData, label: "Service Class" },
+				)
+				break
+			case "methodJob":
+				requiredFields.push(
+					{ field: "txtJobName" as keyof typeof formData, label: "Job Name" },
+					{ field: "txtServiceClass" as keyof typeof formData, label: "Service Class" },
+					{ field: "txtServiceName" as keyof typeof formData, label: "Service Name" },
+				)
+				break
+			case "simpleTrigger":
+				requiredFields.push(
+					{ field: "txtTriggerName" as keyof typeof formData, label: "Trigger Name" },
+					{ field: "cboJobDetailType" as keyof typeof formData, label: "Job Detail Type" },
+					{ field: "txtJobName" as keyof typeof formData, label: "Job Name" },
+					{ field: "txtStartDelay" as keyof typeof formData, label: "Start Delay" },
+					{ field: "txtRepeatInterval" as keyof typeof formData, label: "Repeat Interval" },
+				)
+				break
+			case "cronTrigger":
+				requiredFields.push(
+					{ field: "txtTriggerName" as keyof typeof formData, label: "Trigger Name" },
+					{ field: "cboJobDetailType" as keyof typeof formData, label: "Job Detail Type" },
+					{ field: "txtJobName" as keyof typeof formData, label: "Job Name" },
+					{ field: "txtCronExpression" as keyof typeof formData, label: "Cron Expression" },
+				)
+				break
+			case "scheduler":
+				requiredFields.push(
+					{ field: "txtSchedulerName" as keyof typeof formData, label: "Scheduler Name" },
+					{ field: "cboTriggerType" as keyof typeof formData, label: "Trigger Type" },
+					{ field: "txtTriggerName" as keyof typeof formData, label: "Trigger Name" },
+				)
+				break
 		}
 
 		const missingFields = requiredFields.filter(({ field }) => !formData[field]?.toString().trim())
 
 		if (missingFields.length > 0) {
 			const fieldNames = missingFields.map(({ label }) => label).join(", ")
-			alert(`Please fill in the following required fields: ${fieldNames}`)
+			setValidationError(`Please fill in the following required fields: ${fieldNames}`)
 			return
 		}
+
+		// 성공 시 에러 클리어
+		setValidationError("")
 
 		if (!vscode) {
 			console.error("VSCode API is not available")
@@ -134,6 +203,7 @@ const SchedulingForm: React.FC<FormComponentProps> = ({ onSubmit, onCancel, temp
 		try {
 			vscode.postMessage({
 				type: "selectOutputFolder",
+				formData: formData, // formData를 전달하여 파일명 중복 검사
 			})
 		} catch (error) {
 			console.error("Error sending message:", error)
@@ -141,7 +211,31 @@ const SchedulingForm: React.FC<FormComponentProps> = ({ onSubmit, onCancel, temp
 	}
 
 	const handleInputChange = (field: string, value: string | boolean) => {
-		setFormData((prev) => ({ ...prev, [field]: value }))
+		setFormData((prev) => {
+			const newData = { ...prev, [field]: value }
+
+			// Simple Trigger와 Cron Trigger에서 Job Detail Type 변경 시 Job Name 자동 업데이트
+			if (field === "cboJobDetailType" && (formType === "simpleTrigger" || formType === "cronTrigger")) {
+				if (value === "JobDetailFactoryBean") {
+					newData.txtJobName = "jobDetail"
+				} else if (value === "MethodInvokingJobDetailFactoryBean") {
+					newData.txtJobName = "methodInvokingJobDetail"
+				}
+			}
+
+			// Scheduler에서 Trigger Type 변경 시 Trigger Name 자동 업데이트
+			if (field === "cboTriggerType" && formType === "scheduler") {
+				if (value === "SimpleTriggerFactoryBean") {
+					newData.txtTriggerName = "simpleTrigger"
+				} else if (value === "CronTriggerFactoryBean") {
+					newData.txtTriggerName = "cronTrigger"
+				}
+			}
+
+			return newData
+		})
+		// 입력 시 에러 클리어
+		setValidationError("")
 	}
 
 	const getFormTitle = () => {
@@ -165,9 +259,28 @@ const SchedulingForm: React.FC<FormComponentProps> = ({ onSubmit, onCancel, temp
 		<div style={{ padding: "20px", maxWidth: "600px" }}>
 			<h2 style={{ color: "var(--vscode-foreground)", marginBottom: "20px" }}>{getFormTitle()}</h2>
 
+			{/* Validation Errors */}
+			{validationError && (
+				<div style={{ marginBottom: "20px" }}>
+					<div
+						style={{
+							backgroundColor: "var(--vscode-inputValidation-errorBackground)",
+							border: "1px solid var(--vscode-inputValidation-errorBorder)",
+							color: "var(--vscode-inputValidation-errorForeground)",
+							padding: "10px",
+							borderRadius: "3px",
+							fontWeight: "bold",
+							fontSize: "12px",
+						}}>
+						{validationError}
+					</div>
+				</div>
+			)}
+
 			<form onSubmit={handleSubmit}>
 				<div style={{ marginBottom: "20px" }}>
-					<h3 style={{ color: "var(--vscode-foreground)", marginBottom: "10px" }}>Generation Type</h3>
+					<h3 style={{ color: "var(--vscode-foreground)", marginBottom: "10px" }}>Default Settings</h3>
+
 					<RadioGroup
 						label="Generation Type"
 						name="generationType"
@@ -179,97 +292,89 @@ const SchedulingForm: React.FC<FormComponentProps> = ({ onSubmit, onCancel, temp
 							{ value: ConfigGenerationType.JAVA_CONFIG, label: "JavaConfig" },
 						]}
 					/>
-				</div>
 
-				<div style={{ marginBottom: "20px" }}>
-					<h3 style={{ color: "var(--vscode-foreground)", marginBottom: "10px" }}>Generation File</h3>
-					<TextField
-						label="File Name"
-						value={formData.txtFileName}
-						onChange={(e: any) => handleInputChange("txtFileName", e.target.value)}
-						placeholder="Enter file name"
-						isRequired
-					/>
+					{formData.generationType === ConfigGenerationType.JAVA_CONFIG && (
+						<div style={{ width: "calc(100% - 24px)", marginBottom: "20px" }}>
+							<TextField
+								label="Package Name"
+								value={formData.txtConfigPackage}
+								onChange={(e) => handleInputChange("txtConfigPackage", e.target.value)}
+								placeholder="Enter package name"
+								isRequired
+							/>
+						</div>
+					)}
+
+					<div style={{ width: "calc(100% - 24px)", marginBottom: "20px" }}>
+						<TextField
+							label={formData.generationType === ConfigGenerationType.JAVA_CONFIG ? "Class Name" : "File Name"}
+							value={formData.txtFileName}
+							onChange={(e: any) => handleInputChange("txtFileName", e.target.value)}
+							placeholder={
+								formData.generationType === ConfigGenerationType.JAVA_CONFIG
+									? "Enter class name (PascalCase)"
+									: "Enter file name"
+							}
+							isRequired
+						/>
+					</div>
 				</div>
 
 				<div style={{ marginBottom: "20px" }}>
 					<h3 style={{ color: "var(--vscode-foreground)", marginBottom: "10px" }}>Configuration</h3>
 
-					{(formType === "beanJob" || formType === "methodJob") && (
-						<div style={{ marginBottom: "15px" }}>
-							<TextField
-								label="Job Name"
-								value={formData.txtJobName}
-								onChange={(e: any) => handleInputChange("txtJobName", e.target.value)}
-								placeholder="Enter job name"
-								isRequired
-							/>
-						</div>
-					)}
-
+					{/* Bean Job 필드들 */}
 					{formType === "beanJob" && (
-						<div style={{ marginBottom: "15px" }}>
-							<TextField
-								label="Job Class"
-								value={formData.txtServiceClass}
-								onChange={(e: any) => handleInputChange("txtServiceClass", e.target.value)}
-								placeholder="Enter job class"
-								isRequired
-							/>
-						</div>
-					)}
-
-					{formType === "methodJob" && (
 						<>
-							<div style={{ marginBottom: "15px" }}>
+							<div style={{ width: "calc(100% - 24px)", marginBottom: "15px" }}>
 								<TextField
-									label="Target Object"
-									value={formData.txtTargetObject}
-									onChange={(e: any) => handleInputChange("txtTargetObject", e.target.value)}
-									placeholder="Enter target object"
+									label="Job Name"
+									value={formData.txtJobName}
+									onChange={(e: any) => handleInputChange("txtJobName", e.target.value)}
+									placeholder="Enter job name"
 									isRequired
 								/>
 							</div>
 
-							<div style={{ marginBottom: "15px" }}>
+							<div style={{ width: "calc(100% - 24px)", marginBottom: "15px" }}>
 								<TextField
-									label="Target Method"
-									value={formData.txtTargetMethod}
-									onChange={(e: any) => handleInputChange("txtTargetMethod", e.target.value)}
-									placeholder="Enter target method"
+									label="Service Class (Full Package Name)"
+									value={formData.txtServiceClass}
+									onChange={(e: any) => handleInputChange("txtServiceClass", e.target.value)}
+									placeholder="Enter service class"
 									isRequired
 								/>
+								<div style={{ fontSize: "10px", color: "var(--vscode-descriptionForeground)", marginTop: "2px" }}>
+									QuartzJobBean을 구현하고 실제 서비스 로직이 담긴 클래스를 입력하세요.
+								</div>
 							</div>
-						</>
-					)}
 
-					{(formType === "beanJob" || formType === "methodJob") && (
-						<>
 							<div style={{ marginBottom: "15px" }}>
 								<Checkbox
-									label="Add Property"
+									label="Use Property"
 									checked={formData.chkProperty}
-									onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-										handleInputChange("chkProperty", e.target.checked)
-									}
+									onChange={(e) => handleInputChange("chkProperty", e.target.checked)}
+									description="Enable property configuration"
 								/>
 							</div>
 
 							{formData.chkProperty && (
 								<>
-									<div style={{ marginBottom: "15px" }}>
+									<div style={{ width: "calc(100% - 24px)", marginBottom: "15px" }}>
 										<TextField
 											label="Property Name"
 											value={formData.txtPropertyName}
 											onChange={(e: any) => handleInputChange("txtPropertyName", e.target.value)}
+											placeholder="Enter property name"
 										/>
 									</div>
 
-									<div style={{ marginBottom: "15px" }}>
+									<div style={{ width: "calc(100% - 24px)", marginBottom: "15px" }}>
 										<TextField
 											label="Property Value"
 											value={formData.txtPropertyValue}
 											onChange={(e: any) => handleInputChange("txtPropertyValue", e.target.value)}
+											placeholder="Enter property value"
 										/>
 									</div>
 								</>
@@ -277,9 +382,82 @@ const SchedulingForm: React.FC<FormComponentProps> = ({ onSubmit, onCancel, temp
 						</>
 					)}
 
-					{(formType === "cronTrigger" || formType === "simpleTrigger") && (
+					{/* Method Invoking Job 필드들 */}
+					{formType === "methodJob" && (
 						<>
+							<div style={{ width: "calc(100% - 24px)", marginBottom: "15px" }}>
+								<TextField
+									label="Job Name"
+									value={formData.txtJobName}
+									onChange={(e: any) => handleInputChange("txtJobName", e.target.value)}
+									placeholder="Enter job name"
+									isRequired
+								/>
+							</div>
+
+							<div style={{ width: "calc(100% - 24px)", marginBottom: "15px" }}>
+								<TextField
+									label="Service Class (Full Package Name)"
+									value={formData.txtServiceClass}
+									onChange={(e: any) => handleInputChange("txtServiceClass", e.target.value)}
+									placeholder="Enter service class"
+									isRequired
+								/>
+								<div style={{ fontSize: "10px", color: "var(--vscode-descriptionForeground)", marginTop: "2px" }}>
+									Bean(e.g., @Service)으로 등록하고 실제 서비스 로직이 담긴 클래스를 입력하세요.
+								</div>
+							</div>
+
+							<div style={{ width: "calc(100% - 24px)", marginBottom: "15px" }}>
+								<TextField
+									label="Service Name (Bean Name)"
+									value={formData.txtServiceName}
+									onChange={(e: any) => handleInputChange("txtServiceName", e.target.value)}
+									placeholder="Enter service name"
+									isRequired
+								/>
+								<div style={{ fontSize: "10px", color: "var(--vscode-descriptionForeground)", marginTop: "2px" }}>
+									서비스 로직이 담긴 클래스에서 설정한 Bean(e.g., @Service)의 이름을 입력하세요.
+								</div>
+							</div>
+
 							<div style={{ marginBottom: "15px" }}>
+								<Checkbox
+									label="Use Property"
+									checked={formData.chkProperty}
+									onChange={(e) => handleInputChange("chkProperty", e.target.checked)}
+									description="Enable property configuration"
+								/>
+							</div>
+
+							{formData.chkProperty && (
+								<>
+									<div style={{ width: "calc(100% - 24px)", marginBottom: "15px" }}>
+										<TextField
+											label="Property Name"
+											value={formData.txtPropertyName}
+											onChange={(e: any) => handleInputChange("txtPropertyName", e.target.value)}
+											placeholder="Enter property name"
+										/>
+									</div>
+
+									<div style={{ width: "calc(100% - 24px)", marginBottom: "15px" }}>
+										<TextField
+											label="Property Value"
+											value={formData.txtPropertyValue}
+											onChange={(e: any) => handleInputChange("txtPropertyValue", e.target.value)}
+											placeholder="Enter property value"
+										/>
+									</div>
+								</>
+							)}
+						</>
+					)}
+
+					{/* Simple Trigger 필드들 */}
+					{formType === "simpleTrigger" && (
+						<>
+							<div style={{ width: "calc(100% - 24px)", marginBottom: "15px" }}>
 								<TextField
 									label="Trigger Name"
 									value={formData.txtTriggerName}
@@ -290,67 +468,140 @@ const SchedulingForm: React.FC<FormComponentProps> = ({ onSubmit, onCancel, temp
 							</div>
 
 							<div style={{ marginBottom: "15px" }}>
-								<TextField
-									label="Trigger Group"
-									value={formData.txtGroup}
-									onChange={(e: any) => handleInputChange("txtGroup", e.target.value)}
+								<Select
+									label="Job Detail Type"
+									value={formData.cboJobDetailType}
+									onChange={(e) => handleInputChange("cboJobDetailType", e.target.value)}
+									isRequired
+									options={[
+										{ value: "JobDetailFactoryBean", label: "JobDetailFactoryBean" },
+										{
+											value: "MethodInvokingJobDetailFactoryBean",
+											label: "MethodInvokingJobDetailFactoryBean",
+										},
+									]}
 								/>
 							</div>
 
-							<div style={{ marginBottom: "15px" }}>
+							<div style={{ width: "calc(100% - 24px)", marginBottom: "15px" }}>
 								<TextField
-									label="Job Group"
-									value={formData.txtJobGroup}
-									onChange={(e: any) => handleInputChange("txtJobGroup", e.target.value)}
+									label="Job Name"
+									value={formData.txtJobName}
+									onChange={(e: any) => handleInputChange("txtJobName", e.target.value)}
+									placeholder="Enter job name"
+									isRequired
+								/>
+							</div>
+
+							<div style={{ width: "calc(100% - 24px)", marginBottom: "15px" }}>
+								<TextField
+									label="Start Delay (ms)"
+									value={formData.txtStartDelay}
+									onChange={(e: any) => handleInputChange("txtStartDelay", e.target.value)}
+									placeholder="Enter start delay in milliseconds"
+									isRequired
+								/>
+							</div>
+
+							<div style={{ width: "calc(100% - 24px)", marginBottom: "15px" }}>
+								<TextField
+									label="Repeat Interval (ms)"
+									value={formData.txtRepeatInterval}
+									onChange={(e: any) => handleInputChange("txtRepeatInterval", e.target.value)}
+									placeholder="Enter repeat interval in milliseconds"
+									isRequired
 								/>
 							</div>
 						</>
 					)}
 
+					{/* Cron Trigger 필드들 */}
 					{formType === "cronTrigger" && (
-						<div style={{ marginBottom: "15px" }}>
-							<TextField
-								label="Cron Expression"
-								value={formData.txtCronExpression}
-								onChange={(e: any) => handleInputChange("txtCronExpression", e.target.value)}
-								placeholder="Enter cron expression"
-								isRequired
-							/>
-						</div>
-					)}
-
-					{formType === "simpleTrigger" && (
 						<>
-							<div style={{ marginBottom: "15px" }}>
+							<div style={{ width: "calc(100% - 24px)", marginBottom: "15px" }}>
 								<TextField
-									label="Repeat Interval"
-									value={formData.txtRepeatInterval}
-									onChange={(e: any) => handleInputChange("txtRepeatInterval", e.target.value)}
-									placeholder="Enter repeat interval"
+									label="Trigger Name"
+									value={formData.txtTriggerName}
+									onChange={(e: any) => handleInputChange("txtTriggerName", e.target.value)}
+									placeholder="Enter trigger name"
 									isRequired
 								/>
 							</div>
 
 							<div style={{ marginBottom: "15px" }}>
+								<Select
+									label="Job Detail Type"
+									value={formData.cboJobDetailType}
+									onChange={(e) => handleInputChange("cboJobDetailType", e.target.value)}
+									isRequired
+									options={[
+										{ value: "JobDetailFactoryBean", label: "JobDetailFactoryBean" },
+										{
+											value: "MethodInvokingJobDetailFactoryBean",
+											label: "MethodInvokingJobDetailFactoryBean",
+										},
+									]}
+								/>
+							</div>
+
+							<div style={{ width: "calc(100% - 24px)", marginBottom: "15px" }}>
 								<TextField
-									label="Repeat Count"
-									value={formData.txtRepeatCount}
-									onChange={(e: any) => handleInputChange("txtRepeatCount", e.target.value)}
+									label="Job Name"
+									value={formData.txtJobName}
+									onChange={(e: any) => handleInputChange("txtJobName", e.target.value)}
+									placeholder="Enter job name"
+									isRequired
+								/>
+							</div>
+
+							<div style={{ width: "calc(100% - 24px)", marginBottom: "15px" }}>
+								<TextField
+									label="Cron Expression"
+									value={formData.txtCronExpression}
+									onChange={(e: any) => handleInputChange("txtCronExpression", e.target.value)}
+									placeholder="Enter cron expression (e.g., */10 * * * * ?)"
+									isRequired
 								/>
 							</div>
 						</>
 					)}
 
+					{/* Scheduler 필드들 */}
 					{formType === "scheduler" && (
-						<div style={{ marginBottom: "15px" }}>
-							<TextField
-								label="Scheduler Name"
-								value={formData.txtSchedulerName}
-								onChange={(e: any) => handleInputChange("txtSchedulerName", e.target.value)}
-								placeholder="Enter scheduler name"
-								isRequired
-							/>
-						</div>
+						<>
+							<div style={{ width: "calc(100% - 24px)", marginBottom: "15px" }}>
+								<TextField
+									label="Scheduler Name"
+									value={formData.txtSchedulerName}
+									onChange={(e: any) => handleInputChange("txtSchedulerName", e.target.value)}
+									placeholder="Enter scheduler name"
+									isRequired
+								/>
+							</div>
+
+							<div style={{ marginBottom: "15px" }}>
+								<Select
+									label="Trigger Type"
+									value={formData.cboTriggerType}
+									onChange={(e) => handleInputChange("cboTriggerType", e.target.value)}
+									isRequired
+									options={[
+										{ value: "SimpleTriggerFactoryBean", label: "SimpleTriggerFactoryBean" },
+										{ value: "CronTriggerFactoryBean", label: "CronTriggerFactoryBean" },
+									]}
+								/>
+							</div>
+
+							<div style={{ width: "calc(100% - 24px)", marginBottom: "15px" }}>
+								<TextField
+									label="Trigger Name"
+									value={formData.txtTriggerName}
+									onChange={(e: any) => handleInputChange("txtTriggerName", e.target.value)}
+									placeholder="Enter trigger name"
+									isRequired
+								/>
+							</div>
+						</>
 					)}
 				</div>
 

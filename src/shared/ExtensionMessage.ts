@@ -42,6 +42,10 @@ export type ExtensionMessage =
 			text: string
 	  }
 	| {
+			type: "selectedOutputFolderDuplicate"
+			text: string
+	  }
+	| {
 			type: "relinquishControl"
 	  }
 	| {
@@ -62,4 +66,8 @@ export type ExtensionMessage =
 	| {
 			type: "themeChanged"
 			theme: "light" | "vs-dark"
+	  }
+	| {
+			type: "selectedConfigFilePath"
+			text: string
 	  }

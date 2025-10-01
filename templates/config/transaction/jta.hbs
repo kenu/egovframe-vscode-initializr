@@ -4,8 +4,8 @@
 	xmlns:tx="http://www.springframework.org/schema/tx"
 	xmlns:aop="http://www.springframework.org/schema/aop"
 	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.0.xsd
-											http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-4.0.xsd
-											http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-4.0.xsd">
+						http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-4.0.xsd
+						http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-4.0.xsd">
 
 	<bean id="userTransaction" class="com.atomikos.icatch.jta.UserTransactionImp">
 		<property name="transactionTimeout" value="{{txtGlobalTimeout}}"></property>
@@ -20,26 +20,28 @@
 		<property name="userTransaction" ref="userTransaction"></property>
 		<property name="transactionManager" ref="atomikosTransactionManager"></property>
 	</bean>
-
-	<aop:config>
-		<aop:pointcut id="{{txtPointCutName}}"
-			expression="{{txtPointCutExpression}}" />
-		<aop:advisor advice-ref="{{txtAdviceName}}" pointcut-ref="{{txtPointCutName}}" />
-	</aop:config>
-
+	
+	{{#if (eq transactionManagementType "aopConfigTransaction")}}
+	<!-- AOP 설정 - 트랜잭션 관리 및 포인트컷 설정 -->
 	<tx:advice id="{{txtAdviceName}}" transaction-manager="{{txtTransactionName}}">
 		<tx:attributes>
-			<tx:method name="{{txtMethodName}}" 
+			<tx:method name="{{txtMethodName}}"
 				{{#if chkReadOnly}}read-only="{{chkReadOnly}}"{{/if}}
-				{{#if chkRollbackFor}}rollback-for="{{txtRollbackFor}}"{{/if}}
-				{{#if chkNoRollbackFor}}no-rollback-for="{{txtNoRollbackFor}}"{{/if}}
-				{{#if chkTimeout}}timeout="{{txtTimeout}}"{{/if}}
+				{{#if (trim txtRollbackFor)}}rollback-for="{{txtRollbackFor}}"{{/if}}
+				{{#if (trim txtNoRollbackFor)}}no-rollback-for="{{txtNoRollbackFor}}"{{/if}}
+				{{#if (trim txtTimeout)}}timeout="{{txtTimeout}}"{{/if}}
 				propagation="{{cmbPropagation}}"
 				isolation="{{cmbIsolation}}" />
 		</tx:attributes>
 	</tx:advice>
 
-	{{#if chkAnnotationTransactionManagement}}
+	<aop:config proxy-target-class="true">
+		<aop:pointcut id="{{txtPointCutName}}" expression="{{txtPointCutExpression}}" />
+		<aop:advisor advice-ref="{{txtAdviceName}}" pointcut-ref="{{txtPointCutName}}" />
+	</aop:config>
+	{{/if}}
+
+	{{#if (eq transactionManagementType "annotationTransaction")}}
 	<tx:annotation-driven transaction-manager="{{txtTransactionName}}" proxy-target-class="true" />
 	{{/if}}
 

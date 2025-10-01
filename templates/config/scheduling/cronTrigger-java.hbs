@@ -1,4 +1,4 @@
-package {{defaultPackageName}}.config;
+package {{txtConfigPackage}};
 
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
@@ -10,12 +10,12 @@ import org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean;
 @Configuration
 public class {{txtFileName}} {
 
-  // CronTrigger 설정
-  @Bean(name = "{{txtTriggerName}}")
-  public CronTriggerFactoryBean {{txtTriggerName}}(@Qualifier("{{txtJobName}}") {{#if (eq cboJobDetailType "MethodInvokingJobDetailFactoryBean")}}MethodInvokingJobDetailFactoryBean{{else}}JobDetailFactoryBean{{/if}} jobDetailBean) {
-    CronTriggerFactoryBean trigger = new CronTriggerFactoryBean();
-    trigger.setJobDetail(jobDetailBean.getObject());
-    trigger.setCronExpression("{{txtExpression}}");
-    return trigger;
-  }
+    // CronTrigger 설정
+    @Bean(name = "{{txtTriggerName}}")
+    public CronTriggerFactoryBean {{txtTriggerName}}(@Qualifier("{{txtJobName}}") {{#if (eq cboJobDetailType "MethodInvokingJobDetailFactoryBean")}}MethodInvokingJobDetailFactoryBean{{else}}JobDetailFactoryBean{{/if}} jobDetail) {
+        CronTriggerFactoryBean trigger = new CronTriggerFactoryBean();
+        trigger.setJobDetail(jobDetail.getObject());
+        trigger.setCronExpression("{{txtCronExpression}}");
+        return trigger;
+    }
 }

@@ -1,4 +1,4 @@
-package {{defaultPackageName}}.config;
+package {{txtConfigPackage}};
 
 import java.security.NoSuchAlgorithmException;
 
@@ -10,16 +10,16 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class {{txtFileName}} {
 
-  @Bean(name = "{{txtIdServiceName}}")
-  public EgovUUIdGnrServiceImpl {{txtIdServiceName}}() {
-    EgovUUIdGnrServiceImpl egovUUIdGnrService = new EgovUUIdGnrServiceImpl();
-    {{#if (eq rdoType "Address")}}
-    try {
-      egovUUIdGnrService.setAddress("{{txtAddress}}");
-    } catch (FdlException | NoSuchAlgorithmException e) {
-      e.printStackTrace();
+    @Bean(name = "{{txtIdServiceName}}")
+    public EgovUUIdGnrServiceImpl {{txtIdServiceName}}() {
+        EgovUUIdGnrServiceImpl egovUUIdGnrService = new EgovUUIdGnrServiceImpl();
+        {{#if (eq rdoIdType "Address")}}
+        try {
+            egovUUIdGnrService.setAddress("{{txtAddress}}");
+        } catch (FdlException | NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        }
+        {{/if}}
+        return egovUUIdGnrService;
     }
-    {{/if}}
-    return egovUUIdGnrService;
-  }
 }

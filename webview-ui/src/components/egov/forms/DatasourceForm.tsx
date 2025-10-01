@@ -1,16 +1,12 @@
 import { useState, useEffect } from "react"
 import { Button, TextField, Select, RadioGroup } from "../../ui"
-import { ConfigGenerationType, ConfigFormData } from "../types/templates"
+import { ConfigGenerationType, ConfigFormData, FormComponentProps } from "../types/templates"
 import { vscode } from "../../../utils/vscode"
 
-interface DatasourceFormProps {
-	onSubmit: (data: ConfigFormData) => void
-	onCancel: () => void
-}
-
-const DatasourceForm: React.FC<DatasourceFormProps> = ({ onSubmit, onCancel }) => {
+const DatasourceForm: React.FC<FormComponentProps> = ({ onSubmit, onCancel, template, initialData }) => {
 	const [formData, setFormData] = useState({
 		generationType: ConfigGenerationType.XML,
+		txtConfigPackage: "",
 		txtFileName: "context-datasource",
 		txtDatasourceName: "dataSource",
 		rdoType: "DBCP",
@@ -18,37 +14,38 @@ const DatasourceForm: React.FC<DatasourceFormProps> = ({ onSubmit, onCancel }) =
 		txtUrl: "",
 		txtUser: "",
 		txtPasswd: "",
+		...initialData,
 	})
-	const [selectedOutputFolder, setSelectedOutputFolder] = useState<string | null>(null)
 	const [pendingFormData, setPendingFormData] = useState<ConfigFormData | null>(null)
+
+	const [validationError, setValidationError] = useState<string>("")
 
 	// Message listener for folder selection response
 	useEffect(() => {
-		console.log("DatasourceForm: Setting up message listener")
-
 		const handleMessage = (event: any) => {
-			console.log("DatasourceForm: Received message:", event.data)
 			const message = event.data
-			if (message.type === "selectedOutputFolder") {
-				console.log("DatasourceForm: Received selectedOutputFolder:", message.text)
-				setSelectedOutputFolder(message.text)
-				// If we have pending form data, submit it now
-				if (pendingFormData) {
-					console.log("DatasourceForm: Submitting with pending data:", pendingFormData)
-					onSubmit({
-						...pendingFormData,
-						outputFolder: message.text,
-					})
-					setPendingFormData(null)
-				} else {
-					console.log("DatasourceForm: No pending form data")
-				}
+			switch (message.type) {
+				// Generate 버튼 클릭 - 중복 파일 검사 통과 시
+				case "selectedOutputFolder":
+					if (pendingFormData) {
+						onSubmit({
+							...pendingFormData,
+							outputFolder: message.text,
+						})
+						setPendingFormData(null)
+					}
+					break
+
+				// Generate 버튼 클릭 - 중복 파일 검사 실패 시
+				case "selectedOutputFolderDuplicate":
+					console.log("DatasourceForm: Received selectedOutputFolderDuplicate message:", message.text)
+					setValidationError(message.text) // Duplicate file exists: + formData.txtFileName
+					break
 			}
 		}
 
 		window.addEventListener("message", handleMessage)
 		return () => {
-			console.log("DatasourceForm: Cleaning up message listener")
 			window.removeEventListener("message", handleMessage)
 		}
 	}, [pendingFormData, onSubmit])
@@ -57,18 +54,18 @@ const DatasourceForm: React.FC<DatasourceFormProps> = ({ onSubmit, onCancel }) =
 		setFormData((prev) => ({
 			...prev,
 			generationType: type,
-			txtFileName: type === ConfigGenerationType.XML ? "context-datasource" : "EgovDataSourceConfig",
+			txtFileName: type === ConfigGenerationType.JAVA_CONFIG ? "EgovDataSourceConfig" : "context-datasource",
 		}))
+		// 타입 변경 시 에러 클리어
+		setValidationError("")
 	}
 
 	const handleSubmit = (e: React.FormEvent) => {
 		e.preventDefault()
-		console.log("DatasourceForm handleSubmit called")
-		console.log("Form data:", formData)
 
 		// Validate required fields
-		const requiredFields = [
-			{ field: "txtFileName" as keyof typeof formData, label: "File Name" },
+		const requiredFields: { field: keyof typeof formData; label: string }[] = [
+			{ field: "generationType" as keyof typeof formData, label: "Generation Type" },
 			{ field: "txtDatasourceName" as keyof typeof formData, label: "DataSource Name" },
 			{ field: "rdoType" as keyof typeof formData, label: "Driver Type" },
 			{ field: "txtDriver" as keyof typeof formData, label: "Driver" },
@@ -76,13 +73,26 @@ const DatasourceForm: React.FC<DatasourceFormProps> = ({ onSubmit, onCancel }) =
 			{ field: "txtUser" as keyof typeof formData, label: "User" },
 		]
 
-		const missingFields = requiredFields.filter(({ field }) => !formData[field]?.trim())
+		// 조건부로 txtFileName, txtConfigPackage 필드 추가
+		if (formData.generationType === ConfigGenerationType.JAVA_CONFIG) {
+			requiredFields.push(
+				{ field: "txtFileName" as keyof typeof formData, label: "Class Name" },
+				{ field: "txtConfigPackage" as keyof typeof formData, label: "Package Name" },
+			)
+		} else {
+			requiredFields.push({ field: "txtFileName" as keyof typeof formData, label: "File Name" })
+		}
+
+		const missingFields = requiredFields.filter(({ field }) => !formData[field]?.toString().trim())
 
 		if (missingFields.length > 0) {
 			const fieldNames = missingFields.map(({ label }) => label).join(", ")
-			alert(`Please fill in the following required fields: ${fieldNames}`)
+			setValidationError(`Please fill in the following required fields: ${fieldNames}`)
 			return
 		}
+
+		// 성공 시 에러 클리어
+		setValidationError("")
 
 		// Check if vscode API is available
 		if (!vscode) {
@@ -90,16 +100,13 @@ const DatasourceForm: React.FC<DatasourceFormProps> = ({ onSubmit, onCancel }) =
 			return
 		}
 
-		// Store form data and request folder selection
 		setPendingFormData(formData)
-		console.log("Pending form data set:", formData)
-		console.log("Requesting folder selection...")
 
 		try {
 			vscode.postMessage({
 				type: "selectOutputFolder",
+				formData: formData, // formData를 전달하여 파일명 중복 검사
 			})
-			console.log("Message sent successfully")
 		} catch (error) {
 			console.error("Error sending message:", error)
 		}
@@ -107,11 +114,31 @@ const DatasourceForm: React.FC<DatasourceFormProps> = ({ onSubmit, onCancel }) =
 
 	const handleInputChange = (field: string, value: string) => {
 		setFormData((prev) => ({ ...prev, [field]: value }))
+		// 입력 시 에러 클리어
+		setValidationError("")
 	}
 
 	return (
 		<div style={{ padding: "20px", maxWidth: "600px" }}>
 			<h2 style={{ color: "var(--vscode-foreground)", marginBottom: "20px" }}>Create DataSource</h2>
+
+			{/* Validation Errors */}
+			{validationError && (
+				<div style={{ marginBottom: "20px" }}>
+					<div
+						style={{
+							backgroundColor: "var(--vscode-inputValidation-errorBackground)",
+							border: "1px solid var(--vscode-inputValidation-errorBorder)",
+							color: "var(--vscode-inputValidation-errorForeground)",
+							padding: "10px",
+							borderRadius: "3px",
+							fontWeight: "bold",
+							fontSize: "12px",
+						}}>
+						{validationError}
+					</div>
+				</div>
+			)}
 
 			<form onSubmit={handleSubmit}>
 				<div style={{ marginBottom: "20px" }}>
@@ -128,12 +155,28 @@ const DatasourceForm: React.FC<DatasourceFormProps> = ({ onSubmit, onCancel }) =
 					/>
 				</div>
 
-				<div style={{ marginBottom: "20px" }}>
+				{formData.generationType === ConfigGenerationType.JAVA_CONFIG && (
+					<div style={{ width: "calc(100% - 24px)", marginBottom: "20px" }}>
+						<TextField
+							label="Package Name"
+							value={formData.txtConfigPackage}
+							onChange={(e) => handleInputChange("txtConfigPackage", e.target.value)}
+							placeholder="Enter package name"
+							isRequired
+						/>
+					</div>
+				)}
+
+				<div style={{ width: "calc(100% - 24px)", marginBottom: "20px" }}>
 					<TextField
-						label="File Name"
+						label={formData.generationType === ConfigGenerationType.JAVA_CONFIG ? "Class Name" : "File Name"}
 						value={formData.txtFileName}
-						placeholder="Enter file name"
 						onChange={(e) => handleInputChange("txtFileName", e.target.value)}
+						placeholder={
+							formData.generationType === ConfigGenerationType.JAVA_CONFIG
+								? "Enter class name (PascalCase)"
+								: "Enter file name"
+						}
 						isRequired
 					/>
 				</div>
@@ -141,7 +184,7 @@ const DatasourceForm: React.FC<DatasourceFormProps> = ({ onSubmit, onCancel }) =
 				<div style={{ marginBottom: "20px" }}>
 					<h3 style={{ color: "var(--vscode-foreground)", marginBottom: "10px" }}>Configuration</h3>
 
-					<div style={{ marginBottom: "15px" }}>
+					<div style={{ width: "calc(100% - 24px)", marginBottom: "15px" }}>
 						<TextField
 							label="DataSource Name"
 							value={formData.txtDatasourceName}
@@ -165,7 +208,7 @@ const DatasourceForm: React.FC<DatasourceFormProps> = ({ onSubmit, onCancel }) =
 						/>
 					</div>
 
-					<div style={{ marginBottom: "15px" }}>
+					<div style={{ width: "calc(100% - 24px)", marginBottom: "15px" }}>
 						<TextField
 							label="Driver"
 							value={formData.txtDriver}
@@ -175,7 +218,7 @@ const DatasourceForm: React.FC<DatasourceFormProps> = ({ onSubmit, onCancel }) =
 						/>
 					</div>
 
-					<div style={{ marginBottom: "15px" }}>
+					<div style={{ width: "calc(100% - 24px)", marginBottom: "15px" }}>
 						<TextField
 							label="URL"
 							value={formData.txtUrl}
@@ -185,7 +228,7 @@ const DatasourceForm: React.FC<DatasourceFormProps> = ({ onSubmit, onCancel }) =
 						/>
 					</div>
 
-					<div style={{ marginBottom: "15px" }}>
+					<div style={{ width: "calc(100% - 24px)", marginBottom: "15px" }}>
 						<TextField
 							label="User"
 							value={formData.txtUser}
@@ -195,7 +238,7 @@ const DatasourceForm: React.FC<DatasourceFormProps> = ({ onSubmit, onCancel }) =
 						/>
 					</div>
 
-					<div style={{ marginBottom: "20px" }}>
+					<div style={{ width: "calc(100% - 24px)", marginBottom: "20px" }}>
 						<TextField
 							label="Password"
 							type="password"

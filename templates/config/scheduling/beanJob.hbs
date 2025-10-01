@@ -3,9 +3,8 @@
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.0.xsd">
 
-	<bean id="{{txtJobName}}"
-		class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
-		<property name="jobClass" value="{{txtServiceClass}}" />
+	<bean id="{{txtJobName}}" class="org.springframework.scheduling.quartz.JobDetailFactoryBean">
+		<property name="jobClass" value="{{txtServiceClass}}" /> <!-- 스케줄로 실행될 실제 서비스 로직인 org.springframework.scheduling.quartz.QuartzJobBean 구현 클래스를 입력하세요 -->
 		{{#if chkProperty}}
 		<property name="jobDataAsMap">
 			<map>
