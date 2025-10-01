@@ -27,10 +27,10 @@ import com.atomikos.icatch.jta.UserTransactionImp;
 import com.atomikos.icatch.jta.UserTransactionManager;
 
 @Configuration
-{{#if (eq transactionManagementType "aopConfigTransaction")}}
+{{#if chkAopConfigTransaction}}
 @EnableAspectJAutoProxy(proxyTargetClass = true) // 포인트컷/어드바이저 동작
 {{/if~}}
-{{#if (eq transactionManagementType "annotationTransaction")}}
+{{#if chkAnnotationTransaction}}
 @EnableTransactionManagement // 어노테이션(@Transactional) 기반 트랜잭션 관리
 {{/if~}}
 public class {{txtFileName}} {
@@ -62,7 +62,7 @@ public class {{txtFileName}} {
         return transactionManager;
     }
 
-    {{#if (eq transactionManagementType "aopConfigTransaction")}}
+    {{#if chkAopConfigTransaction}}
     //AOP 설정 - 트랜잭온 관리 및 포인트컷 설정
     @Bean(name = "{{txtAdviceName}}")
     public TransactionInterceptor txAdvice(PlatformTransactionManager transactionManager) {

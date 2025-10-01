@@ -127,7 +127,8 @@ export interface ConfigFormData {
 	txtTransactionTemplate?: string
 	txtTransactionName?: string
 	txtDataSourceName?: string
-	transactionManagementType?: string
+	chkAopConfigTransaction?: boolean
+	chkAnnotationTransaction?: boolean
 	txtEntityManagerFactory?: string
 	txtPackagesToScan?: string
 	cmbDialectName?: string

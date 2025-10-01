@@ -21,7 +21,7 @@
 		<property name="transactionManager" ref="atomikosTransactionManager"></property>
 	</bean>
 	
-	{{#if (eq transactionManagementType "aopConfigTransaction")}}
+	{{#if chkAopConfigTransaction}}
 	<!-- AOP 설정 - 트랜잭션 관리 및 포인트컷 설정 -->
 	<tx:advice id="{{txtAdviceName}}" transaction-manager="{{txtTransactionName}}">
 		<tx:attributes>
@@ -41,7 +41,7 @@
 	</aop:config>
 	{{/if}}
 
-	{{#if (eq transactionManagementType "annotationTransaction")}}
+	{{#if chkAnnotationTransaction}}
 	<tx:annotation-driven transaction-manager="{{txtTransactionName}}" proxy-target-class="true" />
 	{{/if}}
 

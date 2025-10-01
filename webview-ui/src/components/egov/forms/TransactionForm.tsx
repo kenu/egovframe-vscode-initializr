@@ -31,7 +31,8 @@ const TransactionForm: React.FC<FormComponentProps> = ({ onSubmit, onCancel, tem
 		// 공통 필드
 		txtTransactionName: formType === "datasource" ? "txManager" : "transactionManager",
 		txtDataSourceName: "dataSource",
-		transactionManagementType: "aopConfigTransaction",
+		chkAopConfigTransaction: true,
+		chkAnnotationTransaction: true,
 
 		// JPA 전용
 		txtEntityManagerFactory: "entityManagerFactory",
@@ -107,6 +108,12 @@ const TransactionForm: React.FC<FormComponentProps> = ({ onSubmit, onCancel, tem
 	const handleSubmit = (e: React.FormEvent) => {
 		e.preventDefault()
 
+		// 두 트랜잭션 관리 방식 중 최소 하나는 선택되어야 함
+		if (!formData.chkAopConfigTransaction && !formData.chkAnnotationTransaction) {
+			setValidationError("Please select at least one transaction management type (AOP Config or Annotation)")
+			return
+		}
+
 		// Validate required fields
 		const requiredFields: { field: keyof typeof formData; label: string }[] = [
 			{ field: "generationType" as keyof typeof formData, label: "Generation Type" },
@@ -142,7 +149,7 @@ const TransactionForm: React.FC<FormComponentProps> = ({ onSubmit, onCancel, tem
 		}
 
 		// AOP Config, Advice 관련 필드 (aopConfigTransaction일 때만)
-		if (formData.transactionManagementType === "aopConfigTransaction") {
+		if (formData.chkAopConfigTransaction) {
 			requiredFields.push(
 				{ field: "txtPointCutExpression" as keyof typeof formData, label: "Pointcut Expression" },
 				{ field: "txtAdviceName" as keyof typeof formData, label: "Advice Name" },
@@ -449,17 +456,20 @@ const TransactionForm: React.FC<FormComponentProps> = ({ onSubmit, onCancel, tem
 							)}
 
 							<div style={{ marginBottom: "15px" }}>
-								<RadioGroup
-									label="Transaction Management Type"
-									name="transactionManagementType"
-									value={formData.transactionManagementType}
-									onChange={(value) => handleInputChange("transactionManagementType", value)}
-									orientation="vertical"
-									isRequired
-									options={[
-										{ value: "aopConfigTransaction", label: "AOP Config Transaction" },
-										{ value: "annotationTransaction", label: "Annotation Transaction" },
-									]}
+								<Checkbox
+									label="AOP Config Transaction"
+									checked={formData.chkAopConfigTransaction}
+									onChange={(e) => handleInputChange("chkAopConfigTransaction", e.target.checked)}
+									description="Enable AOP-based transaction management"
+								/>
+							</div>
+
+							<div style={{ marginBottom: "15px" }}>
+								<Checkbox
+									label="Annotation Transaction"
+									checked={formData.chkAnnotationTransaction}
+									onChange={(e) => handleInputChange("chkAnnotationTransaction", e.target.checked)}
+									description="Enable annotation-based transaction management"
 								/>
 							</div>
 						</div>
@@ -469,7 +479,7 @@ const TransactionForm: React.FC<FormComponentProps> = ({ onSubmit, onCancel, tem
 								Cancel
 							</Button>
 							{/* aopConfigTransaction일 때에만 Next 버튼 표시 */}
-							{formData.transactionManagementType === "aopConfigTransaction" ? (
+							{formData.chkAopConfigTransaction ? (
 								<Button onClick={() => setCurrentPage(2)}>Next</Button>
 							) : (
 								<Button type="submit" variant="primary">
@@ -480,7 +490,7 @@ const TransactionForm: React.FC<FormComponentProps> = ({ onSubmit, onCancel, tem
 					</div>
 				)}
 
-				{currentPage === 2 && formData.transactionManagementType === "aopConfigTransaction" && (
+				{currentPage === 2 && formData.chkAopConfigTransaction && (
 					<div>
 						<div style={{ marginBottom: "20px" }}>
 							<h3 style={{ color: "var(--vscode-foreground)", marginBottom: "10px" }}>AOP Config</h3>

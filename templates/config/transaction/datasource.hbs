@@ -17,7 +17,7 @@
 	</bean> 
 	{{/if}}
 	
-	{{#if (eq transactionManagementType "aopConfigTransaction")}}
+	{{#if chkAopConfigTransaction}}
 	<aop:config proxy-target-class="true">
 		<aop:pointcut id="{{txtPointCutName}}" expression="{{txtPointCutExpression}}"/>
 		<aop:advisor advice-ref="{{txtAdviceName}}" pointcut-ref="{{txtPointCutName}}" />
@@ -42,7 +42,7 @@
 	</tx:advice>
 	{{/if}}
 	
-	{{#if (eq transactionManagementType "annotationTransaction")}}
+	{{#if chkAnnotationTransaction}}
 	<!-- 어노테이션(@Transactional) 기반 트랜잭션 관리 -->
 	<tx:annotation-driven transaction-manager="{{txtTransactionName}}" proxy-target-class="true" />
 
