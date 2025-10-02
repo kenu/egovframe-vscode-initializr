@@ -26,7 +26,7 @@ const TransactionForm: React.FC<FormComponentProps> = ({ onSubmit, onCancel, tem
 		txtFileName: getDefaultFileName(ConfigGenerationType.XML),
 
 		// Datasource Transaction 전용
-		txtTransactionTemplate: "transactionTemplate",
+		txtTransactionTemplateName: "transactionTemplate",
 
 		// 공통 필드
 		txtTransactionName: formType === "datasource" ? "txManager" : "transactionManager",
@@ -134,7 +134,7 @@ const TransactionForm: React.FC<FormComponentProps> = ({ onSubmit, onCancel, tem
 		// formType별 필수 필드 추가
 		switch (formType) {
 			case "datasource":
-				//requiredFields.push({ field: "txtTransactionTemplate" as keyof typeof formData, label: "Transaction Template" })
+				//requiredFields.push({ field: "txtTransactionTemplateName" as keyof typeof formData, label: "Transaction Template" })
 				break
 			case "jpa":
 				requiredFields.push(
@@ -288,8 +288,8 @@ const TransactionForm: React.FC<FormComponentProps> = ({ onSubmit, onCancel, tem
 								<div style={{ width: "calc(100% - 24px)", marginBottom: "15px" }}>
 									<TextField
 										label="Transaction Template"
-										value={formData.txtTransactionTemplate}
-										onChange={(e: any) => handleInputChange("txtTransactionTemplate", e.target.value)}
+										value={formData.txtTransactionTemplateName}
+										onChange={(e: any) => handleInputChange("txtTransactionTemplateName", e.target.value)}
 										placeholder="Enter transaction template name"
 									/>
 								</div>
