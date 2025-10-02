@@ -10,9 +10,9 @@ const DatasourceForm: React.FC<FormComponentProps> = ({ onSubmit, onCancel, temp
 		txtFileName: "context-datasource",
 		txtDatasourceName: "dataSource",
 		rdoType: "DBCP",
-		txtDriver: "",
-		txtUrl: "",
-		txtUser: "",
+		txtDriver: "com.mysql.cj.jdbc.Driver",
+		txtUrl: "jdbc:mysql://127.0.0.1:3306/myDB",
+		txtUser: "root",
 		txtPasswd: "",
 		...initialData,
 	})
@@ -241,7 +241,7 @@ const DatasourceForm: React.FC<FormComponentProps> = ({ onSubmit, onCancel, temp
 					<div style={{ width: "calc(100% - 24px)", marginBottom: "20px" }}>
 						<TextField
 							label="Password"
-							type="password"
+							//type="password"
 							value={formData.txtPasswd}
 							placeholder="Enter password"
 							onChange={(e) => handleInputChange("txtPasswd", e.target.value)}
