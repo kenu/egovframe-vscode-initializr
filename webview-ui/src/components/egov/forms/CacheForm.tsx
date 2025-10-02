@@ -239,7 +239,7 @@ const CacheForm: React.FC<FormComponentProps> = ({ onSubmit, onCancel, template,
 							*/}
 
 							{/* 업데이트 후 Select 코드 */}
-							<div style={{ width: "calc(100% - 24px)", marginBottom: "15px" }}>
+							<div style={{ marginBottom: "15px" }}>
 								<Select
 									label="Default Cache Eternal"
 									options={[
