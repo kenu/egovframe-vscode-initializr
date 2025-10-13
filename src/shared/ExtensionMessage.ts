@@ -31,7 +31,8 @@ export type ExtensionMessage =
 	  }
 	| {
 			type: "success" | "error"
-			text: string
+			text?: string
+			message?: string
 	  }
 	| {
 			type: "transferDDLToCodeView"
@@ -70,4 +71,24 @@ export type ExtensionMessage =
 	| {
 			type: "selectedConfigFilePath"
 			text: string
+	  }
+	| {
+			type: "egovSettings"
+			settings: {
+				defaultGroupId: string
+				defaultArtifactId: string
+				defaultPackageName: string
+			}
+	  }
+	| {
+			type: "extensionInfo"
+			info: {
+				displayName: string
+				version: string
+				description: string
+				repository: string
+				homepage: string
+				author: string
+				license: string
+			}
 	  }

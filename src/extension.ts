@@ -54,6 +54,8 @@ export async function activate(context: vscode.ExtensionContext) {
 	)
 
 	// Register the new tab command
+	// package.json에 Open in New Tab 명령어를 추가해야 활성화 가능
+	/*
 	const openEgovInNewTab = async () => {
 		const tabWebview = new WebviewProvider(context, outputChannel)
 		const lastCol = Math.max(...vscode.window.visibleTextEditors.map((editor) => editor.viewColumn || 0))
@@ -80,6 +82,7 @@ export async function activate(context: vscode.ExtensionContext) {
 	}
 
 	context.subscriptions.push(vscode.commands.registerCommand("egovframe.openInNewTab", openEgovInNewTab))
+	*/
 }
 
 // This method is called when your extension is deactivated

@@ -506,6 +506,96 @@ export class Controller {
 				break
 			}
 
+			case "getEgovSettings": {
+				try {
+					const config = vscode.workspace.getConfiguration("egovframeInitializr")
+					const settings = {
+						defaultGroupId: config.get<string>("defaultGroupId") || "egovframework.com",
+						defaultArtifactId: config.get<string>("defaultArtifactId") || "egovframe-project",
+						defaultPackageName: config.get<string>("defaultPackageName") || "egovframework.example.sample",
+					}
+
+					await this.postMessageToWebview({
+						type: "egovSettings",
+						settings,
+					})
+				} catch (error) {
+					console.error("Error getting eGov settings:", error)
+					await this.postMessageToWebview({
+						type: "error",
+						message: "Failed to get eGov settings",
+					})
+				}
+				break
+			}
+
+			case "updateEgovSettings": {
+				try {
+					const config = vscode.workspace.getConfiguration("egovframeInitializr")
+
+					if (message.settings && message.settings.defaultGroupId !== undefined) {
+						await config.update("defaultGroupId", message.settings.defaultGroupId, vscode.ConfigurationTarget.Global)
+					}
+					if (message.settings && message.settings.defaultArtifactId !== undefined) {
+						await config.update(
+							"defaultArtifactId",
+							message.settings.defaultArtifactId,
+							vscode.ConfigurationTarget.Global,
+						)
+					}
+					if (message.settings && message.settings.defaultPackageName !== undefined) {
+						await config.update(
+							"defaultPackageName",
+							message.settings.defaultPackageName,
+							vscode.ConfigurationTarget.Global,
+						)
+					}
+
+					await this.postMessageToWebview({
+						type: "success",
+						message: "Settings saved successfully",
+					})
+				} catch (error) {
+					console.error("Error updating eGov settings:", error)
+					await this.postMessageToWebview({
+						type: "error",
+						message: "Failed to save settings",
+					})
+				}
+				break
+			}
+
+			case "getExtensionInfo": {
+				try {
+					// Read package.json from extension context
+					const packageJsonPath = vscode.Uri.joinPath(this.context.extensionUri, "package.json")
+					const packageJsonContent = await vscode.workspace.fs.readFile(packageJsonPath)
+					const packageJson = JSON.parse(packageJsonContent.toString())
+
+					const info = {
+						displayName: packageJson.displayName || "eGovFrame Initializr",
+						version: packageJson.version || "Unknown",
+						description: packageJson.description || "",
+						repository: packageJson.repository?.url || "",
+						homepage: packageJson.homepage || "",
+						author: packageJson.author?.name || packageJson.author || "",
+						license: packageJson.license || "",
+					}
+
+					await this.postMessageToWebview({
+						type: "extensionInfo",
+						info,
+					})
+				} catch (error) {
+					console.error("Error getting extension info:", error)
+					await this.postMessageToWebview({
+						type: "error",
+						message: "Failed to get extension info",
+					})
+				}
+				break
+			}
+
 			default:
 				console.log("Unhandled message type:", message.type)
 				break

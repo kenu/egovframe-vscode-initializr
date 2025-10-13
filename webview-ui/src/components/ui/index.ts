@@ -8,6 +8,7 @@ export { Checkbox, type CheckboxProps } from "./Checkbox"
 export { ProgressRing, type ProgressRingProps } from "./ProgressRing"
 export { Link, type LinkProps } from "./Link"
 export { Divider, type DividerProps } from "./Divider"
+export { ResponsiveMenuButton, type ResponsiveMenuButtonProps } from "./ResponsiveMenuButton"
 
 // Theme System
 export { createVSCodeTheme, useVSCodeTheme, VSCodeThemeContext, type VSCodeTheme } from "./theme"

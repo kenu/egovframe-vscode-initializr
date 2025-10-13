@@ -1,11 +1,17 @@
 import EgovView from "./components/egov/EgovView"
+import EgovSettingsView from "./components/egov/EgovSettingsView"
 import { useExtensionState } from "./context/ExtensionStateContext"
 import { Providers } from "./Providers"
 
 const AppContent = () => {
-	const { showEgov, egovTab, hideEgov } = useExtensionState()
+	const { showEgov, showEgovSettings, egovTab, hideEgov, hideEgovSettingsScreen } = useExtensionState()
 
-	// Always show EgovView as the main and only interface
+	// Show EgovSettingsView when showEgovSettings is true, otherwise show EgovView
+	if (showEgovSettings) {
+		return <EgovSettingsView onDone={hideEgovSettingsScreen} />
+	}
+
+	// Show EgovView as the main interface
 	return <EgovView initialTab={egovTab} onDone={hideEgov} />
 }
 

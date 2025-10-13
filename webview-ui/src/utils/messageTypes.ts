@@ -50,6 +50,23 @@ export interface GetSampleDDLsMessage {
 	type: "getSampleDDLs"
 }
 
+export interface GetEgovSettingsMessage {
+	type: "getEgovSettings"
+}
+
+export interface UpdateEgovSettingsMessage {
+	type: "updateEgovSettings"
+	settings: {
+		defaultGroupId?: string
+		defaultArtifactId?: string
+		defaultPackageName?: string
+	}
+}
+
+export interface GetExtensionInfoMessage {
+	type: "getExtensionInfo"
+}
+
 export type WebviewMessage =
 	| GenerateCodeMessage
 	| UploadTemplatesMessage
@@ -61,6 +78,9 @@ export type WebviewMessage =
 	| ValidateDDLOnlyMessage
 	| GetSampleDDLsMessage
 	| GetCurrentThemeMessage
+	| GetEgovSettingsMessage
+	| UpdateEgovSettingsMessage
+	| GetExtensionInfoMessage
 
 export interface ErrorResponse {
 	type: "error"
@@ -110,6 +130,28 @@ export interface ThemeChangedResponse {
 	theme: "light" | "vs-dark"
 }
 
+export interface EgovSettingsResponse {
+	type: "egovSettings"
+	settings: {
+		defaultGroupId: string
+		defaultArtifactId: string
+		defaultPackageName: string
+	}
+}
+
+export interface ExtensionInfoResponse {
+	type: "extensionInfo"
+	info: {
+		displayName: string
+		version: string
+		description: string
+		repository: string
+		homepage: string
+		author: string
+		license: string
+	}
+}
+
 export type ExtensionResponse =
 	| ErrorResponse
 	| SuccessResponse
@@ -120,3 +162,5 @@ export type ExtensionResponse =
 	| SampleDDLsResponse
 	| CurrentThemeResponse
 	| ThemeChangedResponse
+	| EgovSettingsResponse
+	| ExtensionInfoResponse

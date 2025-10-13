@@ -20,4 +20,9 @@ export interface WebviewMessage {
 	user?: any
 	grpc_request?: any
 	grpc_request_cancel?: any
+	settings?: {
+		defaultGroupId?: string
+		defaultArtifactId?: string
+		defaultPackageName?: string
+	}
 }

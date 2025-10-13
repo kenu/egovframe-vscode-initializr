@@ -73,7 +73,10 @@
 			{
 				"command": "egovframe.egovButtonClicked",
 				"title": "eGovFrame",
-				"icon": "assets/icons/egovframe.svg"
+				"icon": {
+					"light": "assets/icons/settings-light.svg",
+					"dark": "assets/icons/settings-dark.svg"
+				}
 			}
 		],
 		"keybindings": [],
@@ -95,7 +98,23 @@
 		},
 		"configuration": {
 			"title": "eGovFrame Initializr",
-			"properties": {}
+			"properties": {
+				"egovframeInitializr.defaultGroupId": {
+					"type": "string",
+					"default": "egovframework",
+					"description": "Default maven groupId for eGovFrame projects Generation"
+				},
+				"egovframeInitializr.defaultArtifactId": {
+					"type": "string",
+					"default": "egovframe-project",
+					"description": "Default maven artifactId for eGovFrame projects Generation"
+				},
+				"egovframeInitializr.defaultPackageName": {
+					"type": "string",
+					"default": "egovframework.example",
+					"description": "Default package name for eGovFrame CRUD code generation"
+				}
+			}
 		}
 	},
 	"scripts": {

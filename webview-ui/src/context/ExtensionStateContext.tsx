@@ -7,6 +7,7 @@ import { vscode } from "../utils/vscode"
 interface ExtensionStateContextType {
 	// Only keep essential eGov-related state
 	showEgov: boolean
+	showEgovSettings: boolean
 	egovTab?: EgovViewTab
 
 	// Legacy properties for compatibility (empty/default values)
@@ -21,6 +22,8 @@ interface ExtensionStateContextType {
 	setEgovTab: (tab?: EgovViewTab) => void
 	navigateToEgov: () => void
 	hideEgov: () => void
+	showEgovSettingsScreen: () => void
+	hideEgovSettingsScreen: () => void
 }
 
 const ExtensionStateContext = createContext<ExtensionStateContextType | undefined>(undefined)
@@ -28,13 +31,27 @@ const ExtensionStateContext = createContext<ExtensionStateContextType | undefine
 export const ExtensionStateProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
 	// UI view state - only eGov related
 	const [showEgov, setShowEgov] = useState(true)
+	const [showEgovSettings, setShowEgovSettings] = useState(false)
 	const [egovTab, setEgovTab] = useState<EgovViewTab | undefined>(undefined)
 
 	// Hide functions - only eGov
 	const hideEgov = useCallback(() => setShowEgov(false), [setShowEgov])
 
 	// Navigation functions - only eGov
-	const navigateToEgov = useCallback(() => setShowEgov(true), [setShowEgov])
+	const navigateToEgov = useCallback(() => {
+		setShowEgov(true)
+		setShowEgovSettings(false)
+	}, [setShowEgov, setShowEgovSettings])
+
+	// eGov Settings view functions
+	const showEgovSettingsScreen = useCallback(() => {
+		setShowEgovSettings(true)
+		setShowEgov(true)
+	}, [setShowEgovSettings, setShowEgov])
+
+	const hideEgovSettingsScreen = useCallback(() => {
+		setShowEgovSettings(false)
+	}, [setShowEgovSettings])
 
 	// Minimal state for eGov functionality
 	const handleMessage = useCallback(
@@ -42,10 +59,10 @@ export const ExtensionStateProvider: React.FC<{ children: React.ReactNode }> = (
 			const message: ExtensionMessage = event.data
 
 			if (message.type === "action" && message.action === "egovButtonClicked") {
-				navigateToEgov()
+				showEgovSettingsScreen()
 			}
 		},
-		[navigateToEgov],
+		[showEgovSettingsScreen],
 	)
 
 	useEvent("message", handleMessage)
@@ -57,6 +74,7 @@ export const ExtensionStateProvider: React.FC<{ children: React.ReactNode }> = (
 
 	const contextValue: ExtensionStateContextType = {
 		showEgov,
+		showEgovSettings,
 		egovTab,
 
 		// Legacy properties with default values
@@ -71,6 +89,8 @@ export const ExtensionStateProvider: React.FC<{ children: React.ReactNode }> = (
 		navigateToEgov,
 		hideEgov,
 		setEgovTab,
+		showEgovSettingsScreen,
+		hideEgovSettingsScreen,
 	}
 
 	return <ExtensionStateContext.Provider value={contextValue}>{children}</ExtensionStateContext.Provider>

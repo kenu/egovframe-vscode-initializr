@@ -45,19 +45,6 @@ const EgovView = memo(({ onDone, initialTab }: EgovViewProps) => {
 				display: "flex",
 				flexDirection: "column",
 			}}>
-			<div
-				style={{
-					display: "flex",
-					justifyContent: "space-between",
-					alignItems: "center",
-					padding: "10px 17px 5px 20px",
-				}}>
-				<h3 style={{ color: theme.colors.foreground, margin: 0 }}>eGovFrame Initializr</h3>
-				<Button onClick={onDone} variant="secondary" size="sm">
-					Done
-				</Button>
-			</div>
-
 			<div style={{ flex: 1, overflow: "auto" }}>
 				{/* Tabs container */}
 				<div
