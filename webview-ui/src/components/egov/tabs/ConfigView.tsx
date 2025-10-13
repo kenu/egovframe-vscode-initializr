@@ -155,7 +155,9 @@ const ConfigView: React.FC = () => {
 						marginTop: "5px",
 					}}>
 					Generate configuration files for eGovFrame projects. Learn more at{" "}
-					<Link href="https://github.com/eGovFramework/egovframe-vscode-initializr" style={{ display: "inline" }}>
+					<Link
+						href="https://github.com/eGovFramework/egovframe-vscode-initializr"
+						style={{ display: "inline", fontSize: "12px" }}>
 						GitHub
 					</Link>
 				</p>

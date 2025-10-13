@@ -101,7 +101,7 @@
 			"properties": {
 				"egovframeInitializr.defaultGroupId": {
 					"type": "string",
-					"default": "egovframework",
+					"default": "egovframework.com",
 					"description": "Default maven groupId for eGovFrame projects Generation"
 				},
 				"egovframeInitializr.defaultArtifactId": {

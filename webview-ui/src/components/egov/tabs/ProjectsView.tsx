@@ -220,7 +220,9 @@ export const ProjectsView = () => {
 					}}>
 					Generate new eGovFrame projects from predefined templates. Choose from various project templates including
 					basic Spring applications, web applications, and more. Learn more at{" "}
-					<Link href="https://github.com/eGovFramework/egovframe-vscode-initializr" style={{ display: "inline" }}>
+					<Link
+						href="https://github.com/eGovFramework/egovframe-vscode-initializr"
+						style={{ display: "inline", fontSize: "12px" }}>
 						GitHub
 					</Link>
 				</p>

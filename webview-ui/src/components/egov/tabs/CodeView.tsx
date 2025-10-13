@@ -422,7 +422,9 @@ const CodeView = () => {
 						}}>
 						Generate CRUD operations and database-related code from DDL (Data Definition Language) statements.
 						Supports Oracle, MySQL, PostgreSQL and more. Uses Handlebars template engine. Learn more at{" "}
-						<Link href="https://github.com/eGovFramework/egovframe-vscode-initializr" style={{ display: "inline" }}>
+						<Link
+							href="https://github.com/eGovFramework/egovframe-vscode-initializr"
+							style={{ display: "inline", fontSize: "12px" }}>
 							GitHub
 						</Link>
 					</p>
