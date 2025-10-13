@@ -110,6 +110,9 @@ export const ProjectsView = () => {
 		setSelectedTemplate(template)
 		setValidationErrors([]) // Clear previous errors
 		setGenerationStatus("") // Clear previous status
+
+		// Insert Sample 기능을 템플릿 선택 시 자동 실행
+		handleInsertSample()
 	}
 
 	const handleSelectOutputPath = () => {
@@ -567,7 +570,7 @@ export const ProjectsView = () => {
 							disabled={isGenerating || !selectedTemplate || !projectName || !outputPath}
 							onClick={handleGenerateProject}
 							style={{
-								flex: 1,
+								width: "100%",
 								backgroundColor: "var(--vscode-button-background)",
 								color: "var(--vscode-button-foreground)",
 								border: "1px solid var(--vscode-button-border)",
@@ -613,41 +616,6 @@ export const ProjectsView = () => {
 									Generate Project
 								</>
 							)}
-						</button>
-
-						{/* Insert Sample Button */}
-						<button
-							onClick={handleInsertSample}
-							style={{
-								backgroundColor: "var(--vscode-button-secondaryBackground)",
-								color: "var(--vscode-button-secondaryForeground)",
-								border: "1px solid var(--vscode-button-border)",
-								borderRadius: "4px",
-								padding: "12px 16px",
-								cursor: "pointer",
-								display: "inline-flex",
-								alignItems: "center",
-								justifyContent: "center",
-								fontSize: "13px",
-								fontFamily: "inherit",
-								outline: "none",
-							}}
-							onMouseOver={(e) => {
-								;(e.target as HTMLButtonElement).style.backgroundColor =
-									"var(--vscode-button-secondaryHoverBackground)"
-							}}
-							onMouseOut={(e) => {
-								;(e.target as HTMLButtonElement).style.backgroundColor =
-									"var(--vscode-button-secondaryBackground)"
-							}}
-							onFocus={(e) => {
-								;(e.target as HTMLButtonElement).style.outline = "1px solid var(--vscode-focusBorder)"
-							}}
-							onBlur={(e) => {
-								;(e.target as HTMLButtonElement).style.outline = "none"
-							}}>
-							<span className="codicon codicon-beaker" style={{ marginRight: "6px" }}></span>
-							Sample
 						</button>
 					</div>
 				</div>
