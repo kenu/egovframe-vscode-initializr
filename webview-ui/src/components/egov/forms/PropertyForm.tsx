@@ -134,6 +134,23 @@ const PropertyForm: React.FC<FormComponentProps> = ({ onSubmit, onCancel, templa
 		<div style={{ padding: "20px", maxWidth: "600px" }}>
 			<h2 style={{ color: "var(--vscode-foreground)", marginBottom: "20px" }}>Create Property</h2>
 
+			{/* Info */}
+			<div
+				style={{
+					backgroundColor: "var(--vscode-editor-background)",
+					border: "1px solid var(--vscode-panel-border)",
+					borderRadius: "3px",
+					padding: "15px",
+					marginTop: "20px",
+				}}>
+				<h4 style={{ color: "var(--vscode-foreground)", marginBottom: "10px", marginTop: 0 }}>Guide:</h4>
+				<Link
+					href="https://egovframework.github.io/egovframe-docs/egovframe-runtime/foundation-layer/property/property-service/"
+					style={{ display: "inline", fontSize: "12px" }}>
+					Property Guide Here
+				</Link>
+			</div>
+
 			{/* Validation Errors */}
 			{validationError && (
 				<div style={{ marginBottom: "20px" }}>

@@ -216,7 +216,7 @@ const IdGenerationForm: React.FC<FormComponentProps> = ({ onSubmit, onCancel, te
 		<div style={{ padding: "20px", maxWidth: "600px" }}>
 			<h2 style={{ color: "var(--vscode-foreground)", marginBottom: "20px" }}>{getFormTitle()}</h2>
 
-			{/* ID Generation Info */}
+			{/* Info */}
 			<div
 				style={{
 					backgroundColor: "var(--vscode-editor-background)",
@@ -229,7 +229,7 @@ const IdGenerationForm: React.FC<FormComponentProps> = ({ onSubmit, onCancel, te
 					<>
 						{/*
 						<h4 style={{ color: "var(--vscode-foreground)", marginBottom: "10px", marginTop: 0 }}>DB Schema:</h4>
-						<div style={{ fontSize: "11px", color: "var(--vscode-foreground)", margin: "0" }}>
+						<div style={{ fontSize: "11px", color: "var(--vscode-foreground)", marginBottom: "10px" }}>
 							{(() => {
 								// formData.txtQuery에서 "SELECT "와 ".NEXTVAL" 사이의 테이블명 추출 (대소문자 구분 없이)
 								const query = formData.txtQuery || ""
@@ -251,7 +251,7 @@ const IdGenerationForm: React.FC<FormComponentProps> = ({ onSubmit, onCancel, te
 				{formType === "table" && (
 					<>
 						<h4 style={{ color: "var(--vscode-foreground)", marginBottom: "10px", marginTop: 0 }}>DB Schema:</h4>
-						<div style={{ fontSize: "11px", color: "var(--vscode-foreground)", margin: "0" }}>
+						<div style={{ fontSize: "11px", color: "var(--vscode-foreground)", marginBottom: "10px" }}>
 							<div>{`CREATE TABLE ${formData.txtTable} (`}</div>
 							<div style={{ paddingLeft: "20px" }}>{`TABLE_NAME varchar(16) NOT NULL,`}</div>
 							<div style={{ paddingLeft: "20px" }}>NEXT_ID INTEGER NOT NULL,</div>
@@ -265,7 +265,7 @@ const IdGenerationForm: React.FC<FormComponentProps> = ({ onSubmit, onCancel, te
 					<>
 						{/*
 						<h4 style={{ color: "var(--vscode-foreground)", marginBottom: "10px", marginTop: 0 }}>UUID:</h4>
-						<div style={{ fontSize: "11px", color: "var(--vscode-foreground)", margin: "0" }}>
+						<div style={{ fontSize: "11px", color: "var(--vscode-foreground)", marginBottom: "10px" }}>
 							<li>Default : Math.random()</li>
 							<li>MAC Address : e.g., 12:34:56:78:9A:AB</li>
 							<li>IP Address : e.g., 192.168.120.107</li>
@@ -273,13 +273,12 @@ const IdGenerationForm: React.FC<FormComponentProps> = ({ onSubmit, onCancel, te
 						*/}
 					</>
 				)}
-				<div style={{ marginTop: "10px", fontSize: "10px", opacity: 0.8 }}>
-					<Link
-						href="https://egovframework.github.io/egovframe-docs/egovframe-runtime/foundation-layer/id-generated/"
-						style={{ display: "inline", fontSize: "12px" }}>
-						ID Generation Guide Here
-					</Link>
-				</div>
+				<h4 style={{ color: "var(--vscode-foreground)", marginBottom: "10px", marginTop: 0 }}>Guide:</h4>
+				<Link
+					href="https://egovframework.github.io/egovframe-docs/egovframe-runtime/foundation-layer/id-generated/"
+					style={{ display: "inline", fontSize: "12px" }}>
+					ID Generation Guide Here
+				</Link>
 			</div>
 
 			{/* Validation Errors */}

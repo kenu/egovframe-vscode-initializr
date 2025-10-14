@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react"
-import { Button, TextField, RadioGroup, Select, Checkbox } from "../../ui"
+import { Button, TextField, RadioGroup, Select, Checkbox, Link } from "../../ui"
 import { ConfigFormData, ConfigGenerationType, FormComponentProps } from "../types/templates"
 import { vscode } from "../../../utils/vscode"
 
@@ -212,6 +212,23 @@ const TransactionForm: React.FC<FormComponentProps> = ({ onSubmit, onCancel, tem
 	return (
 		<div style={{ padding: "20px", maxWidth: "600px" }}>
 			<h2 style={{ color: "var(--vscode-foreground)", marginBottom: "20px" }}>{getFormTitle()}</h2>
+
+			{/* Info */}
+			<div
+				style={{
+					backgroundColor: "var(--vscode-editor-background)",
+					border: "1px solid var(--vscode-panel-border)",
+					borderRadius: "3px",
+					padding: "15px",
+					marginTop: "20px",
+				}}>
+				<h4 style={{ color: "var(--vscode-foreground)", marginBottom: "10px", marginTop: 0 }}>Guide:</h4>
+				<Link
+					href="https://egovframework.github.io/egovframe-docs/egovframe-runtime/persistence-layer/transaction/"
+					style={{ display: "inline", fontSize: "12px" }}>
+					Transaction Guide Here
+				</Link>
+			</div>
 
 			{/* Validation Errors */}
 			{validationError && (

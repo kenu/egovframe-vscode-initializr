@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react"
-import { Button, TextField, Select, RadioGroup } from "../../ui"
+import { Button, TextField, Select, RadioGroup, Link } from "../../ui"
 import { ConfigGenerationType, ConfigFormData, FormComponentProps } from "../types/templates"
 import { vscode } from "../../../utils/vscode"
 
@@ -121,6 +121,23 @@ const DatasourceForm: React.FC<FormComponentProps> = ({ onSubmit, onCancel, temp
 	return (
 		<div style={{ padding: "20px", maxWidth: "600px" }}>
 			<h2 style={{ color: "var(--vscode-foreground)", marginBottom: "20px" }}>Create DataSource</h2>
+
+			{/* Info */}
+			<div
+				style={{
+					backgroundColor: "var(--vscode-editor-background)",
+					border: "1px solid var(--vscode-panel-border)",
+					borderRadius: "3px",
+					padding: "15px",
+					marginTop: "20px",
+				}}>
+				<h4 style={{ color: "var(--vscode-foreground)", marginBottom: "10px", marginTop: 0 }}>Guide:</h4>
+				<Link
+					href="https://egovframework.github.io/egovframe-docs/egovframe-runtime/persistence-layer/data-source/"
+					style={{ display: "inline", fontSize: "12px" }}>
+					Datasource Guide Here
+				</Link>
+			</div>
 
 			{/* Validation Errors */}
 			{validationError && (
