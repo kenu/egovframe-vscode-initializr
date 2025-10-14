@@ -227,6 +227,7 @@ const IdGenerationForm: React.FC<FormComponentProps> = ({ onSubmit, onCancel, te
 				}}>
 				{formType === "sequence" && (
 					<>
+						{/*
 						<h4 style={{ color: "var(--vscode-foreground)", marginBottom: "10px", marginTop: 0 }}>DB Schema:</h4>
 						<div style={{ fontSize: "11px", color: "var(--vscode-foreground)", margin: "0" }}>
 							{(() => {
@@ -244,6 +245,7 @@ const IdGenerationForm: React.FC<FormComponentProps> = ({ onSubmit, onCancel, te
 								return `CREATE SEQUENCE ${seqName} MINVALUE 0;`
 							})()}
 						</div>
+						*/}
 					</>
 				)}
 				{formType === "table" && (
@@ -261,18 +263,20 @@ const IdGenerationForm: React.FC<FormComponentProps> = ({ onSubmit, onCancel, te
 				)}
 				{formType === "uuid" && (
 					<>
+						{/*
 						<h4 style={{ color: "var(--vscode-foreground)", marginBottom: "10px", marginTop: 0 }}>UUID:</h4>
 						<div style={{ fontSize: "11px", color: "var(--vscode-foreground)", margin: "0" }}>
 							<li>Default : Math.random()</li>
 							<li>MAC Address : e.g., 12:34:56:78:9A:AB</li>
 							<li>IP Address : e.g., 192.168.120.107</li>
 						</div>
+						*/}
 					</>
 				)}
 				<div style={{ marginTop: "10px", fontSize: "10px", opacity: 0.8 }}>
 					<Link
 						href="https://egovframework.github.io/egovframe-docs/egovframe-runtime/foundation-layer/id-generated/"
-						style={{ display: "inline", fontSize: "10px" }}>
+						style={{ display: "inline", fontSize: "12px" }}>
 						ID Generation Guide Here
 					</Link>
 				</div>
