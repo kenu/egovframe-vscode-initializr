@@ -4,12 +4,14 @@ export interface ProjectTemplate {
 	pomFile: string
 	description?: string
 	category?: string
+	projectName?: string
+	artifactId?: string
 }
 
 export interface ProjectConfig {
 	projectName: string
 	artifactId: string
-	groupID: string
+	groupId: string
 	outputPath: string
 	template: ProjectTemplate
 }
@@ -21,6 +23,7 @@ export const PROJECT_TEMPLATES: ProjectTemplate[] = [
 		pomFile: "example-web-pom.xml",
 		description: "Basic eGovFrame web application project",
 		category: "Web",
+		projectName: "web-project",
 	},
 	{
 		displayName: "Template >Simple Homepage", // eGovFrame Template Project > Simple Homepage
@@ -28,6 +31,7 @@ export const PROJECT_TEMPLATES: ProjectTemplate[] = [
 		pomFile: "example-template-simple-pom.xml",
 		description: "Simple homepage template with basic functionalities",
 		category: "Template",
+		projectName: "template-simple-homepage",
 	},
 	{
 		displayName: "Template > Portal Site", // eGovFrame Template Project > Portal Site
@@ -35,6 +39,7 @@ export const PROJECT_TEMPLATES: ProjectTemplate[] = [
 		pomFile: "example-template-portal-pom.xml",
 		description: "Portal site template for enterprise applications",
 		category: "Template",
+		projectName: "template-portal-site",
 	},
 	{
 		displayName: "Template > Enterprise Business", // eGovFrame Template Project > Enterprise Business
@@ -42,6 +47,7 @@ export const PROJECT_TEMPLATES: ProjectTemplate[] = [
 		pomFile: "example-template-enterprise-pom.xml",
 		description: "Enterprise business application template",
 		category: "Template",
+		projectName: "template-enterprise-business",
 	},
 	{
 		displayName: "Template > Common All-in-one", // eGovFrame Template Project > Common All-in-one
@@ -49,6 +55,7 @@ export const PROJECT_TEMPLATES: ProjectTemplate[] = [
 		pomFile: "egovframework-all-in-oneAllNew_wizard-pom.xml",
 		description: "Comprehensive all-in-one project template",
 		category: "Template",
+		projectName: "template-common-all-in-one",
 	},
 	{
 		displayName: "Mobile Project", // eGovFrame Mobile Project
@@ -56,6 +63,7 @@ export const PROJECT_TEMPLATES: ProjectTemplate[] = [
 		pomFile: "mobile-web-pom.xml",
 		description: "Mobile web application project",
 		category: "Mobile",
+		projectName: "mobile-project",
 	},
 	{
 		displayName: "Mobile Template Project", // eGovFrame Mobile Template Project
@@ -63,6 +71,7 @@ export const PROJECT_TEMPLATES: ProjectTemplate[] = [
 		pomFile: "mobile-template-pom.xml",
 		description: "Mobile template project with hybrid app support",
 		category: "Mobile",
+		projectName: "mobile-template-project",
 	},
 	{
 		displayName: "DeviceAPI Web Project", // eGovFrame DeviceAPI Web Project
@@ -70,6 +79,7 @@ export const PROJECT_TEMPLATES: ProjectTemplate[] = [
 		pomFile: "",
 		description: "Device API integration web project",
 		category: "Mobile",
+		projectName: "deviceapi-web-project",
 	},
 	{
 		displayName: "Boot Web Project", // eGovFrame Boot Web Project
@@ -77,6 +87,7 @@ export const PROJECT_TEMPLATES: ProjectTemplate[] = [
 		pomFile: "example-boot-web-pom.xml",
 		description: "Spring Boot based web project",
 		category: "Boot",
+		projectName: "boot-web-project",
 	},
 	{
 		displayName: "Boot Template > Simple Homepage (Backend)", // eGovFrame Boot Template Project > Simple Homepage (Backend)
@@ -84,6 +95,7 @@ export const PROJECT_TEMPLATES: ProjectTemplate[] = [
 		pomFile: "egovframe-template-simple-backend-pom.xml",
 		description: "Spring Boot simple homepage backend",
 		category: "Boot",
+		projectName: "boot-template-simple-backend",
 	},
 	{
 		displayName: "Boot Template > Simple Homepage (Frontend)", // eGovFrame Boot Template Project > Simple Homepage (Frontend)
@@ -91,6 +103,7 @@ export const PROJECT_TEMPLATES: ProjectTemplate[] = [
 		pomFile: "",
 		description: "React-based frontend for simple homepage",
 		category: "Boot",
+		projectName: "boot-template-simple-frontend",
 	},
 	{
 		displayName: "MSA Boot Template > Common Components (KRDS)", // eGovFrame MSA Boot Template Project > Common Components (KRDS)
@@ -98,6 +111,7 @@ export const PROJECT_TEMPLATES: ProjectTemplate[] = [
 		pomFile: "",
 		description: "MSA common components with KRDS integration",
 		category: "MSA",
+		projectName: "msa-boot-common-components",
 	},
 	{
 		displayName: "MSA Boot Template > Portal (Backend)", // eGovFrame MSA Boot Template Project > Portal (Backend)
@@ -105,6 +119,7 @@ export const PROJECT_TEMPLATES: ProjectTemplate[] = [
 		pomFile: "",
 		description: "MSA portal backend services",
 		category: "MSA",
+		projectName: "msa-boot-portal-backend",
 	},
 	{
 		displayName: "MSA Boot Template > Portal (Frontend)", // eGovFrame MSA Boot Template Project > Portal (Frontend)
@@ -112,6 +127,7 @@ export const PROJECT_TEMPLATES: ProjectTemplate[] = [
 		pomFile: "",
 		description: "MSA portal frontend application",
 		category: "MSA",
+		projectName: "msa-boot-portal-frontend",
 	},
 	{
 		displayName: "Boot Batch Template > Scheduler (File)", // eGovFrame Boot Batch Template Project > Scheduler (File)
@@ -119,6 +135,7 @@ export const PROJECT_TEMPLATES: ProjectTemplate[] = [
 		pomFile: "batch-sam-scheduler-pom.xml",
 		description: "File-based batch scheduler project",
 		category: "Batch",
+		projectName: "boot-batch-scheduler-file",
 	},
 	{
 		displayName: "Boot Batch Template > CommandLine (File)", // eGovFrame Boot Batch Template Project > CommandLine (File)
@@ -126,6 +143,7 @@ export const PROJECT_TEMPLATES: ProjectTemplate[] = [
 		pomFile: "batch-sam-commandline-pom.xml",
 		description: "File-based command line batch project",
 		category: "Batch",
+		projectName: "boot-batch-commandline-file",
 	},
 	{
 		displayName: "Boot Batch Template > Web (File)", // eGovFrame Boot Batch Template Project > Web (File)
@@ -133,6 +151,7 @@ export const PROJECT_TEMPLATES: ProjectTemplate[] = [
 		pomFile: "batch-sam-web-pom.xml",
 		description: "File-based web batch project",
 		category: "Batch",
+		projectName: "boot-batch-web-file",
 	},
 	{
 		displayName: "Boot Batch Template > Scheduler (DB)", // eGovFrame Boot Batch Template Project > Scheduler (DB)
@@ -140,6 +159,7 @@ export const PROJECT_TEMPLATES: ProjectTemplate[] = [
 		pomFile: "batch-db-scheduler-pom.xml",
 		description: "Database-based batch scheduler project",
 		category: "Batch",
+		projectName: "boot-batch-scheduler-db",
 	},
 	{
 		displayName: "Boot Batch Template > CommandLine (DB)", // eGovFrame Boot Batch Template Project > CommandLine (DB)
@@ -147,6 +167,7 @@ export const PROJECT_TEMPLATES: ProjectTemplate[] = [
 		pomFile: "batch-db-commandline-pom.xml",
 		description: "Database-based command line batch project",
 		category: "Batch",
+		projectName: "boot-batch-commandline-db",
 	},
 	{
 		displayName: "Boot Batch Template > Web (DB)", // eGovFrame Boot Batch Template Project > Web (DB)
@@ -154,6 +175,7 @@ export const PROJECT_TEMPLATES: ProjectTemplate[] = [
 		pomFile: "batch-db-web-pom.xml",
 		description: "Database-based web batch project",
 		category: "Batch",
+		projectName: "boot-batch-web-db",
 	},
 ]
 
@@ -195,19 +217,24 @@ export function validateProjectConfig(config: Partial<ProjectConfig>): string[] 
 		errors.push("Project name must start with a letter and contain only letters, numbers, hyphens, and underscores")
 	}
 
+	// groupId validation (only for templates with pomFile)
+	if (config.template?.pomFile) {
+		if (!config.groupId || config.groupId.trim() === "") {
+			errors.push("Group ID is required for this template")
+		} else if (!/^[a-z]([a-z0-9.]*[a-z0-9])?$/.test(config.groupId)) {
+			errors.push(
+				"Group ID must start with a lowercase letter, contain only lowercase letters, numbers, or dots, and cannot end with a dot",
+			)
+		}
+	}
+
 	// artifactId validation (only for templates with pomFile)
 	if (config.template?.pomFile) {
 		if (!config.artifactId || config.artifactId.trim() === "") {
 			errors.push("Artifact ID is required for this template")
-		} else if (!/^[a-zA-Z][a-zA-Z0-9_-]*$/.test(config.artifactId)) {
-			errors.push("Artifact ID must start with a letter and contain only letters, numbers, hyphens, and underscores")
+		} else if (!/^[a-z][a-z0-9-]*$/.test(config.artifactId)) {
+			errors.push("Artifact ID must start with a lowercase letter and contain only lowercase letters, numbers, or hyphens")
 		}
-	}
-
-	if (config.template?.pomFile && (!config.groupID || config.groupID.trim() === "")) {
-		errors.push("Group ID is required for this template")
-	} else if (config.groupID && !/^[a-zA-Z][a-zA-Z0-9._-]*$/.test(config.groupID)) {
-		errors.push("Group ID must be a valid Java package name")
 	}
 
 	if (!config.outputPath || config.outputPath.trim() === "") {
@@ -219,18 +246,4 @@ export function validateProjectConfig(config: Partial<ProjectConfig>): string[] 
 	}
 
 	return errors
-}
-
-export function getDefaultGroupId(): string {
-	return "com.example"
-}
-
-export function getDefaultArtifactId(): string {
-	return "example-project"
-}
-
-export function generateSampleProjectName(): string {
-	const timestamp = new Date().toISOString().slice(0, 10).replace(/-/g, "")
-	const randomSuffix = Math.random().toString(36).substring(2, 8)
-	return `egov-project-${timestamp}-${randomSuffix}`
 }

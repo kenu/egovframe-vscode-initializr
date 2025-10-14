@@ -20,7 +20,7 @@ export interface EgovProjectTemplate {
 export interface EgovProjectConfig {
 	projectName: string
 	artifactId: string
-	groupID: string
+	groupId: string
 	outputPath: string
 	packageName: string
 	template: EgovProjectTemplate
@@ -45,7 +45,7 @@ export interface ProjectGenerationResult {
  * Form-based Project Generation
  */
 export async function generateEgovProject(
-	config: EgovProjectConfig, // { projectName: string, artifactId: string, groupID: string, outputPath: string, template: {displayName: string, fileName: string, pomFile: string} }
+	config: EgovProjectConfig, // { projectName: string, artifactId: string, groupId: string, outputPath: string, template: {displayName: string, fileName: string, pomFile: string} }
 	extensionPath: string,
 	progressCallback?: (message: string) => void,
 ): Promise<ProjectGenerationResult> {
@@ -59,7 +59,7 @@ export async function generateEgovProject(
 			throw new Error("Artifact ID is required")
 		}
 
-		if (!config.groupID?.trim()) {
+		if (!config.groupId?.trim()) {
 			throw new Error("Group ID is required")
 		}
 
@@ -141,10 +141,10 @@ export async function generateEgovProject(
 // generateEgovProject 함수에서 processTemplateFiles 함수 주석처리
 /*
 // Internal function for Form-based Project Generation
-async function processTemplateFiles(projectRoot: string, config: EgovProjectConfig): Promise<void> { // config = { projectName: string, groupID: string, outputPath: string, template: {displayName: string, fileName: string, pomFile: string} }
+async function processTemplateFiles(projectRoot: string, config: EgovProjectConfig): Promise<void> { // config = { projectName: string, groupId: string, outputPath: string, template: {displayName: string, fileName: string, pomFile: string} }
 	const placeholders = {
 		"{{projectName}}": config.projectName,
-		"{{groupID}}": config.groupID,
+		"{{groupId}}": config.groupId,
 		//"{{PACKAGE_NAME}}": config.packageName,
 		//"{{AUTHOR}}": config.author || "eGovFrame Developer",
 		//"{{DESCRIPTION}}": config.description || `eGovFrame project: ${config.projectName}`,
@@ -192,7 +192,7 @@ async function processFilesRecursively(projectRoot: string, placeholders: Record
 
 // Internal function for Form-based Project Generation
 async function generatePomFile(
-	config: EgovProjectConfig, // { projectName: string, artifactId: string, groupID: string, outputPath: string, template: {displayName: string, fileName: string, pomFile: string} }
+	config: EgovProjectConfig, // { projectName: string, artifactId: string, groupId: string, outputPath: string, template: {displayName: string, fileName: string, pomFile: string} }
 	projectRoot: string,
 	extensionPath: string,
 	progressCallback?: (message: string) => void,
@@ -215,7 +215,7 @@ async function generatePomFile(
 		const placeholders = {
 			"{{projectName}}": config.projectName,
 			"{{artifactId}}": config.artifactId,
-			"{{groupID}}": config.groupID,
+			"{{groupId}}": config.groupId,
 			//"{{PACKAGE_NAME}}": config.packageName,
 			//"{{DESCRIPTION}}": config.description || `eGovFrame project: ${config.projectName}`,
 			//"{{FRAMEWORK_VERSION}}": config.template.frameworkVersion || "4.3.0",

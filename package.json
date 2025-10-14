@@ -111,7 +111,7 @@
 				},
 				"egovframeInitializr.defaultPackageName": {
 					"type": "string",
-					"default": "egovframework.example",
+					"default": "egovframework.example.sample",
 					"description": "Default package name for eGovFrame CRUD code generation"
 				}
 			}

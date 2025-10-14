@@ -8,26 +8,28 @@ import {
 	PROJECT_CATEGORIES,
 	getTemplatesByCategory,
 	validateProjectConfig,
-	getDefaultGroupId,
-	getDefaultArtifactId,
-	generateSampleProjectName,
 } from "../../../utils/projectUtils"
 import {
 	createProjectGenerationMessage,
 	createSelectOutputPathMessage,
 	createGenerateProjectByCommandMessage,
-	validateFileSystemPath,
 } from "../../../utils/egovUtils"
 import { useProjectsViewState } from "../../../context/EgovTabsStateContext"
 
 export const ProjectsView = () => {
 	const { state, updateState } = useProjectsViewState()
-	const { selectedCategory, outputPath, packageName, groupId, artifactId, projectName, version, description, generationMode } =
-		state
-
-	// Map groupId to groupID for compatibility
-	const groupID = groupId
-	const setGroupID = (value: string) => updateState({ groupId: value })
+	const {
+		selectedCategory,
+		outputPath,
+		groupId,
+		artifactId,
+		projectName,
+		version,
+		description,
+		generationMode,
+		defaultGroupId,
+		defaultArtifactId,
+	} = state
 
 	// Get selectedTemplate from state
 	const { selectedTemplate } = state
@@ -37,8 +39,9 @@ export const ProjectsView = () => {
 	const [isGenerating, setIsGenerating] = useState<boolean>(false)
 	const [generationStatus, setGenerationStatus] = useState<string>("")
 
-	// projectName and artifactId
+	// projectName, groupId, artifactId
 	const setProjectName = (value: string) => updateState({ projectName: value })
+	const setGroupId = (value: string) => updateState({ groupId: value })
 	const setArtifactId = (value: string) => updateState({ artifactId: value })
 
 	// Map generationMethod to generationMode
@@ -57,11 +60,9 @@ export const ProjectsView = () => {
 	const [initialPath, setInitialPath] = useState("")
 
 	useEffect(() => {
-		// Initialize with sample project name
-		setProjectName(generateSampleProjectName())
-
-		// Request current workspace path when component mounts
+		// Request current workspace path and default settings when component mounts
 		vscode.postMessage({ type: "getWorkspacePath" })
+		vscode.postMessage({ type: "getDefaultSettings" })
 
 		// Listen for messages from extension
 		const handleMessage = (event: MessageEvent) => {
@@ -79,13 +80,22 @@ export const ProjectsView = () => {
 						setInitialPath(message.text) // useState로 관리, Sample 버튼(handleInsertSample)을 위해 초기 출력 경로 설정
 					}
 					break
+				case "egovSettings":
+					// Update default settings from VSCode configuration
+					if (message.settings) {
+						updateState({
+							defaultGroupId: message.settings.defaultGroupId,
+							defaultArtifactId: message.settings.defaultArtifactId,
+						})
+					}
+					break
 				case "projectGenerationResult":
 					setIsGenerating(false)
 					if (message.success) {
 						setGenerationStatus(`✅ Project generated successfully at: ${message.projectPath}`)
 						// Reset form
 						setSelectedTemplate(null)
-						setProjectName(generateSampleProjectName())
+						setProjectName("")
 						setValidationErrors([])
 					} else {
 						setGenerationStatus(`❌ Generation failed: ${message.error}`)
@@ -109,12 +119,17 @@ export const ProjectsView = () => {
 	}
 
 	const handleTemplateSelect = (template: ProjectTemplate) => {
-		setSelectedTemplate(template)
 		setValidationErrors([]) // Clear previous errors
 		setGenerationStatus("") // Clear previous status
+		setSelectedTemplate(template)
+		handleInsertDefault(template) // Insert Default 기능을 템플릿 선택 시 자동 실행
+	}
 
-		// Insert Sample 기능을 템플릿 선택 시 자동 실행
-		handleInsertSample()
+	const handleInsertDefault = (template: ProjectTemplate | null) => {
+		setProjectName(template?.projectName || defaultArtifactId || "egov-project")
+		setArtifactId(defaultArtifactId)
+		setGroupId(defaultGroupId)
+		setOutputPath(initialPath)
 	}
 
 	const handleSelectOutputPath = () => {
@@ -130,17 +145,12 @@ export const ProjectsView = () => {
 		const config: Partial<ProjectConfig> = {
 			projectName,
 			artifactId,
-			groupID,
+			groupId,
 			outputPath,
 			template: selectedTemplate,
 		}
 
 		const errors = validateProjectConfig(config)
-
-		// Additional file system validation
-		if (projectName && !validateFileSystemPath(projectName)) {
-			errors.push("Project name contains invalid characters for file system")
-		}
 
 		setValidationErrors(errors)
 		return errors.length === 0
@@ -158,7 +168,7 @@ export const ProjectsView = () => {
 			const config: ProjectConfig = {
 				projectName,
 				artifactId,
-				groupID,
+				groupId,
 				outputPath,
 				template: selectedTemplate!,
 			}
@@ -177,25 +187,8 @@ export const ProjectsView = () => {
 		vscode.postMessage(createGenerateProjectByCommandMessage())
 	}
 
-	const handleInsertSample = () => {
-		if (PROJECT_TEMPLATES.length > 0) {
-			if (!selectedCategory || selectedCategory === "All") {
-				// 카테고리가 선택되지 않거나 All인 경우
-				setSelectedCategory(PROJECT_TEMPLATES[0].category || "Web")
-				setSelectedTemplate(PROJECT_TEMPLATES[0])
-			} else if (!selectedTemplate) {
-				// 카테고리는 선택되었는데 템플릿은 선택되지 않은 경우
-				setSelectedTemplate(filteredTemplates[0])
-			}
-		}
-		setProjectName(generateSampleProjectName())
-		setArtifactId(getDefaultArtifactId())
-		setGroupID(getDefaultGroupId())
-		setOutputPath(initialPath)
-		setGenerationStatus("") // Clear previous status
-	}
-
 	const handleProjectNameChange = (event: any) => {
+		setValidationErrors([]) // Clear previous errors
 		setGenerationStatus("") // Clear previous status
 
 		const value = event.target.value
@@ -203,34 +196,34 @@ export const ProjectsView = () => {
 
 		// Auto-generate groupId and artifactId from projectName
 		const lastDotIndex = value.lastIndexOf(".")
-		if (lastDotIndex === -1) {
+		if (value.trim() === "") {
+			setGroupId(defaultGroupId)
+			setArtifactId(defaultArtifactId)
+		} else if (lastDotIndex === -1) {
 			// No dot: groupId is defaultGroupId, artifactId is the whole value
-			setGroupID(getDefaultGroupId())
+			setGroupId(defaultGroupId)
 			setArtifactId(value)
 		} else {
 			// Has dot(s): split by the last dot
 			const groupPart = value.substring(0, lastDotIndex)
 			const artifactPart = value.substring(lastDotIndex + 1)
-			setGroupID(groupPart)
+			setGroupId(groupPart)
 			setArtifactId(artifactPart)
-		}
-
-		// Real-time validation for project name
-		if (value && !validateFileSystemPath(value)) {
-			setValidationErrors(["Project name contains invalid characters"])
-		} else {
-			setValidationErrors([])
 		}
 	}
 
 	const handleGroupIdChange = (event: any) => {
+		setValidationErrors([]) // Clear previous errors
 		setGenerationStatus("") // Clear previous status
+
 		const value = event.target.value
-		setGroupID(value)
+		setGroupId(value)
 	}
 
 	const handleArtifactIdChange = (event: any) => {
+		setValidationErrors([]) // Clear previous errors
 		setGenerationStatus("") // Clear previous status
+
 		const value = event.target.value
 		setArtifactId(value)
 	}
@@ -475,7 +468,7 @@ export const ProjectsView = () => {
 								<div style={{ width: "calc(100% - 24px)", marginBottom: "15px" }}>
 									<TextField
 										label="Group ID"
-										value={groupID}
+										value={groupId}
 										onChange={handleGroupIdChange}
 										placeholder="com.company.project (lowercase letters, numbers, or dots only)"
 										isRequired
@@ -621,13 +614,14 @@ export const ProjectsView = () => {
 					<div style={{ display: "flex", gap: "10px", marginBottom: "20px" }}>
 						{/* Generate Project Button */}
 						<button
-							disabled={
+							disabled={Boolean(
 								isGenerating ||
-								!selectedTemplate ||
-								!projectName ||
-								!outputPath ||
-								(selectedTemplate?.pomFile && !artifactId)
-							}
+									!selectedTemplate ||
+									!projectName ||
+									!outputPath ||
+									(selectedTemplate?.pomFile && (!groupId || groupId.trim() === "")) ||
+									(selectedTemplate?.pomFile && (!artifactId || artifactId.trim() === "")),
+							)}
 							onClick={handleGenerateProject}
 							style={{
 								width: "100%",
@@ -641,7 +635,8 @@ export const ProjectsView = () => {
 									!selectedTemplate ||
 									!projectName ||
 									!outputPath ||
-									(selectedTemplate?.pomFile && !artifactId)
+									(selectedTemplate?.pomFile && (!groupId || groupId.trim() === "")) ||
+									(selectedTemplate?.pomFile && (!artifactId || artifactId.trim() === ""))
 										? "not-allowed"
 										: "pointer",
 								display: "inline-flex",
@@ -655,7 +650,8 @@ export const ProjectsView = () => {
 									!selectedTemplate ||
 									!projectName ||
 									!outputPath ||
-									(selectedTemplate?.pomFile && !artifactId)
+									(selectedTemplate?.pomFile && (!groupId || groupId.trim() === "")) ||
+									(selectedTemplate?.pomFile && (!artifactId || artifactId.trim() === ""))
 										? 0.5
 										: 1,
 							}}
@@ -666,7 +662,8 @@ export const ProjectsView = () => {
 										!selectedTemplate ||
 										!projectName ||
 										!outputPath ||
-										(selectedTemplate?.pomFile && !artifactId)
+										(selectedTemplate?.pomFile && (!groupId || groupId.trim() === "")) ||
+										(selectedTemplate?.pomFile && (!artifactId || artifactId.trim() === ""))
 									)
 								) {
 									;(e.target as HTMLButtonElement).style.backgroundColor =
@@ -680,7 +677,8 @@ export const ProjectsView = () => {
 										!selectedTemplate ||
 										!projectName ||
 										!outputPath ||
-										(selectedTemplate?.pomFile && !artifactId)
+										(selectedTemplate?.pomFile && (!groupId || groupId.trim() === "")) ||
+										(selectedTemplate?.pomFile && (!artifactId || artifactId.trim() === ""))
 									)
 								) {
 									;(e.target as HTMLButtonElement).style.backgroundColor = "var(--vscode-button-background)"

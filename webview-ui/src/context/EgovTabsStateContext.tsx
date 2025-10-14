@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, ReactNode } from "react"
 import { ParsedDDL } from "../utils/ddlParser"
+import { ProjectTemplate } from "../utils/projectUtils"
 
 // CodeView 상태
 interface CodeViewState {
@@ -24,7 +25,7 @@ interface CodeViewState {
 // ProjectsView 상태
 interface ProjectsViewState {
 	selectedCategory: string
-	selectedTemplate: any | null // ProjectTemplate from utils/projectUtils
+	selectedTemplate: ProjectTemplate | null // ProjectTemplate from utils/projectUtils
 	projectName: string
 	outputPath: string
 	packageName: string
@@ -33,6 +34,10 @@ interface ProjectsViewState {
 	version: string
 	description: string
 	generationMode: "form" | "command"
+	// VSCode Configuration에서 가져온 기본값
+	defaultGroupId: string
+	defaultArtifactId: string
+	defaultPackageName: string
 }
 
 // ConfigView 상태
@@ -86,12 +91,16 @@ const initialProjectsViewState: ProjectsViewState = {
 	selectedTemplate: null,
 	projectName: "",
 	outputPath: "",
-	packageName: "com.example",
-	groupId: "com.example",
-	artifactId: "demo",
+	packageName: "",
+	groupId: "",
+	artifactId: "",
 	version: "1.0.0",
 	description: "",
 	generationMode: "form",
+	// VSCode Configuration에서 가져온 기본값 (초기값은 package.json의 default와 동일)
+	defaultGroupId: "",
+	defaultArtifactId: "",
+	defaultPackageName: "",
 }
 
 // 초기 상태 - Config View

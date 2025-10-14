@@ -113,7 +113,7 @@ export class Controller {
 
 						// Generate the project
 						const result = await generateEgovProject(
-							message.projectConfig, // { projectName: string, artifactId: string, groupID: string, outputPath: string, template: {displayName: string, fileName: string, pomFile: string} }
+							message.projectConfig, // { projectName: string, artifactId: string, groupId: string, outputPath: string, template: {displayName: string, fileName: string, pomFile: string} }
 							this.context.extensionPath,
 							sendProgress,
 						)
@@ -181,6 +181,24 @@ export class Controller {
 						text: workspaceFolders[0].uri.fsPath,
 					})
 				}
+				break
+			}
+
+			case "getDefaultSettings": {
+				const config = vscode.workspace.getConfiguration("egovframeInitializr")
+				const defaultGroupId = config.get<string>("defaultGroupId", "egovframework.com") || "egovframework.com"
+				const defaultArtifactId = config.get<string>("defaultArtifactId", "egovframe-project") || "egovframe-project"
+				const defaultPackageName =
+					config.get<string>("defaultPackageName", "egovframework.example.sample") || "egovframework.example.sample"
+
+				await this.postMessageToWebview({
+					type: "egovSettings",
+					settings: {
+						defaultGroupId,
+						defaultArtifactId,
+						defaultPackageName,
+					},
+				})
 				break
 			}
 
@@ -510,9 +528,9 @@ export class Controller {
 				try {
 					const config = vscode.workspace.getConfiguration("egovframeInitializr")
 					const settings = {
-						defaultGroupId: config.get<string>("defaultGroupId") || "egovframework.com",
-						defaultArtifactId: config.get<string>("defaultArtifactId") || "egovframe-project",
-						defaultPackageName: config.get<string>("defaultPackageName") || "egovframework.example.sample",
+						defaultGroupId: config.get<string>("defaultGroupId", "egovframework.com"),
+						defaultArtifactId: config.get<string>("defaultArtifactId", "egovframe-project"),
+						defaultPackageName: config.get<string>("defaultPackageName", "egovframework.example.sample"),
 					}
 
 					await this.postMessageToWebview({

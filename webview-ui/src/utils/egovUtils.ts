@@ -18,7 +18,7 @@ export function createProjectGenerationMessage(config: ProjectConfig, method: st
 		projectConfig: {
 			projectName: config.projectName,
 			artifactId: config.artifactId,
-			groupID: config.groupID,
+			groupId: config.groupId,
 			outputPath: config.outputPath,
 			template: {
 				displayName: config.template.displayName,
@@ -46,24 +46,6 @@ export function createGetWorkspacePathMessage() {
 	return {
 		type: "getWorkspacePath" as const,
 	}
-}
-
-// Helper function to get workspace-relative path
-export function getWorkspaceRelativePath(fullPath: string, workspacePath?: string): string {
-	if (!workspacePath) {
-		return fullPath
-	}
-	if (fullPath.startsWith(workspacePath)) {
-		return fullPath.substring(workspacePath.length).replace(/^[\/\\]/, "")
-	}
-	return fullPath
-}
-
-// Helper function to validate project name for file system
-export function validateFileSystemPath(path: string): boolean {
-	// Check for invalid characters in file/folder names
-	const invalidChars = /[<>:"|?*\x00-\x1f]/
-	return !invalidChars.test(path)
 }
 
 // Generate unique project name if conflict exists
