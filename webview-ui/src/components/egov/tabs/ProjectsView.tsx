@@ -201,6 +201,20 @@ export const ProjectsView = () => {
 		const value = event.target.value
 		setProjectName(value)
 
+		// Auto-generate groupId and artifactId from projectName
+		const lastDotIndex = value.lastIndexOf(".")
+		if (lastDotIndex === -1) {
+			// No dot: groupId is empty, artifactId is the whole value
+			setGroupID("")
+			setArtifactId(value)
+		} else {
+			// Has dot(s): split by the last dot
+			const groupPart = value.substring(0, lastDotIndex)
+			const artifactPart = value.substring(lastDotIndex + 1)
+			setGroupID(groupPart)
+			setArtifactId(artifactPart)
+		}
+
 		// Real-time validation for project name
 		if (value && !validateFileSystemPath(value)) {
 			setValidationErrors(["Project name contains invalid characters"])
