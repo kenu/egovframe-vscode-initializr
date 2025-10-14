@@ -1,4 +1,4 @@
-import React, { useMemo } from "react"
+import React, { useEffect, useState } from "react"
 import Editor from "@monaco-editor/react"
 
 // CSS 애니메이션 스타일
@@ -21,21 +21,32 @@ interface CodePreviewProps {
 	autoUpdatePreview?: boolean
 	onAutoUpdateChange?: (enabled: boolean) => void
 	monacoTheme?: "light" | "vs-dark"
+	languages?: { [key: string]: string } | null
 }
 
 const CodePreview: React.FC<CodePreviewProps> = ({
 	previews,
 	selectedTemplate,
-	onTemplateChange,
+	onTemplateChange, //= setSelectedPreviewTemplate
 	isLoading,
 	error,
 	packageName,
-	onRequestPreview,
+	onRequestPreview, //= handleRequestPreview
 	isValid,
 	autoUpdatePreview,
-	onAutoUpdateChange,
+	onAutoUpdateChange, //= setAutoUpdatePreview
 	monacoTheme,
+	languages,
 }) => {
+	// 미리보기 가시성 상태 (자동 업데이트가 켜져 있으면 기본 표시)
+	const [isPreviewVisible, setIsPreviewVisible] = useState<boolean>(!!autoUpdatePreview)
+
+	// 자동 업데이트가 켜질 때는 항상 표시로 전환 (끄는 경우는 사용자 선택 유지)
+	useEffect(() => {
+		if (autoUpdatePreview) {
+			setIsPreviewVisible(true)
+		}
+	}, [autoUpdatePreview])
 	const templateOptions = [
 		{ value: "vo", label: "VO 클래스" },
 		{ value: "defaultVo", label: "Default VO 클래스" },
@@ -51,58 +62,11 @@ const CodePreview: React.FC<CodePreviewProps> = ({
 		{ value: "thymeleafRegister", label: "Thymeleaf 등록 페이지" },
 	]
 
-	// 현재 미리보기와 언어 감지 훅은 최상단에서 선언하여 훅 규칙을 준수
+	// 현재 미리보기 설정
 	const currentPreview = (previews && previews[selectedTemplate]) || ""
 
-	// 템플릿 및 내용 기반 언어 감지
-	const detectedLanguage = useMemo(() => {
-		const t = selectedTemplate
-		const content = currentPreview || ""
-
-		// 기본 매핑
-		const templateToLang: { [k: string]: string } = {
-			vo: "java",
-			defaultVo: "java",
-			controller: "java",
-			service: "java",
-			serviceImpl: "java",
-			dao: "java",
-			mapperInterface: "java",
-			mapper: "xml",
-			jspList: "html",
-			jspRegister: "html",
-			thymeleafList: "html",
-			thymeleafRegister: "html",
-		}
-
-		let lang = templateToLang[t] || "plaintext"
-
-		const lower = content.toLowerCase()
-
-		// 내용 기반 휴리스틱 (우선 적용)
-		if (lower.startsWith("<?xml") || lower.includes("<mapper")) {
-			lang = "xml"
-		} else if (
-			lower.includes("<%@ page") ||
-			lower.includes("<jsp:") ||
-			lower.includes("<% ") ||
-			lower.includes("<!doctype html") ||
-			lower.includes("<html") ||
-			lower.includes("<th:")
-		) {
-			lang = "html"
-		} else if (
-			content.includes("package ") ||
-			content.includes("public class") ||
-			content.includes(" interface ") ||
-			content.includes("@Controller") ||
-			content.includes("@Service")
-		) {
-			lang = "java"
-		}
-
-		return lang
-	}, [selectedTemplate, currentPreview])
+	// 현재 미리보기의 언어 설정 : 서버에서 전달된 languages를 그대로 사용 (없으면 plaintext)
+	const currentLanguage = (languages && languages[selectedTemplate]) || "plaintext"
 
 	// 미리보기가 없고 유효한 DDL이 있는 경우 미리보기 요청 버튼 표시
 	if (!previews && isValid) {
@@ -118,14 +82,6 @@ const CodePreview: React.FC<CodePreviewProps> = ({
 					}}>
 					<div style={{ marginBottom: "10px" }}>
 						<h4 style={{ color: "var(--vscode-foreground)", marginBottom: "10px", marginTop: 0 }}>템플릿 미리보기</h4>
-						<p
-							style={{
-								fontSize: "12px",
-								color: "var(--vscode-descriptionForeground)",
-								marginBottom: "15px",
-							}}>
-							미리보기를 생성하려면 아래 버튼을 클릭하세요.
-						</p>
 
 						{/* 자동 업데이트 옵션 */}
 						{onAutoUpdateChange && (
@@ -154,13 +110,19 @@ const CodePreview: React.FC<CodePreviewProps> = ({
 										cursor: "pointer",
 										userSelect: "none",
 									}}>
-									DDL 변경시 자동으로 미리보기 업데이트
+									미리보기 항상 열기
 								</label>
 							</div>
 						)}
 
+						{/* 미리보기 열기 버튼 */}
 						<button
-							onClick={onRequestPreview}
+							onClick={() => {
+								setIsPreviewVisible(true)
+								if (onRequestPreview) {
+									onRequestPreview()
+								}
+							}}
 							style={{
 								backgroundColor: "var(--vscode-button-background)",
 								color: "var(--vscode-button-foreground)",
@@ -177,7 +139,7 @@ const CodePreview: React.FC<CodePreviewProps> = ({
 							onMouseOut={(e) => {
 								;(e.target as HTMLButtonElement).style.backgroundColor = "var(--vscode-button-background)"
 							}}>
-							미리보기 생성
+							미리보기 열기
 						</button>
 					</div>
 				</div>
@@ -215,31 +177,124 @@ const CodePreview: React.FC<CodePreviewProps> = ({
 						)}
 					</h4>
 
-					<select
-						value={selectedTemplate}
-						onChange={(e) => onTemplateChange(e.target.value)}
-						style={{
-							width: "100%",
-							padding: "8px 12px",
-							backgroundColor: "var(--vscode-input-background)",
-							color: "var(--vscode-input-foreground)",
-							border: "1px solid var(--vscode-input-border)",
-							borderRadius: "4px",
-							fontSize: "13px",
-							outline: "none",
-						}}
-						onFocus={(e) => {
-							e.target.style.borderColor = "var(--vscode-focusBorder)"
-						}}
-						onBlur={(e) => {
-							e.target.style.borderColor = "var(--vscode-input-border)"
-						}}>
-						{templateOptions.map((option) => (
-							<option key={option.value} value={option.value}>
-								{option.label}
-							</option>
-						))}
-					</select>
+					{/* 자동 업데이트 옵션 - 항상 표시 */}
+					{onAutoUpdateChange && (
+						<div
+							style={{
+								marginBottom: "10px",
+								display: "flex",
+								alignItems: "center",
+								gap: "8px",
+							}}>
+							<input
+								type="checkbox"
+								id="autoUpdatePreview_always"
+								checked={autoUpdatePreview || false}
+								onChange={(e) => onAutoUpdateChange(e.target.checked)}
+								style={{
+									margin: 0,
+									cursor: "pointer",
+								}}
+							/>
+							<label
+								htmlFor="autoUpdatePreview_always"
+								style={{
+									fontSize: "12px",
+									color: "var(--vscode-foreground)",
+									cursor: "pointer",
+									userSelect: "none",
+								}}>
+								미리보기 항상 열기
+							</label>
+						</div>
+					)}
+
+					{/* 자동 업데이트 미사용 시 열기/닫기 토글 버튼 */}
+					{!autoUpdatePreview && (
+						<div style={{ marginBottom: "10px" }}>
+							{isPreviewVisible ? (
+								<button
+									style={{
+										backgroundColor: "var(--vscode-button-secondaryBackground)",
+										color: "var(--vscode-button-secondaryForeground)",
+										border: "1px solid var(--vscode-button-border)",
+										borderRadius: "4px",
+										padding: "6px 12px",
+										cursor: "pointer",
+										fontSize: "12px",
+										outline: "none",
+									}}
+									onClick={() => setIsPreviewVisible(false)}
+									onMouseOver={(e) => {
+										;(e.target as HTMLButtonElement).style.backgroundColor =
+											"var(--vscode-button-secondaryHoverBackground)"
+									}}
+									onMouseOut={(e) => {
+										;(e.target as HTMLButtonElement).style.backgroundColor =
+											"var(--vscode-button-secondaryBackground)"
+									}}>
+									미리보기 닫기
+								</button>
+							) : (
+								<button
+									style={{
+										backgroundColor: "var(--vscode-button-background)",
+										color: "var(--vscode-button-foreground)",
+										border: "1px solid var(--vscode-button-border)",
+										borderRadius: "4px",
+										padding: "6px 12px",
+										cursor: "pointer",
+										fontSize: "12px",
+										outline: "none",
+									}}
+									onClick={() => {
+										setIsPreviewVisible(true)
+										// 미리보기 데이터가 없거나 로딩 상태가 아니라면 새로 요청
+										if (!previews && onRequestPreview) {
+											onRequestPreview()
+										}
+									}}
+									onMouseOver={(e) => {
+										;(e.target as HTMLButtonElement).style.backgroundColor =
+											"var(--vscode-button-hoverBackground)"
+									}}
+									onMouseOut={(e) => {
+										;(e.target as HTMLButtonElement).style.backgroundColor = "var(--vscode-button-background)"
+									}}>
+									미리보기 열기
+								</button>
+							)}
+						</div>
+					)}
+
+					{/* 미리보기 템플릿 선택 드롭다운 */}
+					{isPreviewVisible && (
+						<select
+							value={selectedTemplate}
+							onChange={(e) => onTemplateChange(e.target.value)}
+							style={{
+								width: "100%",
+								padding: "8px 12px",
+								backgroundColor: "var(--vscode-input-background)",
+								color: "var(--vscode-input-foreground)",
+								border: "1px solid var(--vscode-input-border)",
+								borderRadius: "4px",
+								fontSize: "13px",
+								outline: "none",
+							}}
+							onFocus={(e) => {
+								e.target.style.borderColor = "var(--vscode-focusBorder)"
+							}}
+							onBlur={(e) => {
+								e.target.style.borderColor = "var(--vscode-input-border)"
+							}}>
+							{templateOptions.map((option) => (
+								<option key={option.value} value={option.value}>
+									{option.label}
+								</option>
+							))}
+						</select>
+					)}
 				</div>
 
 				{isLoading && (
@@ -278,7 +333,7 @@ const CodePreview: React.FC<CodePreviewProps> = ({
 					</div>
 				)}
 
-				{!isLoading && currentPreview && (
+				{isPreviewVisible && !isLoading && currentPreview && (
 					<div
 						style={{
 							backgroundColor: "var(--vscode-editor-background)",
@@ -288,7 +343,7 @@ const CodePreview: React.FC<CodePreviewProps> = ({
 						}}>
 						<Editor
 							height="400px"
-							language={detectedLanguage}
+							language={currentLanguage}
 							theme={monacoTheme || "vs-dark"}
 							value={currentPreview}
 							options={{

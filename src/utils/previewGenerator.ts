@@ -9,6 +9,7 @@ export interface ValidationResult {
 	isValid: boolean
 	error?: string
 	previews?: { [key: string]: string }
+	languages?: { [key: string]: string }
 	packageName?: string
 	tableName?: string
 	hasWarnings?: boolean
@@ -87,13 +88,14 @@ export async function validateDDLAndGeneratePreviews(
 		}
 
 		// 3. 검증에 성공하면 미리보기 생성
-		const { previews, packageName: finalPackageName } = await generatePreviews(ddl, context, packageName)
+		const { previews, languages, packageName: finalPackageName } = await generatePreviews(ddl, context, packageName)
 
 		// 4. 성공 결과 반환
 		return {
 			isValid: true,
 			previews: previews,
 			packageName: finalPackageName,
+			languages,
 		}
 	} catch (error) {
 		return {
@@ -115,7 +117,7 @@ export async function generatePreviews(
 	ddl: string,
 	context: vscode.ExtensionContext,
 	packageName?: string,
-): Promise<{ previews: { [key: string]: string }; packageName: string }> {
+): Promise<{ previews: { [key: string]: string }; languages: { [key: string]: string }; packageName: string }> {
 	// DDL 파싱
 	const { tableName, attributes, pkAttributes } = parseDDL(ddl)
 
@@ -133,37 +135,72 @@ export async function generatePreviews(
 
 	// 모든 템플릿을 병렬로 렌더링 (성능 최적화)
 	const templatePromises = [
-		{ key: "vo", promise: renderTemplateForPreview(templateFilePaths.voTemplateFilePath, templateContext) },
-		{ key: "defaultVo", promise: renderTemplateForPreview(templateFilePaths.defaultVoTemplateFilePath, templateContext) },
-		{ key: "controller", promise: renderTemplateForPreview(templateFilePaths.controllerTemplateFilePath, templateContext) },
-		{ key: "service", promise: renderTemplateForPreview(templateFilePaths.serviceTemplateFilePath, templateContext) },
-		{ key: "serviceImpl", promise: renderTemplateForPreview(templateFilePaths.serviceImplTemplateFilePath, templateContext) },
-		{ key: "mapper", promise: renderTemplateForPreview(templateFilePaths.mapperTemplateFilePath, templateContext) },
+		{ key: "vo", lang: "java", promise: renderTemplateForPreview(templateFilePaths.voTemplateFilePath, templateContext) },
+		{
+			key: "defaultVo",
+			lang: "java",
+			promise: renderTemplateForPreview(templateFilePaths.defaultVoTemplateFilePath, templateContext),
+		},
+		{
+			key: "controller",
+			lang: "java",
+			promise: renderTemplateForPreview(templateFilePaths.controllerTemplateFilePath, templateContext),
+		},
+		{
+			key: "service",
+			lang: "java",
+			promise: renderTemplateForPreview(templateFilePaths.serviceTemplateFilePath, templateContext),
+		},
+		{
+			key: "serviceImpl",
+			lang: "java",
+			promise: renderTemplateForPreview(templateFilePaths.serviceImplTemplateFilePath, templateContext),
+		},
+		{
+			key: "mapper",
+			lang: "xml",
+			promise: renderTemplateForPreview(templateFilePaths.mapperTemplateFilePath, templateContext),
+		},
 		{
 			key: "mapperInterface",
+			lang: "java",
 			promise: renderTemplateForPreview(templateFilePaths.mapperInterfaceTemplateFilePath, templateContext),
 		},
-		{ key: "dao", promise: renderTemplateForPreview(templateFilePaths.daoTemplateFilePath, templateContext) },
-		{ key: "jspList", promise: renderTemplateForPreview(templateFilePaths.jspListTemplateFilePath, templateContext) },
-		{ key: "jspRegister", promise: renderTemplateForPreview(templateFilePaths.jspRegisterTemplateFilePath, templateContext) },
+		{ key: "dao", lang: "java", promise: renderTemplateForPreview(templateFilePaths.daoTemplateFilePath, templateContext) },
+		{
+			key: "jspList",
+			lang: "html",
+			promise: renderTemplateForPreview(templateFilePaths.jspListTemplateFilePath, templateContext),
+		},
+		{
+			key: "jspRegister",
+			lang: "html",
+			promise: renderTemplateForPreview(templateFilePaths.jspRegisterTemplateFilePath, templateContext),
+		},
 		{
 			key: "thymeleafList",
+			lang: "html",
 			promise: renderTemplateForPreview(templateFilePaths.thymeleafListTemplateFilePath, templateContext),
 		},
 		{
 			key: "thymeleafRegister",
+			lang: "html",
 			promise: renderTemplateForPreview(templateFilePaths.thymeleafRegisterTemplateFilePath, templateContext),
 		},
 	]
 
 	// 병렬로 실행하고 결과를 객체로 변환
 	const results = await Promise.all(
-		templatePromises.map(async ({ key, promise }) => {
+		templatePromises.map(async ({ key, lang, promise }) => {
 			try {
 				const result = await promise
-				return { key, result }
+				return { key, lang, result }
 			} catch (error) {
-				return { key, result: `// Error rendering ${key}: ${error instanceof Error ? error.message : "Unknown error"}` }
+				return {
+					key,
+					lang,
+					result: `// Error rendering ${key}: ${error instanceof Error ? error.message : "Unknown error"}`,
+				}
 			}
 		}),
 	)
@@ -176,7 +213,15 @@ export async function generatePreviews(
 		{} as { [key: string]: string },
 	)
 
-	return { previews, packageName: finalPackageName }
+	const languages = results.reduce(
+		(acc, { key, lang }) => {
+			acc[key] = lang
+			return acc
+		},
+		{} as { [key: string]: string },
+	)
+
+	return { previews, languages, packageName: finalPackageName }
 }
 
 /**

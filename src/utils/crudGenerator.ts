@@ -10,6 +10,8 @@ interface TemplateFileInfo {
 	templateFile: string
 	outputPath: string
 	fileName: string
+	// 미리보기/에디터를 위한 추천 언어 정보 (Monaco Editor language id)
+	language?: string
 }
 
 // Get template files configuration
@@ -24,61 +26,73 @@ function getTemplateFilesConfig(context: any): TemplateFileInfo[] {
 			templateFile: "sample-vo-template.hbs",
 			outputPath: `src/main/java/${packagePath}/service/${tableName}VO.java`,
 			fileName: `${tableName}VO.java`,
+			language: "java",
 		},
 		{
 			templateFile: "sample-default-vo-template.hbs",
 			outputPath: `src/main/java/${packagePath}/service/${tableName}DefaultVO.java`,
 			fileName: `${tableName}DefaultVO.java`,
+			language: "java",
 		},
 		{
 			templateFile: "sample-mapper-interface-template.hbs",
 			outputPath: `src/main/java/${packagePath}/service/impl/${tableName}Mapper.java`,
 			fileName: `${tableName}Mapper.java`,
+			language: "java",
 		},
 		{
 			templateFile: "sample-mapper-template.hbs",
 			outputPath: `src/main/resources/mapper/${tableName}_SQL.xml`, // 생성 경로 고민해보기 : `src/main/resources/mapper/${packagePath}/${tableName}_SQL.xml`, `src/main/resources/mapper/${tableNameCamelCase}/${tableName}_SQL.xml`
 			fileName: `${tableName}_SQL.xml`,
+			language: "xml",
 		},
 		{
 			templateFile: "sample-controller-template.hbs",
 			outputPath: `src/main/java/${packagePath}/web/${tableName}Controller.java`,
 			fileName: `${tableName}Controller.java`,
+			language: "java",
 		},
 		{
 			templateFile: "sample-service-template.hbs",
 			outputPath: `src/main/java/${packagePath}/service/${tableName}Service.java`,
 			fileName: `${tableName}Service.java`,
+			language: "java",
 		},
 		{
 			templateFile: "sample-service-impl-template.hbs",
 			outputPath: `src/main/java/${packagePath}/service/impl/${tableName}ServiceImpl.java`,
 			fileName: `${tableName}ServiceImpl.java`,
+			language: "java",
 		},
 		{
 			templateFile: "sample-jsp-list.hbs", // Todo : outputPath 수정
 			outputPath: `src/main/webapp/WEB-INF/jsp/${packagePath}/${tableNameCamelCase}List.jsp`, // 생성 경로 고민해보기
 			fileName: `${tableNameCamelCase}List.jsp`,
+			language: "html",
 		},
 		{
 			templateFile: "sample-jsp-register.hbs", // Todo : outputPath 수정
 			outputPath: `src/main/webapp/WEB-INF/jsp/${packagePath}/${tableNameCamelCase}Register.jsp`, // 생성 경로 고민해보기
 			fileName: `${tableNameCamelCase}Register.jsp`,
+			language: "html",
 		},
 		{
 			templateFile: "sample-thymeleaf-list.hbs",
 			outputPath: `src/main/resources/templates/${tableNameCamelCase}/${tableNameCamelCase}List.html`, // 생성 경로 고민해보기
 			fileName: `${tableNameCamelCase}List.html`,
+			language: "html",
 		},
 		{
 			templateFile: "sample-thymeleaf-register.hbs", // Todo : outputPath 수정
 			outputPath: `src/main/resources/templates/${tableNameCamelCase}/${tableNameCamelCase}Register.html`, // 생성 경로 고민해보기
 			fileName: `${tableNameCamelCase}Register.html`,
+			language: "html",
 		},
 		{
 			templateFile: "sample-dao-template.hbs",
 			outputPath: `src/main/java/${packagePath}/service/impl/${tableName}DAO.java`,
 			fileName: `${tableName}DAO.java`,
+			language: "java",
 		},
 	]
 }

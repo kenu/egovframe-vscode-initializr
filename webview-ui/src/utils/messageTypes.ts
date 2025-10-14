@@ -111,6 +111,7 @@ export interface ValidationResultResponse {
 	type: "validationResult"
 	isValid: boolean
 	previews?: { [key: string]: string }
+	languages?: { [key: string]: string }
 	packageName?: string
 	error?: string
 }

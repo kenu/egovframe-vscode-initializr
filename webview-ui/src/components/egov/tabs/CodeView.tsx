@@ -24,6 +24,7 @@ const CodeView = () => {
 		defaultPackageName,
 		// 미리보기 관련 상태
 		previews,
+		previewLanguages,
 		selectedPreviewTemplate,
 		isPreviewLoading,
 		previewError,
@@ -50,6 +51,7 @@ const CodeView = () => {
 	const setAutoUpdatePreview = (value: boolean) => updateState({ autoUpdatePreview: value })
 	const setSampleDDLs = (value: Extract<ExtensionResponse, { type: "sampleDDLs" }>["data"] | null) =>
 		updateState({ sampleDDLs: value })
+	const setPreviewLanguages = (value: { [key: string]: string } | null) => updateState({ previewLanguages: value })
 
 	// DDL 유효성 검사 및 파싱 (빠른 검증만 수행)
 	useEffect(() => {
@@ -184,6 +186,7 @@ const CodeView = () => {
 							setIsValid(true)
 							if (message.previews) {
 								setPreviews(message.previews)
+								setPreviewLanguages(message.languages || null)
 								setPreviewError("")
 							}
 							if (message.error && message.error.includes("⚠️ 경고:")) {
@@ -565,6 +568,7 @@ const CodeView = () => {
 					autoUpdatePreview={autoUpdatePreview}
 					onAutoUpdateChange={setAutoUpdatePreview}
 					monacoTheme={monacoTheme}
+					languages={previewLanguages || null}
 				/>
 
 				{/* Configuration Section */}

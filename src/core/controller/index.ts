@@ -309,6 +309,7 @@ export class Controller {
 							isValid: result.isValid,
 							previews: result.previews,
 							packageName: result.packageName,
+							languages: result.languages,
 							error: result.error,
 						})
 					} catch (error) {

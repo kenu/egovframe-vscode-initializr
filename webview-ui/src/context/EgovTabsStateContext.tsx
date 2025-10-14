@@ -15,6 +15,7 @@ interface CodeViewState {
 	defaultPackageName: string // VSCode 설정에서 가져온 기본값
 	// 미리보기 관련 상태 추가
 	previews: { [key: string]: string } | null
+	previewLanguages?: { [key: string]: string } | null
 	selectedPreviewTemplate: string
 	isPreviewLoading: boolean
 	previewError: string
@@ -84,6 +85,7 @@ const initialCodeViewState: CodeViewState = {
 	defaultPackageName: "egovframework.example.sample", // VSCode 설정에서 가져온 기본값 (CodeView.tsx - useEffect - handleMessage - case "egovSettings")
 	// 미리보기 관련 초기 상태
 	previews: null,
+	previewLanguages: null,
 	selectedPreviewTemplate: "vo",
 	isPreviewLoading: false,
 	previewError: "",
