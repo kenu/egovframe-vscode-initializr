@@ -1,56 +1,54 @@
 import React, { useState, useEffect } from "react"
 import { Button, TextField, TextArea, Select, RadioGroup, ProgressRing, Link, Divider } from "../../ui"
 import { TemplateConfig, GroupedTemplates, ConfigFormData } from "../types/templates"
-import { loadTemplates } from "../utils/templateUtils"
+import { groupTemplates } from "../utils/templateUtils"
 import FormFactory from "../forms/FormFactory"
 import { vscode } from "../../../utils/vscode"
+import { useConfigViewState } from "../../../context/EgovTabsStateContext"
 
 const ConfigView: React.FC = () => {
-	const [templates, setTemplates] = useState<TemplateConfig[]>([])
-	const [groupedTemplates, setGroupedTemplates] = useState<GroupedTemplates>({})
+	const { state, updateState } = useConfigViewState()
+	const { configTemplates, isTemplatesLoading, selectedTemplate } = state
+
 	const [selectedCategory, setSelectedCategory] = useState<string>("")
 	const [selectedSubcategory, setSelectedSubcategory] = useState<string>("")
-	const [selectedTemplate, setSelectedTemplate] = useState<TemplateConfig | null>(null)
+	const [groupedTemplates, setGroupedTemplates] = useState<GroupedTemplates>({})
 	const [currentView, setCurrentView] = useState<"list" | "form">("list")
-	const [loading, setLoading] = useState(true)
 	const [error, setError] = useState<string | null>(null)
 
 	useEffect(() => {
-		const initializeTemplates = () => {
-			try {
-				setLoading(true)
+		// Request config templates when component mounts
+		vscode.postMessage({ type: "getConfigTemplates" })
 
-				// 정적 템플릿 데이터 로드
-				const loadedTemplates = loadTemplates()
-				console.log("Loaded templates:", loadedTemplates)
-				setTemplates(loadedTemplates)
+		// Listen for messages from extension
+		const handleMessage = (event: MessageEvent) => {
+			const message = event.data
+			switch (message.type) {
+				case "configTemplates":
+					// Update config templates from extension
+					if (message.templates) {
+						console.log("Loaded templates:", message.templates)
+						updateState({
+							configTemplates: message.templates,
+							isTemplatesLoading: false,
+						})
 
-				// 템플릿을 카테고리별로 그룹화 (Cache, Datasource, Transaction, ID Generation, Property, Scheduling, Logging)
-				const grouped: GroupedTemplates = {}
-				loadedTemplates.forEach((template) => {
-					const [category, subcategory] = template.displayName.split(" > ")
-					if (category && subcategory) {
-						if (!grouped[category]) {
-							grouped[category] = {}
-						}
-						grouped[category][subcategory] = template
+						// 템플릿을 카테고리별로 그룹화
+						const grouped = groupTemplates(message.templates)
+						console.log("Grouped templates:", grouped)
+						setGroupedTemplates(grouped)
+						setError(null)
 					}
-				})
-
-				console.log("Grouped templates:", grouped)
-
-				// groupedTemplates에 그룹화된 템플릿 설정 set
-				setGroupedTemplates(grouped)
-				setError(null)
-			} catch (err) {
-				console.error("Failed to load templates:", err)
-				setError("Failed to load templates. Please try again.")
-			} finally {
-				setLoading(false)
+					break
+				case "error":
+					setError(message.message || "Failed to load templates. Please try again.")
+					updateState({ isTemplatesLoading: false })
+					break
 			}
 		}
 
-		initializeTemplates()
+		window.addEventListener("message", handleMessage)
+		return () => window.removeEventListener("message", handleMessage)
 	}, [])
 
 	// 1. 사용자가 카테고리(select category)를 선택했을 때
@@ -58,10 +56,10 @@ const ConfigView: React.FC = () => {
 		console.log("Category selected:", category)
 		setSelectedCategory(category)
 		setSelectedSubcategory("")
-		setSelectedTemplate(null)
+		updateState({ selectedTemplate: null })
 	}
 
-	// 2. 사용자가 서브 카테고리(select configuration type), 즉 특정 특정 템플릿을 선택했을 때 => 선택한 서브 카테고리에 해당하는 템플릿 설정
+	// 2. 사용자가 서브 카테고리(select configuration type), 즉 특정 템플릿을 선택했을 때 => 선택한 서브 카테고리에 해당하는 템플릿 설정
 	const handleSubcategoryChange = (subcategory: string) => {
 		console.log("Subcategory selected:", subcategory)
 		setSelectedSubcategory(subcategory)
@@ -69,7 +67,7 @@ const ConfigView: React.FC = () => {
 		if (selectedCategory && subcategory && groupedTemplates[selectedCategory]) {
 			const template = groupedTemplates[selectedCategory][subcategory]
 			if (template) {
-				setSelectedTemplate(template)
+				updateState({ selectedTemplate: template })
 				console.log("Template selected:", template)
 			}
 		}
@@ -119,7 +117,7 @@ const ConfigView: React.FC = () => {
 	}
 
 	// 로딩 중일 때
-	if (loading) {
+	if (isTemplatesLoading) {
 		return (
 			<div style={{ padding: "20px", textAlign: "center" }}>
 				<p style={{ color: "var(--vscode-foreground)" }}>Loading templates...</p>
@@ -266,7 +264,7 @@ const ConfigView: React.FC = () => {
 				)}
 			</div>
 
-			{templates.length === 0 && !loading && (
+			{configTemplates.length === 0 && !isTemplatesLoading && (
 				<div style={{ textAlign: "center", padding: "40px" }}>
 					<p style={{ color: "var(--vscode-foreground)" }}>No templates available</p>
 				</div>

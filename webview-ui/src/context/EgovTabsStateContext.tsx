@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, ReactNode } from "react"
 import { ParsedDDL } from "../utils/ddlParser"
 import { ProjectTemplate } from "../utils/projectUtils"
+import { TemplateConfig } from "../components/egov/types/templates"
 
 // CodeView 상태
 interface CodeViewState {
@@ -46,8 +47,10 @@ interface ProjectsViewState {
 // ConfigView 상태
 interface ConfigViewState {
 	selectedCategory: string
-	selectedTemplate: any | null
+	selectedTemplate: TemplateConfig | null
 	loading: boolean
+	configTemplates: TemplateConfig[]
+	isTemplatesLoading: boolean
 }
 
 // 전체 탭 상태
@@ -114,6 +117,8 @@ const initialConfigViewState: ConfigViewState = {
 	selectedCategory: "",
 	selectedTemplate: null,
 	loading: false,
+	configTemplates: [],
+	isTemplatesLoading: true,
 }
 
 // 초기 상태 - 전체

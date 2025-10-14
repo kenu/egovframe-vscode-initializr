@@ -639,6 +639,31 @@ export class Controller {
 				break
 			}
 
+			case "getConfigTemplates": {
+				try {
+					// Read templates-context-xml.json from extension context
+					const templatesJsonPath = vscode.Uri.joinPath(
+						this.context.extensionUri,
+						"templates",
+						"templates-context-xml.json",
+					)
+					const templatesJsonContent = await vscode.workspace.fs.readFile(templatesJsonPath)
+					const templates = JSON.parse(templatesJsonContent.toString())
+
+					await this.postMessageToWebview({
+						type: "configTemplates",
+						templates,
+					})
+				} catch (error) {
+					console.error("Error reading config templates:", error)
+					await this.postMessageToWebview({
+						type: "error",
+						message: "Failed to load config templates",
+					})
+				}
+				break
+			}
+
 			default:
 				console.log("Unhandled message type:", message.type)
 				break

@@ -103,3 +103,16 @@ export type ExtensionMessage =
 				projectName?: string
 			}>
 	  }
+	| {
+			type: "configTemplates"
+			templates: Array<{
+				displayName: string
+				templateFolder: string
+				templateFile: string
+				webView: string
+				fileNameProperty: string
+				javaConfigTemplate: string
+				yamlTemplate: string
+				propertiesTemplate: string
+			}>
+	  }
