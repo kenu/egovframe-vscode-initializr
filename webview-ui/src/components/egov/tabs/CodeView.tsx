@@ -564,6 +564,7 @@ const CodeView = () => {
 					isValid={isValid}
 					autoUpdatePreview={autoUpdatePreview}
 					onAutoUpdateChange={setAutoUpdatePreview}
+					monacoTheme={monacoTheme}
 				/>
 
 				{/* Configuration Section */}

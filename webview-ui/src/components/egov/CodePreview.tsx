@@ -1,4 +1,5 @@
-import React from "react"
+import React, { useMemo } from "react"
+import Editor from "@monaco-editor/react"
 
 // CSS 애니메이션 스타일
 const spinAnimation = `
@@ -19,6 +20,7 @@ interface CodePreviewProps {
 	isValid: boolean
 	autoUpdatePreview?: boolean
 	onAutoUpdateChange?: (enabled: boolean) => void
+	monacoTheme?: "light" | "vs-dark"
 }
 
 const CodePreview: React.FC<CodePreviewProps> = ({
@@ -32,6 +34,7 @@ const CodePreview: React.FC<CodePreviewProps> = ({
 	isValid,
 	autoUpdatePreview,
 	onAutoUpdateChange,
+	monacoTheme,
 }) => {
 	const templateOptions = [
 		{ value: "vo", label: "VO 클래스" },
@@ -47,6 +50,59 @@ const CodePreview: React.FC<CodePreviewProps> = ({
 		{ value: "thymeleafList", label: "Thymeleaf 목록 페이지" },
 		{ value: "thymeleafRegister", label: "Thymeleaf 등록 페이지" },
 	]
+
+	// 현재 미리보기와 언어 감지 훅은 최상단에서 선언하여 훅 규칙을 준수
+	const currentPreview = (previews && previews[selectedTemplate]) || ""
+
+	// 템플릿 및 내용 기반 언어 감지
+	const detectedLanguage = useMemo(() => {
+		const t = selectedTemplate
+		const content = currentPreview || ""
+
+		// 기본 매핑
+		const templateToLang: { [k: string]: string } = {
+			vo: "java",
+			defaultVo: "java",
+			controller: "java",
+			service: "java",
+			serviceImpl: "java",
+			dao: "java",
+			mapperInterface: "java",
+			mapper: "xml",
+			jspList: "html",
+			jspRegister: "html",
+			thymeleafList: "html",
+			thymeleafRegister: "html",
+		}
+
+		let lang = templateToLang[t] || "plaintext"
+
+		const lower = content.toLowerCase()
+
+		// 내용 기반 휴리스틱 (우선 적용)
+		if (lower.startsWith("<?xml") || lower.includes("<mapper")) {
+			lang = "xml"
+		} else if (
+			lower.includes("<%@ page") ||
+			lower.includes("<jsp:") ||
+			lower.includes("<% ") ||
+			lower.includes("<!doctype html") ||
+			lower.includes("<html") ||
+			lower.includes("<th:")
+		) {
+			lang = "html"
+		} else if (
+			content.includes("package ") ||
+			content.includes("public class") ||
+			content.includes(" interface ") ||
+			content.includes("@Controller") ||
+			content.includes("@Service")
+		) {
+			lang = "java"
+		}
+
+		return lang
+	}, [selectedTemplate, currentPreview])
 
 	// 미리보기가 없고 유효한 DDL이 있는 경우 미리보기 요청 버튼 표시
 	if (!previews && isValid) {
@@ -132,8 +188,6 @@ const CodePreview: React.FC<CodePreviewProps> = ({
 	if (!previews) {
 		return null
 	}
-
-	const currentPreview = previews[selectedTemplate] || ""
 
 	return (
 		<>
@@ -230,21 +284,26 @@ const CodePreview: React.FC<CodePreviewProps> = ({
 							backgroundColor: "var(--vscode-editor-background)",
 							border: "1px solid var(--vscode-input-border)",
 							borderRadius: "4px",
-							padding: "12px",
-							maxHeight: "400px",
-							overflow: "auto",
+							overflow: "hidden",
 						}}>
-						<pre
-							style={{
-								margin: 0,
-								fontSize: "12px",
-								fontFamily: "'Consolas', 'Monaco', 'Courier New', monospace",
-								color: "var(--vscode-editor-foreground)",
-								whiteSpace: "pre-wrap",
-								wordBreak: "break-word",
-							}}>
-							{currentPreview}
-						</pre>
+						<Editor
+							height="400px"
+							language={detectedLanguage}
+							theme={monacoTheme || "vs-dark"}
+							value={currentPreview}
+							options={{
+								readOnly: true,
+								minimap: { enabled: false },
+								scrollBeyondLastLine: false,
+								wordWrap: "on",
+								fontSize: 12,
+								fontFamily: "Consolas, Monaco, 'Courier New', monospace",
+								lineNumbers: "off",
+								glyphMargin: false,
+								folding: true,
+								automaticLayout: true,
+							}}
+						/>
 					</div>
 				)}
 			</div>
