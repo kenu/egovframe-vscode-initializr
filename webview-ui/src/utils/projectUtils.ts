@@ -46,8 +46,6 @@ export function validateProjectConfig(config: Partial<ProjectConfig>): string[] 
 
 	if (!config.projectName || config.projectName.trim() === "") {
 		errors.push("Project name is required")
-	} else if (!/^[a-zA-Z][a-zA-Z0-9_-]*$/.test(config.projectName)) {
-		errors.push("Project name must start with a letter and contain only letters, numbers, hyphens, and underscores")
 	}
 
 	// groupId validation (only for templates with pomFile)
