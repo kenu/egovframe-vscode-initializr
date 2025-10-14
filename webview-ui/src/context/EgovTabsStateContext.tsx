@@ -12,6 +12,7 @@ interface CodeViewState {
 	error: string
 	outputPath: string
 	packageName: string
+	defaultPackageName: string // VSCode 설정에서 가져온 기본값
 	// 미리보기 관련 상태 추가
 	previews: { [key: string]: string } | null
 	selectedPreviewTemplate: string
@@ -79,7 +80,8 @@ const initialCodeViewState: CodeViewState = {
 	isLoading: false,
 	error: "",
 	outputPath: "",
-	packageName: "com.example.project",
+	packageName: "egovframework.example.sample", // VSCode 설정에서 가져온 값으로 곧 업데이트됨 (CodeView.tsx - useEffect - handleMessage - case "egovSettings")
+	defaultPackageName: "egovframework.example.sample", // VSCode 설정에서 가져온 기본값 (CodeView.tsx - useEffect - handleMessage - case "egovSettings")
 	// 미리보기 관련 초기 상태
 	previews: null,
 	selectedPreviewTemplate: "vo",

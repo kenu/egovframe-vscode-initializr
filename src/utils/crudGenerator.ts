@@ -13,6 +13,7 @@ interface TemplateFileInfo {
 }
 
 // Get template files configuration
+// 고정된 값이 아니어서 다른 기능들의 환경설정 파일과 달리 templates 폴더 안에 json 파일로 넣기 어려움
 function getTemplateFilesConfig(context: any): TemplateFileInfo[] {
 	const { tableName, packagePath } = context
 

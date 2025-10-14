@@ -21,6 +21,7 @@ const CodeView = () => {
 		error,
 		outputPath,
 		packageName,
+		defaultPackageName,
 		// 미리보기 관련 상태
 		previews,
 		selectedPreviewTemplate,
@@ -39,6 +40,7 @@ const CodeView = () => {
 	const setError = (value: string) => updateState({ error: value })
 	const setOutputPath = (value: string) => updateState({ outputPath: value })
 	const setPackageName = (value: string) => updateState({ packageName: value })
+	const setDefaultPackageName = (value: string) => updateState({ defaultPackageName: value })
 
 	// 미리보기 관련 Helper functions
 	const setPreviews = (value: { [key: string]: string } | null) => updateState({ previews: value })
@@ -48,53 +50,6 @@ const CodeView = () => {
 	const setAutoUpdatePreview = (value: boolean) => updateState({ autoUpdatePreview: value })
 	const setSampleDDLs = (value: Extract<ExtensionResponse, { type: "sampleDDLs" }>["data"] | null) =>
 		updateState({ sampleDDLs: value })
-
-	// 통신 흐름
-	//
-	// 1. getWorkspacePath → currentWorkspacePath
-	// 요청: CodeView 마운트 시 vscode.postMessage({ type: "getWorkspacePath" })
-	// 응답: Controller가 type: "currentWorkspacePath"로 워크스페이스 경로 전송
-	// 처리: setOutputPath(message.text)로 기본 출력 경로 설정
-	//
-	// 2. selectOutputPath → selectedOutputPath
-	// 요청: Browse 버튼 클릭 시 vscode.postMessage(createSelectOutputPathMessage()) (type: "selectOutputPath")
-	// 응답: Controller가 폴더 선택 후 type: "selectedOutputPath"로 경로 전송
-	// 처리: setOutputPath(message.text)로 선택된 경로 설정
-	//
-	// 3. validateDDLOnly → validationResult
-	// 요청: DDL 변경 시 디바운스로 vscode.postMessage({ type: "validateDDLOnly" })
-	// 응답: Controller가 type: "validationResult"로 검증 결과 전송
-	// 처리: setIsValid, setError 등으로 상태 업데이트
-	//
-	// 4. validateAndPreview → validationResult
-	// 요청: 미리보기 요청 시 vscode.postMessage({ type: "validateAndPreview" })
-	// 응답: Controller가 type: "validationResult"로 검증 + 미리보기 결과 전송
-	// 처리: setPreviews, setIsValid 등으로 상태 업데이트
-	//
-	// 5. generateCode → success/error
-	// 요청: Generate 버튼 클릭 시 vscode.postMessage({ type: "generateCode" })
-	// 응답: Controller가 type: "success" 또는 type: "error"로 결과 전송
-	// 처리: setError("") 또는 setError(message.message)로 상태 업데이트
-	//
-	// 6. uploadTemplates → success/error
-	// 요청: Custom Templates 버튼 클릭 시 vscode.postMessage({ type: "uploadTemplates" })
-	// 응답: Controller가 type: "success" 또는 type: "error"로 결과 전송
-	// 처리: setError 상태 업데이트
-	//
-	// 7. downloadTemplateContext → success/error
-	// 요청: Template Context 버튼 클릭 시 vscode.postMessage({ type: "downloadTemplateContext" })
-	// 응답: Controller가 type: "success" 또는 type: "error"로 결과 전송
-	// 처리: setError 상태 업데이트
-	//
-	// 8. 외부 요청 → transferDDLToCodeView
-	// 요청: 다른 컴포넌트나 채팅에서 vscode.postMessage({ type: "transferDDLToCodeView" })
-	// 응답: Controller가 그대로 type: "transferDDLToCodeView"로 전달
-	// 처리: setDdlContent(message.ddl)로 DDL 내용 설정
-
-	//9, sampleDDLs → sampleDDLs
-	// 요청: getSampleDDLs 요청 시 vscode.postMessage({ type: "getSampleDDLs" })
-	// 응답: Controller가 type: "sampleDDLs"로 샘플 DDL 목록 전송
-	// 처리: setSampleDDLs(message.data)로 샘플 DDL 목록 설정
 
 	// DDL 유효성 검사 및 파싱 (빠른 검증만 수행)
 	useEffect(() => {
@@ -166,6 +121,7 @@ const CodeView = () => {
 			vscode.postMessage({ type: "getWorkspacePath" })
 			vscode.postMessage({ type: "getSampleDDLs" })
 			vscode.postMessage({ type: "getCurrentTheme" })
+			vscode.postMessage({ type: "getEgovSettings" })
 		} catch (err) {
 			console.error("Error sending message:", err)
 		}
@@ -252,6 +208,14 @@ const CodeView = () => {
 					case "themeChanged":
 						console.log("Monaco theme changed to: ", message.theme, "(before: " + monacoTheme + ")")
 						setMonacoTheme(message.theme || "vs-dark")
+						break
+
+					case "egovSettings":
+						if (message.settings && message.settings.defaultPackageName) {
+							console.log("Received egovSettings, setting packageName to:", message.settings.defaultPackageName)
+							setDefaultPackageName(message.settings.defaultPackageName)
+							setPackageName(message.settings.defaultPackageName)
+						}
 						break
 
 					default:
@@ -357,6 +321,13 @@ const CodeView = () => {
 		} catch (err) {
 			console.error("Error sending selectOutputPath message:", err)
 			setError(`Failed to send message to extension: ${err instanceof Error ? err.message : String(err)}`)
+		}
+	}
+
+	const handleResetToDefaultPackageName = () => {
+		console.log("Reset to default package name clicked")
+		if (defaultPackageName) {
+			setPackageName(defaultPackageName)
 		}
 	}
 
@@ -601,14 +572,50 @@ const CodeView = () => {
 						<h4 style={{ color: "var(--vscode-foreground)", marginBottom: "10px" }}>Configuration</h4>
 
 						{/* Package Name */}
-						<div style={{ width: "calc(100% - 24px)", marginBottom: "15px" }}>
-							<TextField
-								label="Package Name"
-								value={packageName}
-								onChange={(e: any) => setPackageName(e.target.value)}
-								placeholder="e.g., com.example.project"
-								isRequired
-							/>
+						<div style={{ marginBottom: "15px" }}>
+							<div style={{ display: "flex", gap: "10px", alignItems: "end" }}>
+								<div style={{ flex: 1, marginRight: "10px" }}>
+									<TextField
+										label="Package Name"
+										value={packageName}
+										onChange={(e: any) => setPackageName(e.target.value)}
+										placeholder="e.g., com.example.project"
+										isRequired
+									/>
+								</div>
+								<button
+									style={{
+										backgroundColor: "var(--vscode-button-secondaryBackground)",
+										color: "var(--vscode-button-secondaryForeground)",
+										border: "1px solid var(--vscode-button-border)",
+										borderRadius: "4px",
+										padding: "8px 12px",
+										cursor: "pointer",
+										display: "inline-flex",
+										alignItems: "center",
+										fontSize: "13px",
+										fontFamily: "inherit",
+										outline: "none",
+									}}
+									onMouseOver={(e) => {
+										;(e.target as HTMLButtonElement).style.backgroundColor =
+											"var(--vscode-button-secondaryHoverBackground)"
+									}}
+									onMouseOut={(e) => {
+										;(e.target as HTMLButtonElement).style.backgroundColor =
+											"var(--vscode-button-secondaryBackground)"
+									}}
+									onFocus={(e) => {
+										;(e.target as HTMLButtonElement).style.outline = "1px solid var(--vscode-focusBorder)"
+									}}
+									onBlur={(e) => {
+										;(e.target as HTMLButtonElement).style.outline = "none"
+									}}
+									onClick={handleResetToDefaultPackageName}>
+									<span className="codicon codicon-settings-gear" style={{ marginRight: "6px" }}></span>
+									Default
+								</button>
+							</div>
 							<div style={{ fontSize: "10px", color: "var(--vscode-descriptionForeground)", marginTop: "2px" }}>
 								Java package naming convention (e.g., com.company.project)
 							</div>
