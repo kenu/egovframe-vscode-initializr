@@ -204,8 +204,8 @@ export const ProjectsView = () => {
 		// Auto-generate groupId and artifactId from projectName
 		const lastDotIndex = value.lastIndexOf(".")
 		if (lastDotIndex === -1) {
-			// No dot: groupId is empty, artifactId is the whole value
-			setGroupID("")
+			// No dot: groupId is defaultGroupId, artifactId is the whole value
+			setGroupID(getDefaultGroupId())
 			setArtifactId(value)
 		} else {
 			// Has dot(s): split by the last dot
