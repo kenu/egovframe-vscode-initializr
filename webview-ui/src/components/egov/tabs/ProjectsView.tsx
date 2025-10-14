@@ -9,6 +9,7 @@ import {
 	getTemplatesByCategory,
 	validateProjectConfig,
 	getDefaultGroupId,
+	getDefaultArtifactId,
 	generateSampleProjectName,
 } from "../../../utils/projectUtils"
 import {
@@ -21,7 +22,8 @@ import { useProjectsViewState } from "../../../context/EgovTabsStateContext"
 
 export const ProjectsView = () => {
 	const { state, updateState } = useProjectsViewState()
-	const { selectedCategory, outputPath, packageName, groupId, artifactId, version, description, generationMode } = state
+	const { selectedCategory, outputPath, packageName, groupId, artifactId, projectName, version, description, generationMode } =
+		state
 
 	// Map groupId to groupID for compatibility
 	const groupID = groupId
@@ -35,9 +37,9 @@ export const ProjectsView = () => {
 	const [isGenerating, setIsGenerating] = useState<boolean>(false)
 	const [generationStatus, setGenerationStatus] = useState<string>("")
 
-	// Extract projectName from artifactId for compatibility
-	const projectName = artifactId
-	const setProjectName = (value: string) => updateState({ artifactId: value })
+	// projectName and artifactId
+	const setProjectName = (value: string) => updateState({ projectName: value })
+	const setArtifactId = (value: string) => updateState({ artifactId: value })
 
 	// Map generationMethod to generationMode
 	const generationMethod = generationMode
@@ -127,6 +129,7 @@ export const ProjectsView = () => {
 
 		const config: Partial<ProjectConfig> = {
 			projectName,
+			artifactId,
 			groupID,
 			outputPath,
 			template: selectedTemplate,
@@ -154,6 +157,7 @@ export const ProjectsView = () => {
 		try {
 			const config: ProjectConfig = {
 				projectName,
+				artifactId,
 				groupID,
 				outputPath,
 				template: selectedTemplate!,
@@ -185,6 +189,7 @@ export const ProjectsView = () => {
 			}
 		}
 		setProjectName(generateSampleProjectName())
+		setArtifactId(getDefaultArtifactId())
 		setGroupID(getDefaultGroupId())
 		setOutputPath(initialPath)
 		setGenerationStatus("") // Clear previous status
@@ -202,6 +207,18 @@ export const ProjectsView = () => {
 		} else {
 			setValidationErrors([])
 		}
+	}
+
+	const handleGroupIdChange = (event: any) => {
+		setGenerationStatus("") // Clear previous status
+		const value = event.target.value
+		setGroupID(value)
+	}
+
+	const handleArtifactIdChange = (event: any) => {
+		setGenerationStatus("") // Clear previous status
+		const value = event.target.value
+		setArtifactId(value)
 	}
 
 	return (
@@ -431,11 +448,11 @@ export const ProjectsView = () => {
 									label="Project Name"
 									value={projectName}
 									onChange={handleProjectNameChange}
-									placeholder="Enter project name (letters, numbers, hyphens, underscores)"
+									placeholder="Enter project name"
 									isRequired
 								/>
 								<div style={{ fontSize: "10px", color: "var(--vscode-descriptionForeground)", marginTop: "2px" }}>
-									Will be used as the project folder name and the artifactId & name in pom.xml
+									Will be used as the project folder name
 								</div>
 							</div>
 
@@ -445,8 +462,8 @@ export const ProjectsView = () => {
 									<TextField
 										label="Group ID"
 										value={groupID}
-										onChange={(e: any) => setGroupID(e.target.value)}
-										placeholder="e.g., com.company.project"
+										onChange={handleGroupIdChange}
+										placeholder="com.company.project (lowercase letters, numbers, or dots only)"
 										isRequired
 									/>
 									<div
@@ -456,6 +473,27 @@ export const ProjectsView = () => {
 											marginTop: "2px",
 										}}>
 										Will be used as the groupId in pom.xml
+									</div>
+								</div>
+							)}
+
+							{/* Artifact ID (only if template has pomFile) */}
+							{selectedTemplate.pomFile && (
+								<div style={{ width: "calc(100% - 24px)", marginBottom: "15px" }}>
+									<TextField
+										label="Artifact ID"
+										value={artifactId}
+										onChange={handleArtifactIdChange}
+										placeholder="my-project (lowercase letters, numbers, or hyphens only)"
+										isRequired
+									/>
+									<div
+										style={{
+											fontSize: "10px",
+											color: "var(--vscode-descriptionForeground)",
+											marginTop: "2px",
+										}}>
+										Will be used as the artifactId and name in pom.xml
 									</div>
 								</div>
 							)}
@@ -569,7 +607,13 @@ export const ProjectsView = () => {
 					<div style={{ display: "flex", gap: "10px", marginBottom: "20px" }}>
 						{/* Generate Project Button */}
 						<button
-							disabled={isGenerating || !selectedTemplate || !projectName || !outputPath}
+							disabled={
+								isGenerating ||
+								!selectedTemplate ||
+								!projectName ||
+								!outputPath ||
+								(selectedTemplate?.pomFile && !artifactId)
+							}
 							onClick={handleGenerateProject}
 							style={{
 								width: "100%",
@@ -579,23 +623,52 @@ export const ProjectsView = () => {
 								borderRadius: "4px",
 								padding: "12px 16px",
 								cursor:
-									isGenerating || !selectedTemplate || !projectName || !outputPath ? "not-allowed" : "pointer",
+									isGenerating ||
+									!selectedTemplate ||
+									!projectName ||
+									!outputPath ||
+									(selectedTemplate?.pomFile && !artifactId)
+										? "not-allowed"
+										: "pointer",
 								display: "inline-flex",
 								alignItems: "center",
 								justifyContent: "center",
 								fontSize: "13px",
 								fontFamily: "inherit",
 								outline: "none",
-								opacity: isGenerating || !selectedTemplate || !projectName || !outputPath ? 0.5 : 1,
+								opacity:
+									isGenerating ||
+									!selectedTemplate ||
+									!projectName ||
+									!outputPath ||
+									(selectedTemplate?.pomFile && !artifactId)
+										? 0.5
+										: 1,
 							}}
 							onMouseOver={(e) => {
-								if (!(isGenerating || !selectedTemplate || !projectName || !outputPath)) {
+								if (
+									!(
+										isGenerating ||
+										!selectedTemplate ||
+										!projectName ||
+										!outputPath ||
+										(selectedTemplate?.pomFile && !artifactId)
+									)
+								) {
 									;(e.target as HTMLButtonElement).style.backgroundColor =
 										"var(--vscode-button-hoverBackground)"
 								}
 							}}
 							onMouseOut={(e) => {
-								if (!(isGenerating || !selectedTemplate || !projectName || !outputPath)) {
+								if (
+									!(
+										isGenerating ||
+										!selectedTemplate ||
+										!projectName ||
+										!outputPath ||
+										(selectedTemplate?.pomFile && !artifactId)
+									)
+								) {
 									;(e.target as HTMLButtonElement).style.backgroundColor = "var(--vscode-button-background)"
 								}
 							}}

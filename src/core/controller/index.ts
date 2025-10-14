@@ -113,7 +113,7 @@ export class Controller {
 
 						// Generate the project
 						const result = await generateEgovProject(
-							message.projectConfig, // { projectName: string, groupID: string, outputPath: string, template: {displayName: string, fileName: string, pomFile: string} }
+							message.projectConfig, // { projectName: string, artifactId: string, groupID: string, outputPath: string, template: {displayName: string, fileName: string, pomFile: string} }
 							this.context.extensionPath,
 							sendProgress,
 						)
@@ -121,7 +121,7 @@ export class Controller {
 						// Send result to webview
 						await this.postMessageToWebview({
 							type: "projectGenerationResult",
-							success: result.success,
+							success: result.success, // boolean
 							text: result.message,
 							projectPath: result.projectPath,
 							error: result.error,

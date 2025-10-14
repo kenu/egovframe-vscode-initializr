@@ -17,6 +17,7 @@ export function createProjectGenerationMessage(config: ProjectConfig, method: st
 		type: "generateProject" as const,
 		projectConfig: {
 			projectName: config.projectName,
+			artifactId: config.artifactId,
 			groupID: config.groupID,
 			outputPath: config.outputPath,
 			template: {

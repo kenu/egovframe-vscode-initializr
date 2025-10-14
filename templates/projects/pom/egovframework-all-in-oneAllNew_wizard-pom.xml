@@ -4,7 +4,7 @@
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <groupId>{{groupID}}</groupId>
-  <artifactId>{{projectName}}</artifactId>
+  <artifactId>{{artifactId}}</artifactId>
   <packaging>war</packaging>
   <version>1.0.0</version>
   <name>{{projectName}}</name>
@@ -564,7 +564,7 @@
   <build>
     <defaultGoal>install</defaultGoal>
     <directory>${basedir}/target</directory>
-    <finalName>egovframework-all-in-one</finalName>
+    <finalName>${artifactId}-${version}</finalName>
     <pluginManagement>
       <plugins>
         <plugin>
@@ -653,7 +653,7 @@
                     <username>tomcat</username>
                     <password>tomcat</password>
                     <path>/</path>
-                    <warFile>target\egovframework-all-in-one.war</warFile>
+                    <warFile>target\${artifactId}-${version}.war</warFile>
                     <update>true</update>
                 </configuration>
             </plugin>

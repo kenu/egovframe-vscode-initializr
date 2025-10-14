@@ -8,6 +8,7 @@ export interface ProjectTemplate {
 
 export interface ProjectConfig {
 	projectName: string
+	artifactId: string
 	groupID: string
 	outputPath: string
 	template: ProjectTemplate
@@ -194,6 +195,15 @@ export function validateProjectConfig(config: Partial<ProjectConfig>): string[] 
 		errors.push("Project name must start with a letter and contain only letters, numbers, hyphens, and underscores")
 	}
 
+	// artifactId validation (only for templates with pomFile)
+	if (config.template?.pomFile) {
+		if (!config.artifactId || config.artifactId.trim() === "") {
+			errors.push("Artifact ID is required for this template")
+		} else if (!/^[a-zA-Z][a-zA-Z0-9_-]*$/.test(config.artifactId)) {
+			errors.push("Artifact ID must start with a letter and contain only letters, numbers, hyphens, and underscores")
+		}
+	}
+
 	if (config.template?.pomFile && (!config.groupID || config.groupID.trim() === "")) {
 		errors.push("Group ID is required for this template")
 	} else if (config.groupID && !/^[a-zA-Z][a-zA-Z0-9._-]*$/.test(config.groupID)) {
@@ -213,6 +223,10 @@ export function validateProjectConfig(config: Partial<ProjectConfig>): string[] 
 
 export function getDefaultGroupId(): string {
 	return "com.example"
+}
+
+export function getDefaultArtifactId(): string {
+	return "example-project"
 }
 
 export function generateSampleProjectName(): string {

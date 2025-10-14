@@ -19,7 +19,8 @@ export interface EgovProjectTemplate {
 
 export interface EgovProjectConfig {
 	projectName: string
-	groupID: string // 선언 안 할 경우 타입오류 발생
+	artifactId: string
+	groupID: string
 	outputPath: string
 	packageName: string
 	template: EgovProjectTemplate
@@ -44,7 +45,7 @@ export interface ProjectGenerationResult {
  * Form-based Project Generation
  */
 export async function generateEgovProject(
-	config: EgovProjectConfig, // { projectName: string, groupID: string, outputPath: string, template: {displayName: string, fileName: string, pomFile: string} }
+	config: EgovProjectConfig, // { projectName: string, artifactId: string, groupID: string, outputPath: string, template: {displayName: string, fileName: string, pomFile: string} }
 	extensionPath: string,
 	progressCallback?: (message: string) => void,
 ): Promise<ProjectGenerationResult> {
@@ -52,6 +53,14 @@ export async function generateEgovProject(
 		// Validate config
 		if (!config.projectName?.trim()) {
 			throw new Error("Project name is required")
+		}
+
+		if (!config.artifactId?.trim()) {
+			throw new Error("Artifact ID is required")
+		}
+
+		if (!config.groupID?.trim()) {
+			throw new Error("Group ID is required")
 		}
 
 		if (!config.outputPath?.trim()) {
@@ -183,7 +192,7 @@ async function processFilesRecursively(projectRoot: string, placeholders: Record
 
 // Internal function for Form-based Project Generation
 async function generatePomFile(
-	config: EgovProjectConfig, // { projectName: string, groupID: string, outputPath: string, template: {displayName: string, fileName: string, pomFile: string} }
+	config: EgovProjectConfig, // { projectName: string, artifactId: string, groupID: string, outputPath: string, template: {displayName: string, fileName: string, pomFile: string} }
 	projectRoot: string,
 	extensionPath: string,
 	progressCallback?: (message: string) => void,
@@ -205,13 +214,13 @@ async function generatePomFile(
 		// Replace placeholders
 		const placeholders = {
 			"{{projectName}}": config.projectName,
+			"{{artifactId}}": config.artifactId,
 			"{{groupID}}": config.groupID,
 			//"{{PACKAGE_NAME}}": config.packageName,
 			//"{{DESCRIPTION}}": config.description || `eGovFrame project: ${config.projectName}`,
 			//"{{FRAMEWORK_VERSION}}": config.template.frameworkVersion || "4.3.0",
 			//"{{VERSION}}": "1.0.0",
 		}
-
 		for (const [placeholder, value] of Object.entries(placeholders)) {
 			content = content.replace(new RegExp(placeholder, "g"), value)
 		}

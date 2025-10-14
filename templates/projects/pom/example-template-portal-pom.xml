@@ -4,7 +4,7 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>{{groupID}}</groupId>
-	<artifactId>{{projectName}}</artifactId>
+	<artifactId>{{artifactId}}</artifactId>
 	<packaging>war</packaging>
 	<version>1.0.0</version>
 	<name>{{projectName}}</name>
@@ -254,7 +254,7 @@
 	<build>
 		<defaultGoal>install</defaultGoal>
 		<directory>${basedir}/target</directory>
-		<finalName>pst_webapp</finalName>
+		<finalName>${artifactId}-${version}</finalName>
 		<pluginManagement>
 			<plugins>
 				<plugin>
