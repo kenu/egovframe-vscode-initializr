@@ -4,8 +4,7 @@ import { vscode } from "../../../utils/vscode"
 import {
 	ProjectTemplate,
 	ProjectConfig,
-	PROJECT_TEMPLATES,
-	PROJECT_CATEGORIES,
+	categoriesFromProjectTemplates,
 	getTemplatesByCategory,
 	validateProjectConfig,
 } from "../../../utils/projectUtils"
@@ -29,6 +28,8 @@ export const ProjectsView = () => {
 		generationMode,
 		defaultGroupId,
 		defaultArtifactId,
+		projectTemplates,
+		isTemplatesLoading,
 	} = state
 
 	// Get selectedTemplate from state
@@ -53,14 +54,16 @@ export const ProjectsView = () => {
 	const setSelectedTemplate = (template: ProjectTemplate | null) => updateState({ selectedTemplate: template })
 	const setOutputPath = (value: string) => updateState({ outputPath: value })
 
-	// 카테고리에 해당하는 템플릿 배열
-	const filteredTemplates = getTemplatesByCategory(selectedCategory)
+	// 카테고리 목록 및 필터링된 템플릿 배열
+	const projectCategories = categoriesFromProjectTemplates(projectTemplates)
+	const filteredTemplates = getTemplatesByCategory(projectTemplates, selectedCategory)
 
 	// Sample 버튼(handleInsertSample)을 위해 초기 출력 경로 설정
 	const [initialPath, setInitialPath] = useState("")
 
 	useEffect(() => {
-		// Request current workspace path and default settings when component mounts
+		// Request project templates, workspace path and default settings when component mounts
+		vscode.postMessage({ type: "getProjectTemplates" })
 		vscode.postMessage({ type: "getWorkspacePath" })
 		vscode.postMessage({ type: "getDefaultSettings" })
 
@@ -68,6 +71,15 @@ export const ProjectsView = () => {
 		const handleMessage = (event: MessageEvent) => {
 			const message = event.data
 			switch (message.type) {
+				case "projectTemplates":
+					// Update project templates from extension
+					if (message.templates) {
+						updateState({
+							projectTemplates: message.templates,
+							isTemplatesLoading: false,
+						})
+					}
+					break
 				case "selectedOutputPath":
 					if (message.text) {
 						setOutputPath(message.text)
@@ -394,7 +406,7 @@ export const ProjectsView = () => {
 							onBlur={(e) => {
 								;(e.target as HTMLSelectElement).style.borderColor = "var(--vscode-input-border)"
 							}}>
-							{PROJECT_CATEGORIES.map((category) => (
+							{projectCategories.map((category) => (
 								<option key={category} value={category}>
 									{category}
 								</option>
@@ -414,33 +426,55 @@ export const ProjectsView = () => {
 								overflowY: "auto",
 								backgroundColor: "var(--vscode-input-background)",
 							}}>
-							{filteredTemplates.map((template) => (
+							{isTemplatesLoading ? (
 								<div
-									key={template.fileName}
 									style={{
-										padding: "8px",
-										margin: "4px 0",
-										cursor: "pointer",
-										borderRadius: "3px",
-										backgroundColor:
-											selectedTemplate?.fileName === template.fileName
-												? "var(--vscode-list-activeSelectionBackground)"
-												: "transparent",
-										color:
-											selectedTemplate?.fileName === template.fileName
-												? "var(--vscode-list-activeSelectionForeground)"
-												: "var(--vscode-foreground)",
-									}}
-									onClick={() => handleTemplateSelect(template)}>
-									{" "}
-									{/* => setSelectedTemplate(template) */}
-									<div style={{ fontWeight: "bold", fontSize: "13px" }}>{template.displayName}</div>
-									<div style={{ fontSize: "11px", opacity: 0.8, marginTop: "2px" }}>{template.description}</div>
-									<div style={{ fontSize: "10px", opacity: 0.6, marginTop: "2px" }}>
-										File: {template.fileName}
-									</div>
+										textAlign: "center",
+										padding: "20px",
+										color: "var(--vscode-descriptionForeground)",
+									}}>
+									Loading templates...
 								</div>
-							))}
+							) : filteredTemplates.length === 0 ? (
+								<div
+									style={{
+										textAlign: "center",
+										padding: "20px",
+										color: "var(--vscode-descriptionForeground)",
+									}}>
+									No templates available
+								</div>
+							) : (
+								filteredTemplates.map((template) => (
+									<div
+										key={template.fileName}
+										style={{
+											padding: "8px",
+											margin: "4px 0",
+											cursor: "pointer",
+											borderRadius: "3px",
+											backgroundColor:
+												selectedTemplate?.fileName === template.fileName
+													? "var(--vscode-list-activeSelectionBackground)"
+													: "transparent",
+											color:
+												selectedTemplate?.fileName === template.fileName
+													? "var(--vscode-list-activeSelectionForeground)"
+													: "var(--vscode-foreground)",
+										}}
+										onClick={() => handleTemplateSelect(template)}>
+										{" "}
+										{/* => setSelectedTemplate(template) */}
+										<div style={{ fontWeight: "bold", fontSize: "13px" }}>{template.displayName}</div>
+										<div style={{ fontSize: "11px", opacity: 0.8, marginTop: "2px" }}>
+											{template.description}
+										</div>
+										<div style={{ fontSize: "10px", opacity: 0.6, marginTop: "2px" }}>
+											File: {template.fileName}
+										</div>
+									</div>
+								))
+							)}
 						</div>
 					</div>
 
@@ -718,7 +752,7 @@ export const ProjectsView = () => {
 					marginTop: "20px",
 				}}>
 				<h4 style={{ color: "var(--vscode-foreground)", marginBottom: "10px", marginTop: 0 }}>
-					Available Templates ({PROJECT_TEMPLATES.length})
+					Available Templates ({projectTemplates.length})
 				</h4>
 				<div style={{ fontSize: "12px", color: "var(--vscode-foreground)" }}>
 					<div style={{ marginBottom: "8px" }}>

@@ -614,6 +614,31 @@ export class Controller {
 				break
 			}
 
+			case "getProjectTemplates": {
+				try {
+					// Read templates-projects.json from extension context
+					const templatesJsonPath = vscode.Uri.joinPath(
+						this.context.extensionUri,
+						"templates",
+						"templates-projects.json",
+					)
+					const templatesJsonContent = await vscode.workspace.fs.readFile(templatesJsonPath)
+					const templates = JSON.parse(templatesJsonContent.toString())
+
+					await this.postMessageToWebview({
+						type: "projectTemplates",
+						templates,
+					})
+				} catch (error) {
+					console.error("Error reading project templates:", error)
+					await this.postMessageToWebview({
+						type: "error",
+						message: "Failed to load project templates",
+					})
+				}
+				break
+			}
+
 			default:
 				console.log("Unhandled message type:", message.type)
 				break

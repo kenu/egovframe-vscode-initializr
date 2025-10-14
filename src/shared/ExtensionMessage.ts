@@ -92,3 +92,14 @@ export type ExtensionMessage =
 				license: string
 			}
 	  }
+	| {
+			type: "projectTemplates"
+			templates: Array<{
+				displayName: string
+				fileName: string
+				pomFile: string
+				description?: string
+				category?: string
+				projectName?: string
+			}>
+	  }

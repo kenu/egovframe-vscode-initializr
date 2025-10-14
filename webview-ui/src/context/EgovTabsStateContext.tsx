@@ -38,6 +38,9 @@ interface ProjectsViewState {
 	defaultGroupId: string
 	defaultArtifactId: string
 	defaultPackageName: string
+	// Extension에서 가져온 프로젝트 템플릿 목록
+	projectTemplates: ProjectTemplate[]
+	isTemplatesLoading: boolean
 }
 
 // ConfigView 상태
@@ -101,6 +104,9 @@ const initialProjectsViewState: ProjectsViewState = {
 	defaultGroupId: "",
 	defaultArtifactId: "",
 	defaultPackageName: "",
+	// Extension에서 가져온 프로젝트 템플릿 목록
+	projectTemplates: [],
+	isTemplatesLoading: true,
 }
 
 // 초기 상태 - Config View
