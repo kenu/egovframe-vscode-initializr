@@ -5,7 +5,7 @@
 		"pomFile": "example-web-pom.xml",
 		"description": "Basic eGovFrame web application project",
 		"category": "Web",
-		"projectName": "web-project"
+		"projectName": "egov-web-project"
 	},
 	{
 		"displayName": "Template > Simple Homepage",
@@ -13,7 +13,7 @@
 		"pomFile": "example-template-simple-pom.xml",
 		"description": "Simple homepage template with basic functionalities",
 		"category": "Template",
-		"projectName": "template-simple-homepage"
+		"projectName": "egov-template-simple-homepage"
 	},
 	{
 		"displayName": "Template > Portal Site",
@@ -21,7 +21,7 @@
 		"pomFile": "example-template-portal-pom.xml",
 		"description": "Portal site template for enterprise applications",
 		"category": "Template",
-		"projectName": "template-portal-site"
+		"projectName": "egov-template-portal-site"
 	},
 	{
 		"displayName": "Template > Enterprise Business",
@@ -29,7 +29,7 @@
 		"pomFile": "example-template-enterprise-pom.xml",
 		"description": "Enterprise business application template",
 		"category": "Template",
-		"projectName": "template-enterprise-business"
+		"projectName": "egov-template-enterprise-business"
 	},
 	{
 		"displayName": "Template > Common All-in-one",
@@ -37,7 +37,7 @@
 		"pomFile": "egovframework-all-in-oneAllNew_wizard-pom.xml",
 		"description": "Comprehensive all-in-one project template",
 		"category": "Template",
-		"projectName": "template-common-all-in-one"
+		"projectName": "egov-template-common-all-in-one"
 	},
 	{
 		"displayName": "Mobile Project",
@@ -45,7 +45,7 @@
 		"pomFile": "mobile-web-pom.xml",
 		"description": "Mobile web application project",
 		"category": "Mobile",
-		"projectName": "mobile-project"
+		"projectName": "egov-mobile-project"
 	},
 	{
 		"displayName": "Mobile Template Project",
@@ -53,7 +53,7 @@
 		"pomFile": "mobile-template-pom.xml",
 		"description": "Mobile template project with hybrid app support",
 		"category": "Mobile",
-		"projectName": "mobile-template-project"
+		"projectName": "egov-mobile-template-project"
 	},
 	{
 		"displayName": "DeviceAPI Web Project",
@@ -61,7 +61,7 @@
 		"pomFile": "",
 		"description": "Device API integration web project",
 		"category": "Mobile",
-		"projectName": "deviceapi-web-project"
+		"projectName": "egov-deviceapi-web-project"
 	},
 	{
 		"displayName": "Boot Web Project",
@@ -69,7 +69,7 @@
 		"pomFile": "example-boot-web-pom.xml",
 		"description": "Spring Boot based web project",
 		"category": "Boot",
-		"projectName": "boot-web-project"
+		"projectName": "egov-boot-web-project"
 	},
 	{
 		"displayName": "Boot Template > Simple Homepage (Backend)",
@@ -77,7 +77,7 @@
 		"pomFile": "egovframe-template-simple-backend-pom.xml",
 		"description": "Spring Boot simple homepage backend",
 		"category": "Boot",
-		"projectName": "boot-template-simple-backend"
+		"projectName": "egov-boot-template-simple-backend"
 	},
 	{
 		"displayName": "Boot Template > Simple Homepage (Frontend)",
@@ -85,7 +85,7 @@
 		"pomFile": "",
 		"description": "React-based frontend for simple homepage",
 		"category": "Boot",
-		"projectName": "boot-template-simple-frontend"
+		"projectName": "egov-boot-template-simple-frontend"
 	},
 	{
 		"displayName": "MSA Boot Template > Common Components (KRDS)",
@@ -93,7 +93,7 @@
 		"pomFile": "",
 		"description": "MSA common components with KRDS integration",
 		"category": "MSA",
-		"projectName": "msa-boot-common-components"
+		"projectName": "egov-msa-boot-common-components"
 	},
 	{
 		"displayName": "MSA Boot Template > Portal (Backend)",
@@ -101,7 +101,7 @@
 		"pomFile": "",
 		"description": "MSA portal backend services",
 		"category": "MSA",
-		"projectName": "msa-boot-portal-backend"
+		"projectName": "egov-msa-boot-portal-backend"
 	},
 	{
 		"displayName": "MSA Boot Template > Portal (Frontend)",
@@ -109,7 +109,7 @@
 		"pomFile": "",
 		"description": "MSA portal frontend application",
 		"category": "MSA",
-		"projectName": "msa-boot-portal-frontend"
+		"projectName": "egov-msa-boot-portal-frontend"
 	},
 	{
 		"displayName": "Boot Batch Template > Scheduler (File)",
@@ -117,7 +117,7 @@
 		"pomFile": "batch-sam-scheduler-pom.xml",
 		"description": "File-based batch scheduler project",
 		"category": "Batch",
-		"projectName": "boot-batch-scheduler-file"
+		"projectName": "egov-boot-batch-scheduler-file"
 	},
 	{
 		"displayName": "Boot Batch Template > CommandLine (File)",
@@ -125,7 +125,7 @@
 		"pomFile": "batch-sam-commandline-pom.xml",
 		"description": "File-based command line batch project",
 		"category": "Batch",
-		"projectName": "boot-batch-commandline-file"
+		"projectName": "egov-boot-batch-commandline-file"
 	},
 	{
 		"displayName": "Boot Batch Template > Web (File)",
@@ -133,7 +133,7 @@
 		"pomFile": "batch-sam-web-pom.xml",
 		"description": "File-based web batch project",
 		"category": "Batch",
-		"projectName": "boot-batch-web-file"
+		"projectName": "egov-boot-batch-web-file"
 	},
 	{
 		"displayName": "Boot Batch Template > Scheduler (DB)",
@@ -141,7 +141,7 @@
 		"pomFile": "batch-db-scheduler-pom.xml",
 		"description": "Database-based batch scheduler project",
 		"category": "Batch",
-		"projectName": "boot-batch-scheduler-db"
+		"projectName": "egov-boot-batch-scheduler-db"
 	},
 	{
 		"displayName": "Boot Batch Template > CommandLine (DB)",
@@ -149,7 +149,7 @@
 		"pomFile": "batch-db-commandline-pom.xml",
 		"description": "Database-based command line batch project",
 		"category": "Batch",
-		"projectName": "boot-batch-commandline-db"
+		"projectName": "egov-boot-batch-commandline-db"
 	},
 	{
 		"displayName": "Boot Batch Template > Web (DB)",
@@ -157,6 +157,6 @@
 		"pomFile": "batch-db-web-pom.xml",
 		"description": "Database-based web batch project",
 		"category": "Batch",
-		"projectName": "boot-batch-web-db"
+		"projectName": "egov-boot-batch-web-db"
 	}
 ]
