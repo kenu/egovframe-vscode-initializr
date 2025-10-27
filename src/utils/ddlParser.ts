@@ -24,8 +24,8 @@ export function parseDDL(ddl: string): ParsedDDL {
 	// 공백 정규화
 	ddl = ddl.replace(/\s+/g, " ").trim()
 
-	// 테이블 이름 추출 (백틱 처리 추가)
-	const tableNameMatch = RegExp(/CREATE TABLE [`]?(\w+)[`]?/i).exec(ddl)
+	// 테이블 이름 추출 (백틱 처리 추가) - DDL 시작 부분에서만 매칭
+	const tableNameMatch = RegExp(/^\s*CREATE\s+TABLE\s+[`]?(\w+)[`]?/i).exec(ddl)
 	if (!tableNameMatch) {
 		throw new Error("Unable to parse table name from DDL")
 	}
@@ -106,8 +106,9 @@ export function validateDDL(ddl: string): boolean {
 		return false
 	}
 
-	// CREATE TABLE 문법 확인
-	if (!ddl.toUpperCase().includes("CREATE TABLE")) {
+	// CREATE TABLE 문법 확인 - DDL 시작 부분에 CREATE TABLE이 와야 함 (공백/주석 제외)
+	const trimmedDDL = ddl.trim()
+	if (!/^\s*CREATE\s+TABLE\s+/i.test(trimmedDDL)) {
 		return false
 	}
 
