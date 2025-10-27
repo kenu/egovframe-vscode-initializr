@@ -68,7 +68,7 @@ export function parseDDL(ddl: string): ParsedDDL {
 	if (!tableNameMatch) {
 		throw new Error("Unable to parse table name from DDL")
 	}
-	const tableName = convertCamelcaseToPascalcase(tableNameMatch[1].toLowerCase())
+	const tableName = convertCamelcaseToPascalcase(convertToCamelCase(tableNameMatch[1]))
 
 	// 컬럼 정의 추출
 	const columnDefinitionsMatch = RegExp(/\((.*)\)/s).exec(ddl)
