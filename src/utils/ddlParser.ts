@@ -63,9 +63,19 @@ export function parseDDL(ddl: string): ParsedDDL {
 		}
 
 		// 기본 컬럼 정보 추출 (백틱 처리 추가)
-		const parts = columnDef.split(" ")
-		const columnName = parts[0].replace(/[`"']/g, "") // 백틱과 따옴표 제거
+		const parts = columnDef.split(" ").filter((part) => part.trim()) // 빈 문자열 제거
+		const columnName = parts[0]?.replace(/[`"']/g, "") // 백틱과 따옴표 제거
 		const rawDataType = parts[1] ? parts[1].toUpperCase() : ""
+
+		// 컬럼명 유효성 검사
+		if (!columnName || columnName.trim() === "") {
+			throw new Error(`Invalid column definition: missing column name in "${columnDef}"`)
+		}
+
+		// 데이터 타입 유효성 검사
+		if (!rawDataType || rawDataType.trim() === "") {
+			throw new Error(`Invalid column definition: missing data type for column "${columnName}"`)
+		}
 
 		// 데이터 타입에서 크기 정보 제거
 		const dataType = RegExp(/^\w+/).exec(rawDataType)?.[0] ?? rawDataType
@@ -124,6 +134,38 @@ export function validateDDL(ddl: string): boolean {
 	const columnMatch = columnRegex.exec(ddl)
 	if (!columnMatch?.[1]?.trim()) {
 		return false
+	}
+
+	// 각 컬럼 정의 검증
+	const columnDefinitions = columnMatch[1]
+	const columnsArray = columnDefinitions
+		.split(/,(?![^(]*\))/)
+		.map((column) => column.trim())
+		.filter(
+			(column) =>
+				column &&
+				!column.toUpperCase().startsWith("UNIQUE KEY") &&
+				!column.toUpperCase().startsWith("KEY") &&
+				!column.toUpperCase().startsWith("CONSTRAINT") &&
+				!column.toUpperCase().startsWith("PRIMARY KEY") &&
+				!column.toUpperCase().startsWith("COMMENT ON"),
+		)
+
+	// 각 컬럼에 컬럼명과 자료형이 있는지 확인
+	for (const columnDef of columnsArray) {
+		const parts = columnDef.split(" ").filter((part) => part.trim())
+		const columnName = parts[0]?.replace(/[`"']/g, "")
+		const dataType = parts[1]
+
+		// 컬럼명 검사
+		if (!columnName || columnName.trim() === "") {
+			return false
+		}
+
+		// 자료형 검사
+		if (!dataType || dataType.trim() === "") {
+			return false
+		}
 	}
 
 	return true
