@@ -864,9 +864,6 @@ const CodeView = () => {
 								<strong>Controller:</strong> {parsedDDL?.tableName || "Table"}Controller.java
 							</li>
 							<li>
-								<strong>DAO:</strong> {parsedDDL?.tableName || "Table"}DAO.java
-							</li>
-							<li>
 								<strong>Mapper Interface:</strong> {parsedDDL?.tableName || "Table"}Mapper.java
 							</li>
 						</ul>
@@ -899,12 +896,12 @@ const CodeView = () => {
 								paddingLeft: "20px",
 							}}>
 							<li>
-								<strong>JSP Views:</strong> {parsedDDL?.tableName || "Table"}List.jsp,{" "}
-								{parsedDDL?.tableName || "Table"}Regist.jsp
-							</li>
-							<li>
 								<strong>Thymeleaf Views:</strong> {parsedDDL?.tableName || "Table"}List.html,{" "}
 								{parsedDDL?.tableName || "Table"}Regist.html
+							</li>
+							<li>
+								<strong>JSP Views:</strong> {parsedDDL?.tableName || "Table"}List.jsp,{" "}
+								{parsedDDL?.tableName || "Table"}Regist.jsp
 							</li>
 						</ul>
 					</div>
@@ -923,13 +920,13 @@ const CodeView = () => {
 								}}>
 								<div>src/main/java/{packageName.replace(/\./g, "/")}/</div>
 								<div style={{ paddingLeft: "10px" }}>
-									├── web/ - <b>Controller</b>
+									├── service/impl/ - <b>Service Impl & Mapper Interface</b>
 								</div>
 								<div style={{ paddingLeft: "10px" }}>
 									├── service/ - <b>Service & VOs</b>
 								</div>
 								<div style={{ paddingLeft: "10px" }}>
-									└── service/impl/ - <b>Service Impl & DAOs</b>
+									└── web/ - <b>Controller</b>
 								</div>
 								<div>src/main/resources/</div>
 								<div style={{ paddingLeft: "10px" }}>

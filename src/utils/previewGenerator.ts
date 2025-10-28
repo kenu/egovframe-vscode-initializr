@@ -135,7 +135,11 @@ export async function generatePreviews(
 
 	// 모든 템플릿을 병렬로 렌더링 (성능 최적화)
 	const templatePromises = [
-		{ key: "vo", lang: "java", promise: renderTemplateForPreview(templateFilePaths.voTemplateFilePath, templateContext) },
+		{
+			key: "vo",
+			lang: "java",
+			promise: renderTemplateForPreview(templateFilePaths.voTemplateFilePath, templateContext),
+		},
 		{
 			key: "defaultVo",
 			lang: "java",
@@ -157,25 +161,14 @@ export async function generatePreviews(
 			promise: renderTemplateForPreview(templateFilePaths.serviceImplTemplateFilePath, templateContext),
 		},
 		{
-			key: "mapper",
-			lang: "xml",
-			promise: renderTemplateForPreview(templateFilePaths.mapperTemplateFilePath, templateContext),
-		},
-		{
 			key: "mapperInterface",
 			lang: "java",
 			promise: renderTemplateForPreview(templateFilePaths.mapperInterfaceTemplateFilePath, templateContext),
 		},
-		{ key: "dao", lang: "java", promise: renderTemplateForPreview(templateFilePaths.daoTemplateFilePath, templateContext) },
 		{
-			key: "jspList",
-			lang: "html",
-			promise: renderTemplateForPreview(templateFilePaths.jspListTemplateFilePath, templateContext),
-		},
-		{
-			key: "jspRegister",
-			lang: "html",
-			promise: renderTemplateForPreview(templateFilePaths.jspRegisterTemplateFilePath, templateContext),
+			key: "mapper",
+			lang: "xml",
+			promise: renderTemplateForPreview(templateFilePaths.mapperTemplateFilePath, templateContext),
 		},
 		{
 			key: "thymeleafList",
@@ -186,6 +179,16 @@ export async function generatePreviews(
 			key: "thymeleafRegister",
 			lang: "html",
 			promise: renderTemplateForPreview(templateFilePaths.thymeleafRegisterTemplateFilePath, templateContext),
+		},
+		{
+			key: "jspList",
+			lang: "html",
+			promise: renderTemplateForPreview(templateFilePaths.jspListTemplateFilePath, templateContext),
+		},
+		{
+			key: "jspRegister",
+			lang: "html",
+			promise: renderTemplateForPreview(templateFilePaths.jspRegisterTemplateFilePath, templateContext),
 		},
 	]
 
@@ -236,13 +239,12 @@ function getTemplateFilePaths(context: vscode.ExtensionContext) {
 		controllerTemplateFilePath: path.join(templatesPath, "sample-controller-template.hbs"),
 		serviceTemplateFilePath: path.join(templatesPath, "sample-service-template.hbs"),
 		serviceImplTemplateFilePath: path.join(templatesPath, "sample-service-impl-template.hbs"),
-		mapperTemplateFilePath: path.join(templatesPath, "sample-mapper-template.hbs"),
 		mapperInterfaceTemplateFilePath: path.join(templatesPath, "sample-mapper-interface-template.hbs"),
-		daoTemplateFilePath: path.join(templatesPath, "sample-dao-template.hbs"),
-		jspListTemplateFilePath: path.join(templatesPath, "sample-jsp-list.hbs"),
-		jspRegisterTemplateFilePath: path.join(templatesPath, "sample-jsp-register.hbs"),
+		mapperTemplateFilePath: path.join(templatesPath, "sample-mapper-template.hbs"),
 		thymeleafListTemplateFilePath: path.join(templatesPath, "sample-thymeleaf-list.hbs"),
 		thymeleafRegisterTemplateFilePath: path.join(templatesPath, "sample-thymeleaf-register.hbs"),
+		jspListTemplateFilePath: path.join(templatesPath, "sample-jsp-list.hbs"),
+		jspRegisterTemplateFilePath: path.join(templatesPath, "sample-jsp-register.hbs"),
 	}
 }
 

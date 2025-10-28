@@ -53,13 +53,12 @@ const CodePreview: React.FC<CodePreviewProps> = ({
 		{ value: "controller", label: "Controller 클래스" },
 		{ value: "service", label: "Service 인터페이스" },
 		{ value: "serviceImpl", label: "ServiceImpl 클래스" },
-		{ value: "mapper", label: "MyBatis Mapper XML" },
 		{ value: "mapperInterface", label: "Mapper 인터페이스" },
-		{ value: "dao", label: "DAO 클래스" },
-		{ value: "jspList", label: "JSP 목록 페이지" },
-		{ value: "jspRegister", label: "JSP 등록 페이지" },
+		{ value: "mapper", label: "MyBatis Mapper XML" },
 		{ value: "thymeleafList", label: "Thymeleaf 목록 페이지" },
 		{ value: "thymeleafRegister", label: "Thymeleaf 등록 페이지" },
+		{ value: "jspList", label: "JSP 목록 페이지" },
+		{ value: "jspRegister", label: "JSP 등록 페이지" },
 	]
 
 	// 현재 미리보기 설정
