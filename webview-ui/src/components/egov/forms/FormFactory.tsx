@@ -36,7 +36,22 @@ const FormFactory: React.FC<FormFactoryProps> = ({ template, onSubmit, onCancel,
 
 		// ID Generation forms
 		if (webView.includes("id-gnr-")) {
-			return <IdGenerationForm template={template} onSubmit={onSubmit} onCancel={onCancel} initialData={initialData} />
+			const idGenerationFormType = webView.includes("sequence")
+				? "sequence"
+				: webView.includes("table")
+					? "table"
+					: webView.includes("uuid")
+						? "uuid"
+						: "sequence"
+			return (
+				<IdGenerationForm
+					template={template}
+					onSubmit={onSubmit}
+					onCancel={onCancel}
+					formType={idGenerationFormType}
+					initialData={initialData}
+				/>
+			)
 		}
 
 		// Logging formType

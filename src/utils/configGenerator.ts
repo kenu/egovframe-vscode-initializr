@@ -13,6 +13,7 @@ export interface TemplateConfig {
 	javaConfigTemplate?: string
 	yamlTemplate?: string
 	propertiesTemplate?: string
+	description: string
 }
 
 // Form data interface

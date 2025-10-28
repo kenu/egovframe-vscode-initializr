@@ -15,6 +15,7 @@ export interface TemplateConfig {
 	javaConfigTemplate: string
 	yamlTemplate: string
 	propertiesTemplate: string
+	description: string
 }
 
 export interface GroupedTemplates {

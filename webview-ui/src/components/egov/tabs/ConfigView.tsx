@@ -251,10 +251,14 @@ const ConfigView: React.FC = () => {
 								<strong>Name:</strong> {selectedTemplate.displayName}
 							</p>
 							<p style={{ color: "var(--vscode-foreground)", marginBottom: "15px" }}>
-								<strong>Template:</strong> {selectedTemplate.templateFile}
+								<strong>File extension : </strong>
+								{selectedTemplate.templateFile !== "" ? "XML" : ""}
+								{selectedTemplate.javaConfigTemplate !== "" ? ", Java" : ""}
+								{selectedTemplate.yamlTemplate !== "" ? ", Yaml" : ""}
+								{selectedTemplate.propertiesTemplate !== "" ? ", Properties" : ""}
 							</p>
 							<p style={{ color: "var(--vscode-foreground)", marginBottom: "15px" }}>
-								<strong>Folder:</strong> {selectedTemplate.templateFolder}
+								<strong>Description : </strong> {selectedTemplate.description}
 							</p>
 							<Button onClick={handleConfigureClick} variant="primary">
 								Configure

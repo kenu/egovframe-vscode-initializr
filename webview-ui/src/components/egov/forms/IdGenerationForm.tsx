@@ -3,13 +3,30 @@ import { Button, TextField, TextArea, Select, RadioGroup, Checkbox, ProgressRing
 import { ConfigFormData, ConfigGenerationType, FormComponentProps } from "../types/templates"
 import { vscode } from "../../../utils/vscode"
 
-const IdGenerationForm: React.FC<FormComponentProps> = ({ onSubmit, onCancel, template, initialData }) => {
+const IdGenerationForm: React.FC<FormComponentProps> = ({ onSubmit, onCancel, template, formType, initialData }) => {
+	const getDefaultFileName = (type: ConfigGenerationType) => {
+		const baseNames = {
+			sequence: { xml: "context-idgn-sequence", java: "EgovIdgnSequenceConfig" },
+			table: { xml: "context-idgn-table", java: "EgovIdgnTableConfig" },
+			uuid: { xml: "context-idgn-uuid", java: "EgovIdgnUuidConfig" },
+		}
+		const names = baseNames[formType as keyof typeof baseNames]
+		switch (type) {
+			case ConfigGenerationType.XML:
+				return names.xml // = If (names === baseNames.sequence) => names.xml은 "context-idgn-sequence"
+			case ConfigGenerationType.JAVA_CONFIG:
+				return names.java // = If (names === baseNames.sequence) => names.java은 "EgovIdgnSequenceConfig"
+			default:
+				return names.xml
+		}
+	}
+
 	const [formData, setFormData] = useState<ConfigFormData>({
 		// 아래는 입력값들에 대한 초기값
 		// 전체 공통
 		generationType: ConfigGenerationType.XML,
 		txtConfigPackage: "egovframework.example.config",
-		txtFileName: "context-idgn-sequence",
+		txtFileName: getDefaultFileName(ConfigGenerationType.XML),
 		txtIdServiceName: "sequenceIdGnrService",
 		// sequence, table 공통
 		txtDatasourceName: "dataSource",
@@ -33,22 +50,6 @@ const IdGenerationForm: React.FC<FormComponentProps> = ({ onSubmit, onCancel, te
 	const [pendingFormData, setPendingFormData] = useState<ConfigFormData | null>(null)
 
 	const [validationError, setValidationError] = useState<string>("")
-
-	// Determine form type based on template webView
-	const getFormType = () => {
-		if (template.webView.includes("sequence")) {
-			return "sequence"
-		}
-		if (template.webView.includes("table")) {
-			return "table"
-		}
-		if (template.webView.includes("uuid")) {
-			return "uuid"
-		}
-		return "sequence"
-	}
-
-	const formType = getFormType()
 
 	// Message listener for folder selection response
 	useEffect(() => {
@@ -79,24 +80,6 @@ const IdGenerationForm: React.FC<FormComponentProps> = ({ onSubmit, onCancel, te
 			window.removeEventListener("message", handleMessage)
 		}
 	}, [pendingFormData, onSubmit])
-
-	const getDefaultFileName = (type: ConfigGenerationType) => {
-		const baseNames = {
-			sequence: { xml: "context-idgn-sequence", java: "EgovIdgnSequenceConfig" },
-			table: { xml: "context-idgn-table", java: "EgovIdgnTableConfig" },
-			uuid: { xml: "context-idgn-uuid", java: "EgovIdgnUuidConfig" },
-		}
-
-		const names = baseNames[formType as keyof typeof baseNames]
-		switch (type) {
-			case ConfigGenerationType.XML:
-				return names.xml // = If (names === baseNames.sequence) => names.xml은 "context-idgn-sequence"
-			case ConfigGenerationType.JAVA_CONFIG:
-				return names.java // = If (names === baseNames.sequence) => names.java은 "EgovIdgnSequenceConfig"
-			default:
-				return names.xml
-		}
-	}
 
 	const handleGenerationTypeChange = (type: ConfigGenerationType) => {
 		setFormData((prev) => ({
