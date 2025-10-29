@@ -1,7 +1,7 @@
-import { TemplateConfig, GroupedTemplates } from "../types/templates"
+import { TemplateConfig, GroupedTemplates } from "../components/egov/types/templates"
 
 /**
- * 템플릿 배열을 카테고리별로 그룹화
+ * Configuration Generation 템플릿 배열을 카테고리별로 그룹화
  */
 export function groupTemplates(templates: TemplateConfig[]): GroupedTemplates {
 	const grouped: GroupedTemplates = {}

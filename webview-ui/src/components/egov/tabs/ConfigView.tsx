@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react"
 import { Button, TextField, TextArea, Select, RadioGroup, ProgressRing, Link, Divider } from "../../ui"
 import { TemplateConfig, GroupedTemplates, ConfigFormData } from "../types/templates"
-import { groupTemplates } from "../utils/templateUtils"
+import { groupTemplates } from "../../../utils/templateUtils"
 import FormFactory from "../forms/FormFactory"
 import { vscode } from "../../../utils/vscode"
 import { useConfigViewState } from "../../../context/EgovTabsStateContext"

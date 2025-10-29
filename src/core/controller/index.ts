@@ -100,7 +100,7 @@ export class Controller {
 			// Form-based Project Generation
 			case "generateProject": {
 				if (message.projectConfig && message.method) {
-					const { generateEgovProject, openProjectInVSCode } = await import("../../utils/egovProjectGenerator")
+					const { generateEgovProject, openProjectInVSCode } = await import("../../utils/projectGenerator")
 
 					try {
 						// Send progress updates to webview
@@ -148,7 +148,7 @@ export class Controller {
 			case "generateProjectByCommand": {
 				// Start interactive project generation workflow
 				try {
-					const { startInteractiveProjectGeneration } = await import("../../utils/egovProjectGenerator")
+					const { startInteractiveProjectGeneration } = await import("../../utils/projectGenerator")
 					await startInteractiveProjectGeneration(this.context)
 				} catch (error) {
 					vscode.window.showErrorMessage(`Failed to start interactive generation: ${error}`)
@@ -192,7 +192,7 @@ export class Controller {
 						console.log("Starting CRUD code generation with DDL:", message.ddl)
 						console.log("Package name:", message.packageName)
 						console.log("Output path:", message.outputPath)
-						const { generateCrudFromDDL } = await import("../../utils/crudGenerator")
+						const { generateCrudFromDDL } = await import("../../utils/codeGenerator")
 						await generateCrudFromDDL(message.ddl, this.context, message.packageName, message.outputPath)
 						await this.postMessageToWebview({
 							type: "success",
@@ -217,7 +217,7 @@ export class Controller {
 			case "uploadTemplates": {
 				if (message.ddl) {
 					try {
-						const { uploadTemplates } = await import("../../utils/crudGenerator")
+						const { uploadTemplates } = await import("../../utils/codeGenerator")
 						await uploadTemplates(message.ddl)
 						await this.postMessageToWebview({
 							type: "success",
@@ -236,7 +236,7 @@ export class Controller {
 			case "downloadTemplateContext": {
 				if (message.ddl && message.context) {
 					try {
-						const { downloadTemplateContext } = await import("../../utils/crudGenerator")
+						const { downloadTemplateContext } = await import("../../utils/codeGenerator")
 						await downloadTemplateContext(message.ddl, message.context)
 						await this.postMessageToWebview({
 							type: "success",
