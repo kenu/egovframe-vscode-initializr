@@ -127,23 +127,7 @@ export class Controller {
 							error: result.error,
 						})
 
-						if (result.success) {
-							// Show success message with option to open project
-							const openProject = await vscode.window.showInformationMessage(
-								`✅ eGovFrame project "${message.projectConfig.projectName}" created successfully!`,
-								"Open Project",
-								"Open in New Window",
-							)
-
-							if (openProject === "Open Project") {
-								await openProjectInVSCode(result.projectPath!)
-							} else if (openProject === "Open in New Window") {
-								const projectUri = vscode.Uri.file(result.projectPath!)
-								await vscode.commands.executeCommand("vscode.openFolder", projectUri, {
-									forceNewWindow: true,
-								})
-							}
-						} else {
+						if (result.error) {
 							vscode.window.showErrorMessage(`❌ Failed to generate project: ${result.error}`)
 						}
 					} catch (error) {
@@ -153,7 +137,7 @@ export class Controller {
 							text: "Project generation failed",
 							error: error instanceof Error ? error.message : String(error),
 						})
-						vscode.window.showErrorMessage(`Failed to generate project: ${error}`)
+						vscode.window.showErrorMessage(`❌ Failed to generate project: ${error}`)
 					}
 				}
 				break

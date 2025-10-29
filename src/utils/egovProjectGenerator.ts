@@ -115,12 +115,30 @@ export async function generateEgovProject(
 
 		// Notify completion
 		vscode.window
-			.showInformationMessage(`eGovFrame project '${config.projectName}' created successfully!`, "Open Project")
+			.showInformationMessage(
+				`✅ eGovFrame project '${config.projectName}' created successfully!`,
+				"Open project in new window",
+			)
 			.then((selection) => {
-				if (selection === "Open Project") {
+				if (selection === "Open project in new window") {
 					vscode.commands.executeCommand("vscode.openFolder", vscode.Uri.file(projectRoot), true)
 				}
 			})
+		/* 이런 방식도 가능하다 (참고만)
+		const openProject = await vscode.window.showInformationMessage(
+			`✅ eGovFrame project "${message.projectConfig.projectName}" created successfully!`,
+			"Open Project",
+			"Open in New Window",
+		)
+		if (openProject === "Open Project") {
+			const projectUri = vscode.Uri.file(result.projectPath!)
+			await vscode.commands.executeCommand("vscode.openFolder", projectUri, true)
+			await openProjectInVSCode(result.projectPath!)
+		} else if (openProject === "Open in New Window") {
+			const projectUri = vscode.Uri.file(result.projectPath!)
+			await vscode.commands.executeCommand("vscode.openFolder", projectUri, true)
+		}
+		*/
 
 		return {
 			success: true,
