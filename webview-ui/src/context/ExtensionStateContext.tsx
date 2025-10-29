@@ -3,6 +3,7 @@ import { useEvent } from "react-use"
 import { ExtensionMessage } from "@shared/ExtensionMessage"
 import { EgovViewTab } from "../shared/egovframe"
 import { vscode } from "../utils/vscode"
+import { AutoApprovalSettings } from "@shared/AutoApprovalSettings"
 
 interface ExtensionStateContextType {
 	// Only keep essential eGov-related state
@@ -15,7 +16,7 @@ interface ExtensionStateContextType {
 	telemetrySetting?: string
 	distinctId?: string
 	version?: string
-	autoApprovalSettings?: any
+	autoApprovalSettings?: AutoApprovalSettings
 	navigateToSettings?: () => void
 
 	// eGov setters and navigation
@@ -82,7 +83,7 @@ export const ExtensionStateProvider: React.FC<{ children: React.ReactNode }> = (
 		telemetrySetting: "unset",
 		distinctId: "",
 		version: "",
-		autoApprovalSettings: {},
+		autoApprovalSettings: {} as AutoApprovalSettings,
 		navigateToSettings: () => {},
 
 		// eGov functions

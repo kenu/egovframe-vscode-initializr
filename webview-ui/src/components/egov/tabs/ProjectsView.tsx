@@ -5,14 +5,12 @@ import {
 	ProjectTemplate,
 	ProjectConfig,
 	categoriesFromProjectTemplates,
+	createGenerateProjectByCommandMessage,
+	createProjectGenerationMessage,
 	getTemplatesByCategory,
 	validateProjectConfig,
 } from "../../../utils/projectUtils"
-import {
-	createProjectGenerationMessage,
-	createSelectOutputPathMessage,
-	createGenerateProjectByCommandMessage,
-} from "../../../utils/egovUtils"
+import { createSelectOutputPathMessage } from "../../../utils/egovUtils"
 import { useProjectsViewState } from "../../../context/EgovTabsStateContext"
 
 export const ProjectsView = () => {
