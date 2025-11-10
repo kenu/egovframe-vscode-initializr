@@ -1,165 +1,146 @@
 <%@ page contentType="text/html; charset=utf-8" pageEncoding="utf-8"%>
 <%@ taglib prefix="c"         uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="form"      uri="http://www.springframework.org/tags/form" %>
-<%@ taglib prefix="validator" uri="http://www.springmodules.org/tags/commons-validator" %>
 <%@ taglib prefix="spring"    uri="http://www.springframework.org/tags"%>
 
-{{~setVar "Q" "\""~}}
 {{~setVar "voInstanceName" (concat classNameFirstCharLower "VO")~}}
 {{~setVar "listPath" (concat "/" classNameFirstCharLower "/" classNameFirstCharLower "List.do")~}}
-{{~setVar "addViewPath" (concat "/" classNameFirstCharLower "/add" className "View.do")~}}
-{{~setVar "updateViewPath" (concat "/" classNameFirstCharLower "/update" className "View.do")~}}
 {{~setVar "addPath" (concat "/" classNameFirstCharLower "/add" className ".do")~}}
-{{~setVar "selectPath" (concat "/" classNameFirstCharLower "/select" className ".do")~}}
 {{~setVar "updatePath" (concat "/" classNameFirstCharLower "/update" className ".do")~}}
 {{~setVar "deletePath" (concat "/" classNameFirstCharLower "/delete" className ".do")~}}
-{{~setVar "listPageName" (concat className "List.jsp")~}}
-{{~setVar "registerPageName" (concat className "Register.jsp")~}}
-{{~setVar "selectFunctionName" (concat "fncSelect" className)~}}
-{{~setVar "addViewFunctionName" (concat "fncAdd" className "View")~}}
-{{~setVar "listFunctionName" (concat "fn_egov_select" className "List")~}}
-{{~setVar "deleteFunctionName" (concat "fn_egov_delete" className)~}}
-{{~setVar "saveFunctionName" (concat "fn_egov_save" className)~}}
 
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" lang="ko" xml:lang="ko">
+<!DOCTYPE html>
+<html lang="ko">
 <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <c:set var="registerFlag" value="${empty {{voInstanceName}}.{{#if pkAttributes.length}}{{pkAttributes.[0].ccName}}{{else}}{{attributes.[0].ccName}}{{/if}} ? 'create' : 'modify'}"/>
-    <title>{{className}} <c:if test="${registerFlag == 'create'}">등록</c:if><c:if test="${registerFlag == 'modify'}">수정</c:if>
+    <title>{{className}} <c:if test="${registerFlag == 'create'}">Regist</c:if>
+                  <c:if test="${registerFlag == 'modify'}">Update</c:if>
     </title>
-    <link type="text/css" rel="stylesheet" href="<c:url value='/css/egovframework/sample.css'/>"/>
-    
-    <!--For Commons Validator Client-Side-->
+
+    <!-- KRDS CSS -->
+    <link rel="stylesheet" type="text/css" href="<c:url value='/css/component/output.css'/>" />
+    <link rel="stylesheet" type="text/css" href="<c:url value='/css/egovframe.css'/>" />
+    <script type="text/javascript" src="<c:url value='/js/jquery.min.js'/>"></script>
+    <script type="text/javascript" src="<c:url value='/js/component/ui-script.js'/>" defer></script>
+    <script type="text/javascript" src="<c:url value='/js/egovframework/common.js'/>" defer></script>
+
+    <!--For Custom Validation-->
     <!-- egovframe-Todo: Validator 적용시 아래 주석 코드 참고 -->
-    <!-- <script type="text/javascript" src="<c:url value='/cmmn/validator.do'/>"></script> -->
-    <!-- <validator:javascript formName="{{voInstanceName}}" staticJavascript="false" xhtml="true" cdata="false"/> -->
-    
-    <script type="text/javaScript" language="javascript" defer="defer">
-        <!--
-        /* 글 목록 화면 function */
-        function {{listFunctionName}}() {
-           	document.getElementById("detailForm").action = "<c:url value='{{listPath}}'/>";
-           	document.getElementById("detailForm").method = 'get';
+    <!-- <script type="text/javascript" src="<c:url value='/js/egovframework/EgovValidation.js'/>" defer></script> -->
+
+    <script type="text/javascript" defer>
+
+    function fn_egov_list() {
+    	document.getElementById("detailForm").action = "<c:url value='{{listPath}}'/>";
+       	document.getElementById("detailForm").method = 'get';
+       	document.getElementById("detailForm").submit();
+    }
+
+    function fn_egov_add() {
+        if (confirm('Are you sure you want to register?')) {
+            let frm = document.getElementById("detailForm");
+            // egovframe-Todo: Validator 적용시 아래 주석 코드 참고
+            // EgovValidation.js 파일에 validate{{className}}VO 함수 추가 필요
+            // if (!validate{{className}}VO(frm)) {
+            //     return;
+            // }
+            frm.action = "<c:url value='{{addPath}}'/>";
+            frm.submit();
+        }
+    }
+
+    function fn_egov_update() {
+        if (confirm('Are you sure you want to modify?')) {
+            let frm = document.getElementById("detailForm");
+            // egovframe-Todo: Validator 적용시 아래 주석 코드 참고
+            // EgovValidation.js 파일에 validate{{className}}VO 함수 추가 필요
+            // if (!validate{{className}}VO(frm)) {
+            //     return;
+            // }
+            frm.action = "<c:url value='{{updatePath}}'/>";
+            frm.submit();
+        }
+    }
+
+    function fn_egov_delete() {
+        if (confirm('Are you sure you want to delete?')) {
+        	document.getElementById("detailForm").action = "<c:url value='{{deletePath}}'/>";
            	document.getElementById("detailForm").submit();
         }
-        
-        /* 글 삭제 function */
-        function {{deleteFunctionName}}() {
-           	document.getElementById("detailForm").action = "<c:url value='{{deletePath}}'/>";
-           	document.getElementById("detailForm").submit();
-        }
-        
-        /* 글 등록 function */
-        function {{saveFunctionName}}() {
-        	frm = document.getElementById("detailForm");
-          // egovframe-Todo: Validator 적용시 아래 주석 코드 참고
-          // if(!validate{{className}}VO(frm)) {
-          //     return;
-          // }
-          frm.action = "<c:url value="${registerFlag == 'create' ? '{{addPath}}' : '{{updatePath}}'}"/>";
-          frm.submit();
-        }
-        
-        -->
+    }
+
+    function fn_egov_reset() {
+        $('form').each(function() {
+            this.reset();
+        });
+    }
     </script>
 </head>
-<body style="text-align:center; margin:0 auto; display:inline; padding-top:100px;">
 
-<form:form modelAttribute="{{voInstanceName}}" id="detailForm" name="detailForm">
-    <div id="content_pop">
-    	<!-- 타이틀 -->
-    	<div id="title">
-    		<ul>
-    			<li><img src="<c:url value='/images/egovframework/example/title_dot.gif'/>" alt=""/>
-                    <c:if test="${registerFlag == 'create'}">등록</c:if>
-                    <c:if test="${registerFlag == 'modify'}">수정</c:if>
-                </li>
-    		</ul>
-    	</div>
-    	<!-- // 타이틀 -->
-    	<div id="table">
-            <table width="100%" border="1" cellpadding="0" cellspacing="0" style="bordercolor:#D3E2EC; bordercolordark:#FFFFFF; BORDER-TOP:#C2D0DB 2px solid; BORDER-LEFT:#ffffff 1px solid; BORDER-RIGHT:#ffffff 1px solid; BORDER-BOTTOM:#C2D0DB 1px solid; border-collapse: collapse;">
-                <colgroup>
-                    <col width="150"/>
-                    <col width="?"/>
-                </colgroup>
-                
-                {{!-- 모든 컬럼을 동일한 방식으로 처리 --}}
+<body>
+<div id="container" class="inner">
+
+	<!-- Page Title -->
+	<h2 class="heading-large">
+		<c:if test="${registerFlag == 'create'}">Regist</c:if>
+		<c:if test="${registerFlag == 'modify'}">Update</c:if>
+	</h2>
+
+	<form:form id="detailForm" name="detailForm" modelAttribute="{{voInstanceName}}">
+
+		<div class="conts-wrap">
+			<div class="fieldset input-form">
                 {{#each attributes}}
-                <tr>
-                    <th>
-                        {{pcName}}{{#unless ../pkAttributes.length}}{{#if @first}}(egovframe-Warning: PK 컬럼 역할 수행){{/if}}{{/unless}}
-                    </th>
-                    <td>
-                        {{#if isPrimaryKey}}
-                        <!-- PK 컬럼: 수정 모드에서는 readonly -->
-                        <c:if test="${registerFlag == 'modify'}">
-                            <form:input path="{{ccName}}" cssClass="essentiality" readonly="true" />
-                        </c:if>
-                        <!-- PK 컬럼: 등록 모드에서는 입력란 없음 -->
-                        {{!-- 등록 모드에서는 PK 컬럼 입력란 렌더링 삭제 처리 --}}
-                        {{!-- 
-                        <c:if test="${registerFlag == 'create'}">
-                            <form:input path="{{ccName}}" cssClass="txt" />
-                            <!-- egovframe-Todo: Validator 적용시 아래 주석 코드 참고 -->
-                            <!-- &nbsp;<span class="error">{{ccName}}</span> -->
-                        </c:if>
-                        --}}
-                        {{else}}
-                        <!-- 일반 컬럼: 항상 수정 가능 -->
-                        <form:input path="{{ccName}}" cssClass="txt" />
-                        <!-- egovframe-Todo: Validator 적용시 아래 주석 코드 참고 -->
-                        <!-- &nbsp;<form:errors path="{{ccName}}" />" -->
-                        {{/if}}
-                    </td>
-                </tr>
+                  {{#if isPrimaryKey}}
+                <c:if test="{{concat "${not empty " @root.voInstanceName "." ccName "}"}}">
+                <div class="form-group">
+                    <div class="form-tit">
+                        <label for="{{ccName}}">{{pcName}}</label>
+                    </div>
+                    <div class="form-conts">
+                        <form:input path="{{ccName}}" readonly="true" cssClass="krds-input"/>
+                    </div>
+                </div>
+                </c:if>
+                  {{else}}
+
+                <div class="form-group">
+                    <div class="form-tit">
+                        <label for="{{ccName}}">{{pcName}}</label>
+                    </div>
+                    <div class="form-conts">
+                        <form:input path="{{ccName}}" cssClass="krds-input" />
+                        <form:errors path="{{ccName}}" cssClass="error-message" />
+                    </div>
+                </div>
+                  {{/if}}
                 {{/each}}
-            </table>
-        </div>
-    	<div id="sysbtn">
-    		<ul>
-    			<!-- 목록 버튼 -->
-    			<li>
-                    <span class="btn_blue_l">
-                        <a href="javascript:{{listFunctionName}}();">목록</a>
-                        <img src="<c:url value='/images/egovframework/example/btn_bg_r.gif'/>" style="margin-left:6px;" alt=""/>
-                    </span>
-                </li>
-    			<!-- 등록/수정 버튼 -->
-    			<li>
-                    <span class="btn_blue_l">
-                        <a href="javascript:{{saveFunctionName}}();">
-                            <c:if test="${registerFlag == 'create'}">등록</c:if>
-                            <c:if test="${registerFlag == 'modify'}">수정</c:if>
-                        </a>
-                        <img src="<c:url value='/images/egovframework/example/btn_bg_r.gif'/>" style="margin-left:6px;" alt=""/>
-                    </span>
-                </li>
-    			<!-- 삭제 버튼 (수정 모드에서만 표시) -->
-    			<c:if test="${registerFlag == 'modify'}">
-                    <li>
-                        <span class="btn_blue_l">
-                            <a href="javascript:{{deleteFunctionName}}();">삭제</a>
-                            <img src="<c:url value='/images/egovframework/example/btn_bg_r.gif'/>" style="margin-left:6px;" alt=""/>
-                        </span>
-                    </li>
-    			</c:if>
-    			<!-- 재설정 버튼 -->
-    			<li>
-                    <span class="btn_blue_l">
-                        <a href="javascript:document.detailForm.reset();">재설정</a>
-                        <img src="<c:url value='/images/egovframework/example/btn_bg_r.gif'/>" style="margin-left:6px;" alt=""/>
-                    </span>
-                </li>
-            </ul>
-    	</div>
-    </div>
-    <!-- 검색조건 유지 -->
-    <!-- 목적 : 등록 완료 후 다시 목록 페이지로 돌아갈 때, 이전 검색조건에 따른 페이지 위치를 유지하기 위함 -->
-    <input type="hidden" name="searchCondition" value="<c:out value='${searchVO.searchCondition}'/>"/>
-    <input type="hidden" name="searchKeyword" value="<c:out value='${searchVO.searchKeyword}'/>"/>
-    <input type="hidden" name="pageIndex" value="<c:out value='${searchVO.pageIndex}'/>"/>
-</form:form>
+
+            </div>
+
+			<!-- Action Buttons -->
+			<div class="page-btn-wrap">
+                <div class="btn-wrap">
+	                <button type="button" class="krds-btn medium secondary" onclick="fn_egov_list()">List</button>
+	                <button type="button" class="krds-btn medium tertiary" onclick="fn_egov_reset()">Reset</button>
+                </div>
+				<div class="btn-wrap">
+					<c:if test="${registerFlag == 'modify'}">
+						<button type="button" class="krds-btn medium" onclick="fn_egov_update()">Update</button>
+						<button type="button" class="krds-btn medium danger" onclick="fn_egov_delete()">Delete</button>
+					</c:if>
+					<c:if test="${registerFlag == 'create'}">
+						<button type="button" class="krds-btn medium" onclick="fn_egov_add()">Regist</button>
+					</c:if>
+				</div>
+	        </div>
+		</div>
+
+	</form:form>
+
+</div>
+
 </body>
 </html>

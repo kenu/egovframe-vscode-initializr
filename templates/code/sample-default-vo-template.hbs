@@ -1,127 +1,134 @@
-{{!-- 패키지 및 클래스 설정 --}}
-{{~setVar "voPackage" (concat packageName ".service")~}}
-{{~setVar "defaultVoClassName" (concat className "DefaultVO")~}}
-package {{voPackage}};
+package {{packageName}}.service;
 
 import java.io.Serializable;
+
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
 /**
- * @Class Name : {{defaultVoClassName}}.java
- * @Description : {{className}} Default VO class
+ * @Class Name : {{className}}DefaultVO.java
+ * @Description : {{className}} Default VO Class
  * @Modification Information
+ * @
+ * @ 수정일 수정자 수정내용
+ * @ --------- --------- -------------------------------
+ * @ {{date}} {{author}} 최초생성
  *
  * @author {{author}}
  * @since {{date}}
  * @version {{version}}
  * @see
- *  
- *  Copyright (C)  All right reserved.
+ *
+ * Copyright (C) All right reserved.
  */
-public class {{defaultVoClassName}} implements Serializable {
+public class {{className}}DefaultVO implements Serializable {
 
-  private static final long serialVersionUID = 1L;
-  
-  /** 검색조건 */
-  private String searchCondition = "";
-  
-  /** 검색Keyword */
-  private String searchKeyword = "";
-  
-  /** 검색사용여부 */
-  private String searchUseYn = "";
-  
-  /** 현재페이지 */
-  private int pageIndex = 1;
-  
-  /** 페이지갯수 */
-  private int pageUnit = 10;
-  
-  /** 페이지사이즈 */
-  private int pageSize = 10;
+	/**
+	 *  serialVersion UID
+	 */
+	private static final long serialVersionUID = -858838578081269359L;
 
-  /** firstIndex */
-  private int firstIndex = 1;
+	/** 검색조건 */
+	private String searchCondition = "";
 
-  /** lastIndex */
-  private int lastIndex = 1;
+	/** 검색Keyword */
+	private String searchKeyword = "";
 
-  /** recordCountPerPage */
-  private int recordCountPerPage = 10;
+	/** 검색사용여부 */
+	private String searchUseYn = "";
 
-  public int getFirstIndex() {
-    return firstIndex;
-  }
+	/** 현재페이지 */
+	private int pageIndex = 1;
 
-  public void setFirstIndex(int firstIndex) {
-    this.firstIndex = firstIndex;
-  }
+	/** 페이지갯수 */
+	private int pageUnit = 10;
 
-  public int getLastIndex() {
-    return lastIndex;
-  }
+	/** 페이지사이즈 */
+	private int pageSize = 10;
 
-  public void setLastIndex(int lastIndex) {
-    this.lastIndex = lastIndex;
-  }
+	/** firstIndex */
+	private int firstIndex = 1;
 
-  public int getRecordCountPerPage() {
-    return recordCountPerPage;
-  }
+	/** lastIndex */
+	private int lastIndex = 1;
 
-  public void setRecordCountPerPage(int recordCountPerPage) {
-    this.recordCountPerPage = recordCountPerPage;
-  }
+	/** recordCountPerPage */
+	private int recordCountPerPage = 10;
 
-  public String getSearchCondition() {
-    return searchCondition;
-  }
+	public int getFirstIndex() {
+		return firstIndex;
+	}
 
-  public void setSearchCondition(String searchCondition) {
-    this.searchCondition = searchCondition;
-  }
+	public void setFirstIndex(int firstIndex) {
+		this.firstIndex = firstIndex;
+	}
 
-  public String getSearchKeyword() {
-    return searchKeyword;
-  }
+	public int getLastIndex() {
+		return lastIndex;
+	}
 
-  public void setSearchKeyword(String searchKeyword) {
-    this.searchKeyword = searchKeyword;
-  }
+	public void setLastIndex(int lastIndex) {
+		this.lastIndex = lastIndex;
+	}
 
-  public String getSearchUseYn() {
-    return searchUseYn;
-  }
+	public int getRecordCountPerPage() {
+		return recordCountPerPage;
+	}
 
-  public void setSearchUseYn(String searchUseYn) {
-    this.searchUseYn = searchUseYn;
-  }
+	public void setRecordCountPerPage(int recordCountPerPage) {
+		this.recordCountPerPage = recordCountPerPage;
+	}
 
-  public int getPageIndex() {
-    return pageIndex;
-  }
+	public String getSearchCondition() {
+		return searchCondition;
+	}
 
-  public void setPageIndex(int pageIndex) {
-    this.pageIndex = pageIndex;
-  }
+	public void setSearchCondition(String searchCondition) {
+		this.searchCondition = searchCondition;
+	}
 
-  public int getPageUnit() {
-    return pageUnit;
-  }
+	public String getSearchKeyword() {
+		return searchKeyword;
+	}
 
-  public void setPageUnit(int pageUnit) {
-    this.pageUnit = pageUnit;
-  }
+	public void setSearchKeyword(String searchKeyword) {
+		this.searchKeyword = searchKeyword;
+	}
 
-  public int getPageSize() {
-    return pageSize;
-  }
+	public String getSearchUseYn() {
+		return searchUseYn;
+	}
 
-  public void setPageSize(int pageSize) {
-    this.pageSize = pageSize;
-  }
+	public void setSearchUseYn(String searchUseYn) {
+		this.searchUseYn = searchUseYn;
+	}
 
-  public String toString() {
-    return ToStringBuilder.reflectionToString(this);
-  }
+	public int getPageIndex() {
+		return pageIndex;
+	}
+
+	public void setPageIndex(int pageIndex) {
+		this.pageIndex = pageIndex;
+	}
+
+	public int getPageUnit() {
+		return pageUnit;
+	}
+
+	public void setPageUnit(int pageUnit) {
+		this.pageUnit = pageUnit;
+	}
+
+	public int getPageSize() {
+		return pageSize;
+	}
+
+	public void setPageSize(int pageSize) {
+		this.pageSize = pageSize;
+	}
+
+	@Override
+	public String toString() {
+		return ToStringBuilder.reflectionToString(this);
+	}
+
 }

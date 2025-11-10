@@ -1,7 +1,4 @@
-{{!-- Handlebars 템플릿 변환 --}}
-{{~setVar "controllerPackage" (concat packageName ".web")~}}
-{{~setVar "servicePackage" (concat packageName ".service")~}}
-package {{controllerPackage}};
+package {{packageName}}.web;
 
 import java.util.List;
 
@@ -14,247 +11,203 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.SessionAttributes;
 import org.springframework.web.bind.support.SessionStatus;
-import org.springmodules.validation.commons.DefaultBeanValidator;
 
-import {{servicePackage}}.{{className}}Service;
-import {{servicePackage}}.{{className}}DefaultVO;
-import {{servicePackage}}.{{className}}VO;
+import {{packageName}}.service.{{className}}Service;
+import {{packageName}}.service.{{className}}VO;
+
+import jakarta.annotation.Resource;
+import jakarta.validation.Valid;
 
 /**
  * @Class Name : {{className}}Controller.java
- * @Description : {{className}} Controller class
+ * @Description : {{className}} Controller Class
  * @Modification Information
+ * @
+ * @ 수정일 수정자 수정내용
+ * @ --------- --------- -------------------------------
+ * @ {{date}} {{author}} 최초생성
  *
  * @author {{author}}
  * @since {{date}}
  * @version {{version}}
  * @see
- *  
- *  Copyright (C)  All right reserved.
+ *
+ * Copyright (C) All right reserved.
  */
-
 @Controller
-@SessionAttributes(types={{className}}VO.class)
 public class {{className}}Controller {
 
-    /** {{classNameFirstCharLower}}Service */
-    private final {{className}}Service {{classNameFirstCharLower}}Service;
+	/** {{className}}Service */
+	@Resource(name = "{{classNameFirstCharLower}}Service")
+	private {{className}}Service {{classNameFirstCharLower}}Service;
 
-    /** EgovPropertyService */
-    private final EgovPropertyService propertiesService;
+	/** EgovPropertyService */
+	@Resource(name = "propertiesService")
+	private EgovPropertyService propertiesService;
 
-    /** Validator */
-    // egovframe-Todo: Validator 적용시 아래 주석 코드 참고
-    //private final DefaultValidator validator;
+	/**
+	 * {{className}} 목록을 조회한다. (pageing)
+	 * @param {{classNameFirstCharLower}}VO - 조회할 정보가 담긴 {{className}}DefaultVO
+	 * @param model
+	 * @return "{{classNameFirstCharLower}}List"
+	 * @exception Exception
+	 */
+	@GetMapping("/{{classNameFirstCharLower}}/{{classNameFirstCharLower}}List.do")
+	public String select{{className}}List(@ModelAttribute("{{classNameFirstCharLower}}VO") {{className}}VO {{classNameFirstCharLower}}VO, ModelMap model) throws Exception {
 
-    public {{className}}Controller(
-        {{className}}Service {{classNameFirstCharLower}}Service,
-        EgovPropertyService propertiesService
-        // egovframe-Todo: Validator 적용시 아래 주석 코드 참고
-        //DefaultBeanValidator beanValidator
-    ){
-        this.{{classNameFirstCharLower}}Service = {{classNameFirstCharLower}}Service;
-        this.propertiesService = propertiesService;
-        // egovframe-Todo: Validator 적용시 아래 주석 코드 참고
-        //this.beanValidator = beanValidator;
-    }
+		/** EgovPropertyService.sample */
+		{{classNameFirstCharLower}}VO.setPageUnit(propertiesService.getInt("pageUnit"));
+		{{classNameFirstCharLower}}VO.setPageSize(propertiesService.getInt("pageSize"));
 
-    /**
-    * {{tableName}} 목록 화면을 조회
-    * @param searchVO - 목록 조회조건 정보가 담긴 {{className}}DefaultVO
-    * @return "{{classNameFirstCharLower}}/{{classNameFirstCharLower}}List"
-    * @exception Exception
-    */
-    @GetMapping(value="/{{classNameFirstCharLower}}/{{classNameFirstCharLower}}List.do")
-    public String select{{className}}List(
-        @ModelAttribute("searchVO") {{className}}DefaultVO searchVO,
-        ModelMap model
-    ) throws Exception {
+		/** pageing setting */
+		PaginationInfo paginationInfo = new PaginationInfo();
+		paginationInfo.setCurrentPageNo({{classNameFirstCharLower}}VO.getPageIndex());
+		paginationInfo.setRecordCountPerPage({{classNameFirstCharLower}}VO.getPageUnit());
+		paginationInfo.setPageSize({{classNameFirstCharLower}}VO.getPageSize());
 
-        /** EgovPropertyService.sample */
-        searchVO.setPageUnit(propertiesService.getInt("pageUnit"));
-        searchVO.setPageSize(propertiesService.getInt("pageSize"));
+		{{classNameFirstCharLower}}VO.setFirstIndex(paginationInfo.getFirstRecordIndex());
+		{{classNameFirstCharLower}}VO.setLastIndex(paginationInfo.getLastRecordIndex());
+		{{classNameFirstCharLower}}VO.setRecordCountPerPage(paginationInfo.getRecordCountPerPage());
 
-        /** paging setting */
-        PaginationInfo paginationInfo = new PaginationInfo();
-        paginationInfo.setCurrentPageNo(searchVO.getPageIndex());
-        paginationInfo.setRecordCountPerPage(searchVO.getPageUnit());
-        paginationInfo.setPageSize(searchVO.getPageSize());
+		/** List */
+		List<?> {{classNameFirstCharLower}}List = {{classNameFirstCharLower}}Service.select{{className}}List({{classNameFirstCharLower}}VO);
+		model.addAttribute("resultList", {{classNameFirstCharLower}}List);
 
-        searchVO.setFirstIndex(paginationInfo.getFirstRecordIndex());
-        searchVO.setLastIndex(paginationInfo.getLastRecordIndex());
-        searchVO.setRecordCountPerPage(paginationInfo.getRecordCountPerPage());
-    
-        List<?> {{classNameFirstCharLower}}List = {{classNameFirstCharLower}}Service.select{{className}}List(searchVO);
-        model.addAttribute("resultList", {{classNameFirstCharLower}}List);
-        
-        int totCnt = {{classNameFirstCharLower}}Service.select{{className}}ListTotCnt(searchVO);
-        paginationInfo.setTotalRecordCount(totCnt);
-        model.addAttribute("paginationInfo", paginationInfo);
-        
-        return "{{classNameFirstCharLower}}/{{classNameFirstCharLower}}List";
-  }
-  
-    /**
-    * {{tableName}} 등록 화면을 조회
-    * @param searchVO - 목록 조회조건 정보가 담긴 {{className}}DefaultVO
-    * @param model - 모델 객체
-    * @return "{{classNameFirstCharLower}}/{{classNameFirstCharLower}}Register"
-    * @exception Exception
-    */
-    @GetMapping("/{{classNameFirstCharLower}}/add{{className}}View.do")
-    public String add{{className}}View(
-        @ModelAttribute("searchVO") {{className}}DefaultVO searchVO,
-        Model model
-    ) throws Exception {
-        
-        model.addAttribute("{{classNameFirstCharLower}}VO", new {{className}}VO());
-        
-        return "{{classNameFirstCharLower}}/{{classNameFirstCharLower}}Register";
-    }
+		/** Count */
+		int totCnt = {{classNameFirstCharLower}}Service.select{{className}}ListTotCnt({{classNameFirstCharLower}}VO);
+		paginationInfo.setTotalRecordCount(totCnt);
 
-    /**
-    * {{tableName}} 등록
-    * @param {{classNameFirstCharLower}}VO - 등록할 정보가 담긴 {{className}}VO
-    * @param searchVO - 목록 조회조건 정보가 담긴 {{className}}DefaultVO
-    * @param bindingResult - Validator 바인딩 결과
-    * @param status - SessionStatus 객체(세션 상태)
-    * @return "redirect:/{{classNameFirstCharLower}}/{{classNameFirstCharLower}}List.do"
-    * @exception Exception
-    */
-    @PostMapping("/{{classNameFirstCharLower}}/add{{className}}.do")
-    public String add{{className}}(
-        {{className}}VO {{classNameFirstCharLower}}VO,
-        @ModelAttribute("searchVO") {{className}}DefaultVO searchVO,
-        BindingResult bindingResult,
-        SessionStatus status
-    ) throws Exception {
+		/** Pagination */
+		model.addAttribute("paginationInfo", paginationInfo);
 
-        // Server-Side Validation
-        // egovframe-Todo: Validator 적용시 아래 주석 코드 참고
-        //beanValidator.validate(searchVO, bindingResult);
-        //if(bindingResult.hasErrors()){
-        //    model.addAttribute("{{classNameFirstCharLower}}VO", {{classNameFirstCharLower}}VO);
-        //    return "{{classNameFirstCharLower}}/{{className}}Register";
-        //}
+		return "{{classNameFirstCharLower}}/{{classNameFirstCharLower}}List";
+	}
 
-        {{classNameFirstCharLower}}Service.insert{{className}}({{classNameFirstCharLower}}VO);
-        status.setComplete();
-        
-        return "redirect:/{{classNameFirstCharLower}}/{{classNameFirstCharLower}}List.do";
-    }
+	/**
+	 * 글 등록 화면을 조회한다.
+	 * @param {{classNameFirstCharLower}}VO - 목록 조회조건 정보가 담긴 VO
+	 * @param model
+	 * @return "{{classNameFirstCharLower}}Register"
+	 * @exception Exception
+	 */
+	@GetMapping("/{{classNameFirstCharLower}}/add{{className}}View.do")
+	public String add{{className}}View(@ModelAttribute("{{classNameFirstCharLower}}VO") {{className}}VO {{classNameFirstCharLower}}VO, Model model) throws Exception {
+		return "{{classNameFirstCharLower}}/{{classNameFirstCharLower}}Register";
+	}
 
-    /**
-    * {{tableName}} 수정 화면 조회
-    {{#if pkAttributes.length}}
-        {{#each pkAttributes}}
-    * @param {{this.ccName}} - 수정할 {{tableName}}의 {{this.ccName}}
-        {{/each}}
-    {{else}}
-    * @param {{attributes.[0].ccName}} - 수정할 {{tableName}}의 {{attributes.[0].ccName}}
-    {{/if}}
-    * @param searchVO - 목록 조회조건 정보가 담긴 {{className}}DefaultVO
-    * @param model - 모델 객체
-    * @return "{{classNameFirstCharLower}}/{{classNameFirstCharLower}}Register"
-    * @exception Exception
-    */
-    @GetMapping("/{{classNameFirstCharLower}}/update{{className}}View.do")
-    public String update{{className}}View(
-        {{#if pkAttributes.length}}
-            {{#each pkAttributes}}
-        @RequestParam("{{this.ccName}}") {{this.javaType}} {{this.ccName}},
-            {{/each}}
-        {{else}}
-        @RequestParam("{{attributes.[0].ccName}}") {{attributes.[0].javaType}} {{attributes.[0].ccName}},
-        {{/if}}
-        @ModelAttribute("searchVO") {{className}}DefaultVO searchVO,
-        Model model
-    ) throws Exception {
-        
-        {{className}}VO {{classNameFirstCharLower}}VO = new {{className}}VO();
-        {{#if pkAttributes.length}}
-            {{#each pkAttributes}}
-        {{../classNameFirstCharLower}}VO.set{{this.pcName}}({{this.ccName}});
-            {{/each}}
-        {{else}}
-        // egovframe-Warning: 첫 번째 컬럼이 PK 역할 수행하여 select 메서드의 SQL문의 WHERE 조건에 사용됨
-        {{../classNameFirstCharLower}}VO.set{{attributes.[0].pcName}}({{attributes.[0].ccName}});
-        {{/if}}
-        // 변수명은 CoC 에 따라 {{classNameFirstCharLower}}VO
-        model.addAttribute(select{{className}}({{classNameFirstCharLower}}VO, searchVO));
+	/**
+	 * 글을 등록한다.
+	 * @param {{classNameFirstCharLower}}VO - 등록할 정보가 담긴 VO
+	 * @param bindingResult - @ModelAttrubute에 대한 바인딩 검증 결과
+	 * @param model
+	 * @param status
+	 * @return "redirect:/{{classNameFirstCharLower}}/{{classNameFirstCharLower}}List.do"
+	 * @exception Exception
+	 */
+	@PostMapping("/{{classNameFirstCharLower}}/add{{className}}.do")
+	public String add{{className}}(@Valid @ModelAttribute("{{classNameFirstCharLower}}VO") {{className}}VO {{classNameFirstCharLower}}VO, BindingResult bindingResult, Model model, SessionStatus status) throws Exception {
 
-        return "{{classNameFirstCharLower}}/{{classNameFirstCharLower}}Register";
-    }
+		// Server-Side Validation
+		if (bindingResult.hasErrors()) {
+			model.addAttribute("{{classNameFirstCharLower}}VO", {{classNameFirstCharLower}}VO);
+			return "{{classNameFirstCharLower}}/{{classNameFirstCharLower}}Register";
+		}
 
-    /**
-    * {{tableName}} 조회
-    * @param {{classNameFirstCharLower}}VO - 조회할 정보가 담긴 {{className}}VO
-    * @param searchVO - 목록 조회조건 정보가 담긴 {{className}}DefaultVO
-    * @return {{className}}VO
-    * @exception Exception
-    */
-    public {{className}}VO select{{className}}(
-        {{className}}VO {{classNameFirstCharLower}}VO,
-        @ModelAttribute("searchVO") {{className}}DefaultVO searchVO
-    ) throws Exception {
-        
-        return {{classNameFirstCharLower}}Service.select{{className}}({{classNameFirstCharLower}}VO);
-    }
+		{{classNameFirstCharLower}}Service.insert{{className}}({{classNameFirstCharLower}}VO);
+		status.setComplete();
 
-    /**
-    * {{tableName}} 수정
-    * @param {{classNameFirstCharLower}}VO - 수정할 정보가 담긴 {{className}}VO
-    * @param searchVO - 목록 조회조건 정보가 담긴 {{className}}DefaultVO
-    * @param bindingResult - Validator 바인딩 결과
-    * @param status - SessionStatus 객체(세션 상태)
-    * @return "redirect:/{{classNameFirstCharLower}}/{{classNameFirstCharLower}}List.do"
-    * @exception Exception
-    */
-    @PostMapping("/{{classNameFirstCharLower}}/update{{className}}.do")
-    public String update{{className}}(
-        {{className}}VO {{classNameFirstCharLower}}VO,
-        @ModelAttribute("searchVO") {{className}}DefaultVO searchVO,
-        BindingResult bindingResult,
-        SessionStatus status
-    ) throws Exception {
+		model.addAttribute("searchCondition", {{classNameFirstCharLower}}VO.getSearchCondition());
+		model.addAttribute("searchKeyword", {{classNameFirstCharLower}}VO.getSearchKeyword());
+		model.addAttribute("pageIndex", {{classNameFirstCharLower}}VO.getPageIndex());
 
+		return "redirect:/{{classNameFirstCharLower}}/{{classNameFirstCharLower}}List.do";
+	}
 
-        // Server-Side Validation
-        // egovframe-Todo: Validator 적용시 아래 주석 코드 참고
-        //beanValidator.validate(searchVO, bindingResult);
-        //if(bindingResult.hasErrors()){
-        //    model.addAttribute("{{classNameFirstCharLower}}VO", {{classNameFirstCharLower}}VO);
-        //    return "{{classNameFirstCharLower}}/{{className}}Register";
-        //}
+	/**
+	 * 글 수정화면을 조회한다.
+	{{#if pkAttributes.length}}
+	  {{#each pkAttributes}}
+	 * @param {{ccName}} - 수정할 글의 {{ccName}}
+	  {{/each}}
+	{{else}}
+	 * @param {{attributes.[0].ccName}} - 수정할 글의 {{attributes.[0].ccName}}
+	{{/if}}
+	 * @param model
+	 * @return "{{classNameFirstCharLower}}Register"
+	 * @exception Exception
+	 */
+	@GetMapping("/{{classNameFirstCharLower}}/update{{className}}View.do")
+	public String update{{className}}View({{#if pkAttributes.length}}{{#each pkAttributes}}@RequestParam("{{ccName}}") {{javaType}} {{ccName}}, {{/each}}{{else}}@RequestParam("{{attributes.[0].ccName}}") {{attributes.[0].javaType}} {{attributes.[0].ccName}}, {{/if}}Model model) throws Exception {
+		{{className}}VO {{classNameFirstCharLower}}VO = new {{className}}VO();
+		{{#if pkAttributes.length}}
+		  {{#each pkAttributes}}
+		{{../classNameFirstCharLower}}VO.set{{pcName}}({{ccName}});
+		  {{/each}}
+		{{else}}
+		{{classNameFirstCharLower}}VO.set{{attributes.[0].pcName}}({{attributes.[0].ccName}});
+		{{/if}}
+		model.addAttribute(select{{className}}({{classNameFirstCharLower}}VO));
+		return "{{classNameFirstCharLower}}/{{classNameFirstCharLower}}Register";
+	}
 
-        {{classNameFirstCharLower}}Service.update{{className}}({{classNameFirstCharLower}}VO);
-        status.setComplete();
-        
-        return "redirect:/{{classNameFirstCharLower}}/{{classNameFirstCharLower}}List.do";
-    }
+	/**
+	 * 글을 조회한다.
+	 * @param {{classNameFirstCharLower}}VO - 조회할 정보가 담긴 VO
+	 * @return @ModelAttribute("{{classNameFirstCharLower}}VO") - 조회한 정보
+	 * @exception Exception
+	 */
+	public {{className}}VO select{{className}}(@ModelAttribute("{{classNameFirstCharLower}}VO") {{className}}VO {{classNameFirstCharLower}}VO) throws Exception {
+		return {{classNameFirstCharLower}}Service.select{{className}}({{classNameFirstCharLower}}VO);
+	}
 
-    /**
-    * {{tableName}} 삭제
-    * @param {{classNameFirstCharLower}}VO - 삭제할 정보가 담긴 {{className}}VO
-    * @param searchVO - 목록 조회조건 정보가 담긴 {{className}}DefaultVO
-    * @param status - SessionStatus 객체(세션 상태)
-    * @return "redirect:/{{classNameFirstCharLower}}/{{classNameFirstCharLower}}List.do"
-    * @exception Exception
-    */
-    @PostMapping("/{{classNameFirstCharLower}}/delete{{className}}.do")
-    public String delete{{className}}(
-        {{className}}VO {{classNameFirstCharLower}}VO,
-        @ModelAttribute("searchVO") {{className}}DefaultVO searchVO,
-        SessionStatus status
-    ) throws Exception {
+	/**
+	 * 글을 수정한다.
+	 * @param {{classNameFirstCharLower}}VO - 수정할 정보가 담긴 VO
+	 * @param bindingResult - @ModelAttrubute에 대한 바인딩 검증 결과
+	 * @param model
+	 * @param status
+	 * @return "redirect:/{{classNameFirstCharLower}}/{{classNameFirstCharLower}}List.do"
+	 * @exception Exception
+	 */
+	@PostMapping("/{{classNameFirstCharLower}}/update{{className}}.do")
+	public String update{{className}}(@Valid @ModelAttribute("{{classNameFirstCharLower}}VO") {{className}}VO {{classNameFirstCharLower}}VO, BindingResult bindingResult, Model model, SessionStatus status) throws Exception {
 
-        {{classNameFirstCharLower}}Service.delete{{className}}({{classNameFirstCharLower}}VO);
-        status.setComplete();
+		// Server-Side Validation
+		if (bindingResult.hasErrors()) {
+			model.addAttribute("{{classNameFirstCharLower}}VO", {{classNameFirstCharLower}}VO);
+			return "{{classNameFirstCharLower}}/{{classNameFirstCharLower}}Register";
+		}
 
-        return "redirect:/{{classNameFirstCharLower}}/{{classNameFirstCharLower}}List.do";
-    }
+		{{classNameFirstCharLower}}Service.update{{className}}({{classNameFirstCharLower}}VO);
+		status.setComplete();
+
+		model.addAttribute("searchCondition", {{classNameFirstCharLower}}VO.getSearchCondition());
+		model.addAttribute("searchKeyword", {{classNameFirstCharLower}}VO.getSearchKeyword());
+		model.addAttribute("pageIndex", {{classNameFirstCharLower}}VO.getPageIndex());
+
+		return "redirect:/{{classNameFirstCharLower}}/{{classNameFirstCharLower}}List.do";
+	}
+
+	/**
+	 * 글을 삭제한다.
+	 * @param {{classNameFirstCharLower}}VO - 삭제할 정보가 담긴 VO
+	 * @param model
+	 * @param status
+	 * @return "redirect:/{{classNameFirstCharLower}}/{{classNameFirstCharLower}}List.do"
+	 * @exception Exception
+	 */
+	@PostMapping("/{{classNameFirstCharLower}}/delete{{className}}.do")
+	public String delete{{className}}(@ModelAttribute("{{classNameFirstCharLower}}VO") {{className}}VO {{classNameFirstCharLower}}VO, Model model, SessionStatus status) throws Exception {
+		{{classNameFirstCharLower}}Service.delete{{className}}({{classNameFirstCharLower}}VO);
+		status.setComplete();
+
+		model.addAttribute("searchCondition", {{classNameFirstCharLower}}VO.getSearchCondition());
+		model.addAttribute("searchKeyword", {{classNameFirstCharLower}}VO.getSearchKeyword());
+		model.addAttribute("pageIndex", {{classNameFirstCharLower}}VO.getPageIndex());
+
+		return "redirect:/{{classNameFirstCharLower}}/{{classNameFirstCharLower}}List.do";
+	}
+
 }

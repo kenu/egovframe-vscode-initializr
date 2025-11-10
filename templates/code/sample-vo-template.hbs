@@ -1,36 +1,43 @@
-{{!-- Setting the package and class names --}}
-{{~setVar "voPackage" (concat packageName ".service")~}}
-{{~setVar "voClassName" (concat className "VO")~}}
-{{~setVar "defaultVoClassName" (concat className "DefaultVO")~}}
 package {{packageName}}.service;
+
+import org.egovframe.rte.ptl.reactive.validation.EgovNullCheck;
 
 /**
  * @Class Name : {{className}}VO.java
- * @Description : {{className}} VO class
+ * @Description : {{className}}VO Class
  * @Modification Information
+ * @
+ * @  수정일      수정자              수정내용
+ * @ ---------   ---------   -------------------------------
+ * @ {{date}}   {{author}}   최초생성
  *
  * @author {{author}}
  * @since {{date}}
  * @version {{version}}
  * @see
- *  
- *  Copyright (C)  All right reserved.
+ *
+ *  Copyright (C) All right reserved.
  */
 public class {{className}}VO extends {{className}}DefaultVO {
-  private static final long serialVersionUID = 1L;
-    
-  {{#each attributes}}
-  /** {{this.columnName}} */
-  private {{this.javaType}} {{this.ccName}};
-  {{/each}}
 
-  {{#each attributes}}
-  public {{this.javaType}} get{{this.pcName}}() {
-    return this.{{this.ccName}};
-  }
+	private static final long serialVersionUID = 1L;
 
-  public void set{{this.pcName}}({{this.javaType}} {{this.ccName}}) {
-    this.{{this.ccName}} = {{this.ccName}};
-  }
-  {{/each}}
+{{#each attributes}}
+	/** {{columnName}} */
+  {{#unless isPrimaryKey}}
+	// @EgovNullCheck(message="{{ccName}} is required") // egovframe-Todo: Null Check 적용시 좌측 주석 코드 참고
+  {{/unless}}
+	private {{javaType}} {{ccName}};
+
+{{/each}}
+{{#each attributes}}
+	public {{javaType}} get{{pcName}}() {
+		return {{ccName}};
+	}
+
+	public void set{{pcName}}({{javaType}} {{ccName}}) {
+		this.{{ccName}} = {{ccName}};
+	}
+
+{{/each}}
 }

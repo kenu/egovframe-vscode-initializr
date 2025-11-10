@@ -1,15 +1,15 @@
 import { Column } from "./ddlParser"
 
 export interface TemplateContext {
-	namespace: string
-	resultMapId: string
-	resultMapType: string
+	//namespace: string
+	//resultMapId: string
+	//resultMapType: string
 	//parameterType: string
 	//resultType: string
 	tableName: string
 	attributes: Column[]
 	pkAttributes: Column[]
-	sortOrder: string
+	//sortOrder: string
 	//searchKeyword: string
 	//searchCondition: number
 	packageName: string
@@ -28,9 +28,9 @@ export function getTemplateContext(
 ): TemplateContext {
 	return {
 		// MyBatis 설정
-		namespace: `${packageName}.service.impl.${tableName}Mapper`, // MyBatis 네임스페이스
-		resultMapId: `${tableName[0].toLowerCase()}${tableName.slice(1)}Result`, // ResultMap ID
-		resultMapType: `${packageName}.service.${tableName}VO`, // ResultMap 타입
+		//namespace: `${packageName}.service.impl.${tableName}Mapper`, // MyBatis 네임스페이스
+		//resultMapId: `${tableName[0].toLowerCase()}${tableName.slice(1)}Result`, // ResultMap ID
+		//resultMapType: `${packageName}.service.${tableName}VO`, // ResultMap 타입
 		//parameterType: `${packageName}.service.${tableName}VO`,      // 파라미터 타입
 		//resultType: "egovMap",                                       // 결과 타입 (전자정부 표준)
 
@@ -40,7 +40,7 @@ export function getTemplateContext(
 		pkAttributes, // 기본키 컬럼 정보
 
 		// 검색 및 정렬 관련 기본값
-		sortOrder: pkAttributes[0]?.columnName || attributes[0]?.columnName || "", // 정렬 필드
+		//sortOrder: pkAttributes[0]?.columnName || attributes[0]?.columnName || "", // 정렬 필드
 		//searchKeyword: "",  // 검색 키워드 초기값
 		//searchCondition: 0, // 검색 조건 초기값
 

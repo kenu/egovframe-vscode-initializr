@@ -57,6 +57,9 @@ coverage
 # But don't ignore the coverage scripts in .github/scripts/
 !.github/scripts/coverage/
 
+# Claude
+CLAUDE.md
+
 *evals.env
 
 # Generated proto files

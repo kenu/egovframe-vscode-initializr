@@ -1,173 +1,135 @@
-{{~setVar "Q" "\""~}}
 {{~setVar "voInstanceName" (concat classNameFirstCharLower "VO")~}}
 {{~setVar "listPath" (concat "/" classNameFirstCharLower "/" classNameFirstCharLower "List.do")~}}
-{{~setVar "addViewPath" (concat "/" classNameFirstCharLower "/add" className "View.do")~}}
-{{~setVar "updateViewPath" (concat "/" classNameFirstCharLower "/update" className "View.do")~}}
 {{~setVar "addPath" (concat "/" classNameFirstCharLower "/add" className ".do")~}}
-{{~setVar "selectPath" (concat "/" classNameFirstCharLower "/select" className ".do")~}}
 {{~setVar "updatePath" (concat "/" classNameFirstCharLower "/update" className ".do")~}}
 {{~setVar "deletePath" (concat "/" classNameFirstCharLower "/delete" className ".do")~}}
-{{~setVar "listPageName" (concat className "List.html")~}}
-{{~setVar "registerPageName" (concat className "Register.html")~}}
-{{~setVar "selectFunctionName" (concat "fncSelect" className)~}}
-{{~setVar "addViewFunctionName" (concat "fncAdd" className "View")~}}
-{{~setVar "functionNameList" (concat classNameFirstCharLower "List")~}}
-{{~setVar "functionNameAdd" (concat classNameFirstCharLower "Add")~}}
-{{~setVar "functionNameUpdate" (concat classNameFirstCharLower "Update")~}}
-{{~setVar "functionNameDelete" (concat classNameFirstCharLower "Delete")~}}
-{{~setVar "functionNameReset" (concat classNameFirstCharLower "Reset")~}}
-
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" th:with="registerFlag=${#strings.isEmpty({{voInstanceName}}.{{#if pkAttributes.length}}{{pkAttributes.[0].ccName}}{{else}}{{attributes.[0].ccName}}{{/if}})} ? 'create' : 'modify'">
-
+<html lang="ko" xmlns:th="http://www.thymeleaf.org" th:with="registerFlag=${#strings.isEmpty({{voInstanceName}}.{{#if pkAttributes.length}}{{pkAttributes.[0].ccName}}{{else}}{{attributes.[0].ccName}}{{/if}})} ? 'create' : 'modify'">
 <head>
-	<meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/>
-	<title th:text="|{{className}} ${registerFlag == 'create' ? '등록' : '수정'}|"></title>
-	<link id="contextPathHolder" th:data-contextPath="${#httpServletRequest.getContextPath()}"/>
-	<link type="text/css" rel="stylesheet" th:href="@{/css/egovframework/sample.css}"/>
-	<script type="text/javascript" th:src="@{/js/egovframework/jquery-3.6.1.min.js}"></script>
-	
-	<script th:inline="javascript">
-		document.addEventListener('keydown', function(event) {
-			if (event.keyCode === 13) {
-				event.preventDefault();
-			};
-		}, true);
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title th:if="registerFlag == 'modify'">{{className}} Update</title>
+    <title th:if="registerFlag == 'create'">{{className}} Regist</title>
 
-		var contextPath = $('#contextPathHolder').attr('data-contextPath') ? $('#contextPathHolder').attr('data-contextPath') : '';
-		
-		function {{functionNameList}}() {
-			$(location).attr('href', contextPath + '{{listPath}}');
-		}
+    <!-- KRDS CSS -->
+	<link rel="stylesheet" type="text/css" th:href="@{/css/component/output.css}">
+	<link rel="stylesheet" type="text/css" th:href="@{/css/egovframe.css}">
+	<script th:inline="javascript" th:src="@{/js/jquery.min.js}"></script>
+	<script th:inline="javascript" th:src="@{/js/component/ui-script.js}" defer></script>
+	<script th:inline="javascript" th:src="@{/js/egovframework/common.js}" defer></script>
 
-		function {{functionNameDelete}}() {
-			if (confirm('Are you sure you want to delete?')) {
-				$('#detailForm').attr('method', 'post').attr('action', contextPath + '{{deletePath}}').submit();
-			}
-		}
+	<!--For Custom Validation-->
+	<!-- egovframe-Todo: Validator 적용시 아래 주석 코드 참고 -->
+    <!-- <script th:inline="javascript" th:src="@{/js/egovframework/EgovValidation.js}" defer></script> -->
 
-		function {{functionNameAdd}}() {
-			if (confirm('Are you sure you want to register?')) {
+    <script th:inline="javascript" defer>
+	    function fn_egov_list() {
+            $(location).attr('href', contextPath + '{{listPath}}');
+        }
+
+        function fn_egov_add() {
+            if (confirm('Are you sure you want to register?')) {
+                let frm = document.detailForm;
+                // egovframe-Todo: Validator 적용시 아래 주석 코드 참고
+                // EgovValidation.js 파일에 validate{{className}}VO 함수 추가 필요
+                // if (!validate{{className}}VO(frm)) {
+				//	  return;
+				// }
 				$('#detailForm').attr('method', 'post').attr('action', contextPath + '{{addPath}}').submit();
+            }
+        }
+
+        function fn_egov_update() {
+            if (confirm('Are you sure you want to modify?')) {
+            	let frm = document.detailForm;
+                // egovframe-Todo: Validator 적용시 아래 주석 코드 참고
+                // EgovValidation.js 파일에 validate{{className}}VO 함수 추가 필요
+                // if (!validate{{className}}VO(frm)) {
+				//	  return;
+				// }
+            	$('#detailForm').attr('method', 'post').attr('action', contextPath + '{{updatePath}}').submit();
 			}
-		}
+        }
 
-		function {{functionNameUpdate}}() {
-			if (confirm('Are you sure you want to modify?')) {
-				$('#detailForm').attr('method', 'post').attr('action', contextPath + '{{updatePath}}').submit();
-			}
-		}
+        function fn_egov_delete() {
+            if (confirm('Are you sure you want to delete?')) {
+                $('#detailForm').attr('method', 'post').attr('action', contextPath + '{{deletePath}}').submit();
+            }
+        }
 
-		function {{functionNameReset}}() {
-			$('form').each(function() {
-				this.reset();
-			});
-		}
-	</script>
-
+        function fn_egov_reset() {
+            $('form').each(function() {
+                this.reset();
+            });
+        }
+    </script>
 </head>
 
-<body style="text-align:center; margin:0 auto; display:inline; padding-top:100px;">
+<body>
+<div id="container" class="inner">
 
-<div id="content_pop">
+	<!-- Page Title -->
+	<h2 class="heading-large">
+	    <span th:if="${registerFlag == 'modify'}">Update</span>
+	    <span th:if="${registerFlag == 'create'}">Regist</span>
+	</h2>
 
-	<!-- Title -->
-	<div id="title">
-		<ul>
-			<li>
-				<img th:src="@{/images/egovframework/example/title_dot.gif}"/>
-				<span th:text="${registerFlag == 'create' ? '등록' : '수정'}"></span>
-			</li>
-		</ul>
-	</div>
+	<form id="detailForm" name="detailForm" th:object="{{concat "${" voInstanceName "}"}}"
 
-	<form id="detailForm" th:object="{{concat "${" voInstanceName "}"}}">
-
-		<!-- Detail -->
-		<div id="table">
-			<table th:width="680px" th:border="1" th:cellpadding="0" th:cellspacing="0" style="bordercolor:#D3E2EC; bordercolordark:#FFFFFF; BORDER-TOP:#C2D0DB 2px solid; BORDER-LEFT:#ffffff 1px solid; BORDER-RIGHT:#ffffff 1px solid; BORDER-BOTTOM:#C2D0DB 1px solid; border-collapse: collapse;">
-				<colgroup>
-					<col width="150px"/>
-					<col width="530px"/>
-				</colgroup>
-				
-				{{!-- 모든 컬럼을 동일한 방식으로 처리 --}}
+		<div class="conts-wrap">
+	        <div class="fieldset input-form">
 				{{#each attributes}}
-				<tr>
-					<td class="tbtd_caption">
-						<label for="{{ccName}}"><span>{{pcName}}{{#unless ../pkAttributes.length}}{{#if @first}}(egovframe-Warning: PK 컬럼 역할 수행){{/if}}{{/unless}}</span></label>
-					</td>
-					<td class="tbtd_content">
-						{{#if isPrimaryKey}}
-						<!-- PK 컬럼: 수정 모드에서는 readonly -->
-						<th:block th:if="${registerFlag == 'modify'}">
-							<input type="text" th:field="{{concat "*{" ccName "}"}}" readonly="readonly" class="essentiality" />
-						</th:block>
-						<!-- PK 컬럼: 등록 모드에서는 입력란 없음 -->
-						{{!-- 등록 모드에서는 PK 컬럼 입력란 렌더링 삭제 처리 --}}
-						{{!--
-						<th:block th:if="${registerFlag == 'create'}">
-						<input type="text" th:field="{{concat "*{" ccName "}"}}" class="essentiality" />
-						</th:block>
-						--}}
-						{{else}}
-						<!-- 일반 컬럼: 항상 수정 가능 -->
-						<input type="text" th:field="{{concat "*{" ccName "}"}}" class="txt" />
-						<!-- egovframe-Todo: Validator 적용시 아래 주석 코드 참고 -->
-						<!-- <span th:if="${#fields.hasErrors('{{ccName}}')}" th:errors="*{{{ccName}}}">{{pcName}} Error</span> -->
-						{{/if}}
-					</td>
-				</tr>
+				  {{#if isPrimaryKey}}
+                <div class="form-group" th:if="{{concat "${" @root.voInstanceName "." ccName " != null}"}}">
+                    <div class="form-tit">
+                        <label for="{{ccName}}">{{pcName}}</label>
+                    </div>
+                    <div class="form-conts">
+                        <input type="text" id="{{ccName}}" name="{{ccName}}" class="krds-input" th:value="{{concat "${" @root.voInstanceName "." ccName "}"}}" th:readonly="readonly">
+                    </div>
+                </div>
+				  {{else}}
+
+                <div class="form-group">
+                    <div class="form-tit">
+                        <label for="{{ccName}}">{{pcName}}</label>
+                    </div>
+                    <div class="form-conts">
+                        <input type="text" id="{{ccName}}" name="{{ccName}}" class="krds-input" th:value="{{concat "${" @root.voInstanceName "." ccName "}"}}">
+                        <span class="error-message" th:if="${#fields.hasErrors('{{ccName}}')}" th:errors="*{{{ccName}}}"></span>
+                    </div>
+                </div>
+				  {{/if}}
 				{{/each}}
-			</table>
-		</div>
 
-		<!-- Update / Delete / List -->
-		<div id="sysbtn">
-			<ul>
-				<!-- 목록 버튼 -->
-				<li>
-					<span class="btn_blue_l">
-					<span th:text="목록" th:onclick="{{functionNameList}}()"></span>
-					<img th:src="@{/images/egovframework/example/btn_bg_r.gif}" style="margin-left:6px;" th:alt="목록"/></span>
-				</li>
-				<!-- 등록 버튼 (등록 모드에서만 표시) -->
-				<li th:if="${registerFlag == 'create'}">
-					<span class="btn_blue_l">
-					<span th:text="등록" th:onclick="{{functionNameAdd}}()"></span>
-					<img th:src="@{/images/egovframework/example/btn_bg_r.gif}" style="margin-left:6px;" th:alt="등록"/></span>
-				</li>
-				<!-- 수정 버튼 (수정 모드에서만 표시) -->
-				<li th:if="${registerFlag == 'modify'}">
-					<span class="btn_blue_l">
-					<span th:text="수정" th:onclick="{{functionNameUpdate}}()"></span>
-					<img th:src="@{/images/egovframework/example/btn_bg_r.gif}" style="margin-left:6px;" th:alt="수정"/></span>
-				</li>
-				<!-- 삭제 버튼 (수정 모드에서만 표시) -->
-				<li th:if="${registerFlag == 'modify'}">
-					<span class="btn_blue_l">
-					<span th:text="삭제" th:onclick="{{functionNameDelete}}()"></span>
-					<img th:src="@{/images/egovframework/example/btn_bg_r.gif}" style="margin-left:6px;" th:alt="삭제"/></span>
-				</li>
-				<!-- 재설정 버튼 -->
-				<li>
-					<span class="btn_blue_l">
-					<span th:text="재설정" th:onclick="{{functionNameReset}}()"></span>
-					<img th:src="@{/images/egovframework/example/btn_bg_r.gif}" style="margin-left:6px;" th:alt="재설정"/></span>
-				</li>
-			</ul>
-		</div>
+            </div>
 
-		<!-- 검색조건 유지 -->
-    <!-- 목적 : 등록 완료 후 다시 목록 페이지로 돌아갈 때, 이전 검색조건에 따른 페이지 위치를 유지하기 위함 -->
-		<input type="hidden" name="searchCondition" th:value="${searchVO.searchCondition}"/>
-		<input type="hidden" name="searchKeyword" th:value="${searchVO.searchKeyword}"/>
-		<input type="hidden" name="pageIndex" th:value="${searchVO.pageIndex}"/>
+	        <!-- Action Buttons -->
+	        <div class="page-btn-wrap">
+                <div class="btn-wrap">
+	                <button type="button" class="krds-btn medium secondary" th:onclick="fn_egov_list()">List</button>
+	                <button type="button" class="krds-btn medium tertiary" th:onclick="fn_egov_reset()">Reset</button>
+                </div>
+	            <div class="btn-wrap">
+					<button type="button"
+	                        class="krds-btn medium"
+	                        th:onclick="fn_egov_update()"
+	                        th:if="${registerFlag == 'modify'}">Update</button>
+	                <button type="button"
+	                        class="krds-btn medium danger"
+	                        th:onclick="fn_egov_delete()"
+	                        th:if="${registerFlag == 'modify'}">Delete</button>
+	                <button type="button"
+	                        class="krds-btn medium"
+	                        th:onclick="fn_egov_add()"
+	                        th:if="${registerFlag == 'create'}">Regist</button>
+	            </div>
+	        </div>
+		</div>
 
 	</form>
 
 </div>
 
 </body>
-
 </html>

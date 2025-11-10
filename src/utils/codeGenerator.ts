@@ -167,6 +167,10 @@ function registerHandlebarsHelpers() {
 			return options.inverse(this)
 		}
 	})
+
+	Handlebars.registerHelper("add", function (a: any, b: any) {
+		return (Number(a) || 0) + (Number(b) || 0)
+	})
 }
 
 /*
