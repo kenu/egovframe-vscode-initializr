@@ -35,6 +35,7 @@ interface ProjectsViewState {
 	groupId: string
 	artifactId: string
 	version: string
+	url: string
 	description: string
 	generationMode: "form" | "command"
 	// VSCode Configuration에서 가져온 기본값
@@ -105,6 +106,7 @@ const initialProjectsViewState: ProjectsViewState = {
 	groupId: "",
 	artifactId: "",
 	version: "1.0.0",
+	url: "http://www.egovframe.go.kr",
 	description: "",
 	generationMode: "form",
 	// VSCode Configuration에서 가져온 기본값 (초기값은 package.json의 default와 동일)

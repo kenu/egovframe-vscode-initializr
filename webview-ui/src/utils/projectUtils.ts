@@ -9,10 +9,12 @@ export interface ProjectTemplate {
 }
 
 export interface ProjectConfig {
-	projectName: string
-	artifactId: string
-	groupId: string
+	projectName: string // pom.xml - ###NAME###
+	artifactId: string // pom.xml - ###ARTIFACT_ID###
+	groupId: string // pom.xml - ###GROUP_ID###
 	outputPath: string
+	version?: string // pom.xml - ###VERSION###
+	url?: string // pom.xml - ###URL###
 	template: ProjectTemplate
 }
 
@@ -104,6 +106,8 @@ export function createProjectGenerationMessage(config: ProjectConfig, method: "f
 			projectName: config.projectName,
 			artifactId: config.artifactId,
 			groupId: config.groupId,
+			version: config.version,
+			url: config.url,
 			outputPath: config.outputPath,
 			template: {
 				displayName: config.template.displayName,

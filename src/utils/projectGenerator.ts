@@ -21,6 +21,8 @@ export interface EgovProjectConfig {
 	projectName: string
 	artifactId: string
 	groupId: string
+	version?: string
+	url?: string
 	outputPath: string
 	packageName: string
 	template: EgovProjectTemplate
@@ -45,7 +47,7 @@ export interface ProjectGenerationResult {
  * Form-based Project Generation
  */
 export async function generateEgovProject(
-	config: EgovProjectConfig, // { projectName: string, artifactId: string, groupId: string, outputPath: string, template: {displayName: string, fileName: string, pomFile: string} }
+	config: EgovProjectConfig, // { projectName: string, artifactId: string, groupId: string, version: string(초기값 "1.0.0"), url: string(초기값 "http://www.egovframe.go.kr"), outputPath: string, template: {displayName: string, fileName: string, pomFile: string} }
 	extensionPath: string,
 	progressCallback?: (message: string) => void,
 ): Promise<ProjectGenerationResult> {
@@ -62,6 +64,15 @@ export async function generateEgovProject(
 		if (!config.groupId?.trim()) {
 			throw new Error("Group ID is required")
 		}
+		/*
+		if (!config.version?.trim()) {
+			throw new Error("Version is required")
+		}
+
+		if (!config.url?.trim()) {
+			throw new Error("URL is required")
+		}
+		*/
 
 		if (!config.outputPath?.trim()) {
 			throw new Error("Output path is required")
@@ -231,13 +242,14 @@ async function generatePomFile(
 
 		// Replace placeholders
 		const placeholders = {
-			"{{projectName}}": config.projectName,
-			"{{artifactId}}": config.artifactId,
-			"{{groupId}}": config.groupId,
+			"###NAME###": config.projectName,
+			"###ARTIFACT_ID###": config.artifactId,
+			"###GROUP_ID###": config.groupId,
+			"###VERSION###": config.version || "1.0.0",
+			"###URL###": config.url || "http://www.egovframe.go.kr",
 			//"{{PACKAGE_NAME}}": config.packageName,
 			//"{{DESCRIPTION}}": config.description || `eGovFrame project: ${config.projectName}`,
 			//"{{FRAMEWORK_VERSION}}": config.template.frameworkVersion || "4.3.0",
-			//"{{VERSION}}": "1.0.0",
 		}
 		for (const [placeholder, value] of Object.entries(placeholders)) {
 			content = content.replace(new RegExp(placeholder, "g"), value)

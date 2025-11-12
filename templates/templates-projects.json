@@ -42,23 +42,23 @@
 	{
 		"displayName": "Mobile Project",
 		"fileName": "example-mbl-web.zip",
-		"pomFile": "mobile-web-pom.xml",
+		"pomFile": "example-mbl-web-pom.xml",
 		"description": "Mobile web application project",
 		"category": "Mobile",
 		"projectName": "egov-mobile-project"
 	},
 	{
 		"displayName": "Mobile Template Project",
-		"fileName": "egovframework-all-in-one-mobile-4.3.0.zip",
-		"pomFile": "mobile-template-pom.xml",
+		"fileName": "egovframework-all-in-one-mobile.zip",
+		"pomFile": "egovframework-all-in-one-mobile-pom.xml",
 		"description": "Mobile template project with hybrid app support",
 		"category": "Mobile",
 		"projectName": "egov-mobile-template-project"
 	},
 	{
 		"displayName": "DeviceAPI Web Project",
-		"fileName": "DeviceAPI_WEBService_Guide_V4.3.0.zip",
-		"pomFile": "",
+		"fileName": "DeviceAPI_WEBService_Guide.zip",
+		"pomFile": "DeviceAPI_WEBService_Guide-pom.xml",
 		"description": "Device API integration web project",
 		"category": "Mobile",
 		"projectName": "egov-deviceapi-web-project"
@@ -73,8 +73,8 @@
 	},
 	{
 		"displayName": "Boot Template > Simple Homepage (Backend)",
-		"fileName": "egovframe-template-simple-backend.zip",
-		"pomFile": "egovframe-template-simple-backend-pom.xml",
+		"fileName": "template-Web-Boot-Simple-Homepage.zip",
+		"pomFile": "template-Web-Boot-Simple-Homepage-pom.xml",
 		"description": "Spring Boot simple homepage backend",
 		"category": "Boot",
 		"projectName": "egov-boot-template-simple-backend"
@@ -89,7 +89,7 @@
 	},
 	{
 		"displayName": "MSA Boot Template > Common Components (KRDS)",
-		"fileName": "egovframe-common-components-msa-krds-4.3.1.zip",
+		"fileName": "egovframe-common-components-msa-krds.zip",
 		"pomFile": "",
 		"description": "MSA common components with KRDS integration",
 		"category": "MSA",
@@ -114,7 +114,7 @@
 	{
 		"displayName": "Boot Batch Template > Scheduler (File)",
 		"fileName": "egovframework.rte.bat.template.sam.scheduler.zip",
-		"pomFile": "batch-sam-scheduler-pom.xml",
+		"pomFile": "egovframework.rte.bat.template.sam.scheduler-pom.xml",
 		"description": "File-based batch scheduler project",
 		"category": "Batch",
 		"projectName": "egov-boot-batch-scheduler-file"
@@ -122,7 +122,7 @@
 	{
 		"displayName": "Boot Batch Template > CommandLine (File)",
 		"fileName": "egovframework.rte.bat.template.sam.commandline.zip",
-		"pomFile": "batch-sam-commandline-pom.xml",
+		"pomFile": "egovframework.rte.bat.template.sam.commandline-pom.xml",
 		"description": "File-based command line batch project",
 		"category": "Batch",
 		"projectName": "egov-boot-batch-commandline-file"
@@ -130,7 +130,7 @@
 	{
 		"displayName": "Boot Batch Template > Web (File)",
 		"fileName": "egovframework.rte.bat.template.sam.web.zip",
-		"pomFile": "batch-sam-web-pom.xml",
+		"pomFile": "egovframework.rte.bat.template.sam.web-pom.xml",
 		"description": "File-based web batch project",
 		"category": "Batch",
 		"projectName": "egov-boot-batch-web-file"
@@ -138,7 +138,7 @@
 	{
 		"displayName": "Boot Batch Template > Scheduler (DB)",
 		"fileName": "egovframework.rte.bat.template.db.scheduler.zip",
-		"pomFile": "batch-db-scheduler-pom.xml",
+		"pomFile": "egovframework.rte.bat.template.db.scheduler-pom.xml",
 		"description": "Database-based batch scheduler project",
 		"category": "Batch",
 		"projectName": "egov-boot-batch-scheduler-db"
@@ -146,7 +146,7 @@
 	{
 		"displayName": "Boot Batch Template > CommandLine (DB)",
 		"fileName": "egovframework.rte.bat.template.db.commandline.zip",
-		"pomFile": "batch-db-commandline-pom.xml",
+		"pomFile": "egovframework.rte.bat.template.db.commandline-pom.xml",
 		"description": "Database-based command line batch project",
 		"category": "Batch",
 		"projectName": "egov-boot-batch-commandline-db"
@@ -154,7 +154,7 @@
 	{
 		"displayName": "Boot Batch Template > Web (DB)",
 		"fileName": "egovframework.rte.bat.template.db.web.zip",
-		"pomFile": "batch-db-web-pom.xml",
+		"pomFile": "egovframework.rte.bat.template.db.web-pom.xml",
 		"description": "Database-based web batch project",
 		"category": "Batch",
 		"projectName": "egov-boot-batch-web-db"

@@ -22,6 +22,7 @@ export const ProjectsView = () => {
 		artifactId,
 		projectName,
 		version,
+		url,
 		description,
 		generationMode,
 		defaultGroupId,
@@ -179,6 +180,8 @@ export const ProjectsView = () => {
 				projectName,
 				artifactId,
 				groupId,
+				version,
+				url,
 				outputPath,
 				template: selectedTemplate!,
 			}

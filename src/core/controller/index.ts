@@ -113,7 +113,7 @@ export class Controller {
 
 						// Generate the project
 						const result = await generateEgovProject(
-							message.projectConfig, // { projectName: string, artifactId: string, groupId: string, outputPath: string, template: {displayName: string, fileName: string, pomFile: string} }
+							message.projectConfig, // { projectName: string, artifactId: string, groupId: string, version: string(초기값 "1.0.0"), url: string(초기값 "http://www.egovframe.go.kr"), outputPath: string, template: {displayName: string, fileName: string, pomFile: string} }
 							this.context.extensionPath,
 							sendProgress,
 						)
