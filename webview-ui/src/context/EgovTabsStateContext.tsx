@@ -105,8 +105,8 @@ const initialProjectsViewState: ProjectsViewState = {
 	packageName: "",
 	groupId: "",
 	artifactId: "",
-	version: "1.0.0",
-	url: "http://www.egovframe.go.kr",
+	version: "",
+	url: "",
 	description: "",
 	generationMode: "form",
 	// VSCode Configuration에서 가져온 기본값 (초기값은 package.json의 default와 동일)

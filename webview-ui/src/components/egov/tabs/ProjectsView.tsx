@@ -767,16 +767,19 @@ export const ProjectsView = () => {
 							<strong>Template:</strong> Pre-configured project templates
 						</li>
 						<li>
-							<strong>Mobile:</strong> Mobile and hybrid app projects
-						</li>
-						<li>
 							<strong>Boot:</strong> Spring Boot based projects
 						</li>
 						<li>
 							<strong>MSA:</strong> Microservices architecture projects
 						</li>
 						<li>
+							<strong>Mobile:</strong> Mobile and hybrid app projects
+						</li>
+						<li>
 							<strong>Batch:</strong> Batch processing projects
+						</li>
+						<li>
+							<strong>AI:</strong> AI app projects
 						</li>
 					</ul>
 					<div style={{ marginTop: "10px", fontSize: "10px", opacity: 0.8 }}>

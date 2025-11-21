@@ -246,7 +246,7 @@ async function generatePomFile(
 			"###ARTIFACT_ID###": config.artifactId,
 			"###GROUP_ID###": config.groupId,
 			"###VERSION###": config.version || "1.0.0",
-			"###URL###": config.url || "http://www.egovframe.go.kr",
+			"###URL###": config.url || "https://www.egovframe.go.kr",
 			//"{{PACKAGE_NAME}}": config.packageName,
 			//"{{DESCRIPTION}}": config.description || `eGovFrame project: ${config.projectName}`,
 			//"{{FRAMEWORK_VERSION}}": config.template.frameworkVersion || "4.3.0",

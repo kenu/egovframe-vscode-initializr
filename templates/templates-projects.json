@@ -1,95 +1,71 @@
 [
 	{
 		"displayName": "Web Project",
-		"fileName": "example-web.zip",
-		"pomFile": "example-web-pom.xml",
+		"fileName": "egovframe-web.zip",
+		"pomFile": "egovframe-web-pom.xml",
 		"description": "Basic eGovFrame web application project",
 		"category": "Web",
-		"projectName": "egov-web-project"
+		"projectName": "egov-web"
 	},
 	{
 		"displayName": "Template > Simple Homepage",
-		"fileName": "example-template-simple.zip",
-		"pomFile": "example-template-simple-pom.xml",
+		"fileName": "egovframe-template-simple.zip",
+		"pomFile": "egovframe-template-simple-pom.xml",
 		"description": "Simple homepage template with basic functionalities",
 		"category": "Template",
-		"projectName": "egov-template-simple-homepage"
+		"projectName": "egov-template-simple"
 	},
 	{
 		"displayName": "Template > Portal Site",
-		"fileName": "example-template-portal.zip",
-		"pomFile": "example-template-portal-pom.xml",
+		"fileName": "egovframe-template-portal.zip",
+		"pomFile": "egovframe-template-portal-pom.xml",
 		"description": "Portal site template for enterprise applications",
 		"category": "Template",
-		"projectName": "egov-template-portal-site"
+		"projectName": "egov-template-portal"
 	},
 	{
 		"displayName": "Template > Enterprise Business",
-		"fileName": "example-template-enterprise.zip",
-		"pomFile": "example-template-enterprise-pom.xml",
+		"fileName": "egovframe-template-enterprise.zip",
+		"pomFile": "egovframe-template-enterprise-pom.xml",
 		"description": "Enterprise business application template",
 		"category": "Template",
-		"projectName": "egov-template-enterprise-business"
+		"projectName": "egov-template-enterprise"
 	},
 	{
-		"displayName": "Template > Common All-in-one",
-		"fileName": "egovframework-all-in-oneAllNew_wizard.zip",
-		"pomFile": "egovframework-all-in-oneAllNew_wizard-pom.xml",
-		"description": "Comprehensive all-in-one project template",
+		"displayName": "Template > Common Components",
+		"fileName": "egovframe-template-common-components.zip",
+		"pomFile": "egovframe-template-common-components-pom.xml",
+		"description": "Comprehensive common-components all-in-one project template",
 		"category": "Template",
-		"projectName": "egov-template-common-all-in-one"
-	},
-	{
-		"displayName": "Mobile Project",
-		"fileName": "example-mbl-web.zip",
-		"pomFile": "example-mbl-web-pom.xml",
-		"description": "Mobile web application project",
-		"category": "Mobile",
-		"projectName": "egov-mobile-project"
-	},
-	{
-		"displayName": "Mobile Template Project",
-		"fileName": "egovframework-all-in-one-mobile.zip",
-		"pomFile": "egovframework-all-in-one-mobile-pom.xml",
-		"description": "Mobile template project with hybrid app support",
-		"category": "Mobile",
-		"projectName": "egov-mobile-template-project"
-	},
-	{
-		"displayName": "DeviceAPI Web Project",
-		"fileName": "DeviceAPI_WEBService_Guide.zip",
-		"pomFile": "DeviceAPI_WEBService_Guide-pom.xml",
-		"description": "Device API integration web project",
-		"category": "Mobile",
-		"projectName": "egov-deviceapi-web-project"
+		"projectName": "egov-template-common-components"
 	},
 	{
 		"displayName": "Boot Web Project",
-		"fileName": "example-boot-web.zip",
-		"pomFile": "example-boot-web-pom.xml",
+		"fileName": "egovframe-boot-web.zip",
+		"pomFile": "egovframe-boot-web-pom.xml",
 		"description": "Spring Boot based web project",
 		"category": "Boot",
-		"projectName": "egov-boot-web-project"
+		"projectName": "egov-boot-web"
 	},
 	{
 		"displayName": "Boot Template > Simple Homepage (Backend)",
-		"fileName": "template-Web-Boot-Simple-Homepage.zip",
-		"pomFile": "template-Web-Boot-Simple-Homepage-pom.xml",
+		"fileName": "egovframe-boot-simple-backend.zip",
+		"pomFile": "egovframe-boot-simple-backend-pom.xml",
 		"description": "Spring Boot simple homepage backend",
 		"category": "Boot",
-		"projectName": "egov-boot-template-simple-backend"
+		"projectName": "egov-boot-simple-backend"
 	},
 	{
 		"displayName": "Boot Template > Simple Homepage (Frontend)",
-		"fileName": "egovframe-template-simple-react.zip",
+		"fileName": "egovframe-boot-simple-frontend.zip",
 		"pomFile": "",
 		"description": "React-based frontend for simple homepage",
 		"category": "Boot",
-		"projectName": "egov-boot-template-simple-frontend"
+		"projectName": "egov-boot-simple-frontend"
 	},
 	{
 		"displayName": "MSA Boot Template > Common Components (KRDS)",
-		"fileName": "egovframe-common-components-msa-krds.zip",
+		"fileName": "egovframe-msa-common-components.zip",
 		"pomFile": "",
 		"description": "MSA common components with KRDS integration",
 		"category": "MSA",
@@ -101,7 +77,7 @@
 		"pomFile": "",
 		"description": "MSA portal backend services",
 		"category": "MSA",
-		"projectName": "egov-msa-boot-portal-backend"
+		"projectName": "egov-msa-portal-backend"
 	},
 	{
 		"displayName": "MSA Boot Template > Portal (Frontend)",
@@ -109,54 +85,86 @@
 		"pomFile": "",
 		"description": "MSA portal frontend application",
 		"category": "MSA",
-		"projectName": "egov-msa-boot-portal-frontend"
+		"projectName": "egov-msa-portal-frontend"
+	},
+	{
+		"displayName": "Mobile Web Project",
+		"fileName": "egovframe-mobile-web.zip",
+		"pomFile": "egovframe-mobile-web-pom.xml",
+		"description": "Mobile web application project",
+		"category": "Mobile",
+		"projectName": "egov-mobile-web"
+	},
+	{
+		"displayName": "Mobile Common Components Project",
+		"fileName": "egovframe-mobile-common-components.zip",
+		"pomFile": "egovframe-mobile-common-components-pom.xml",
+		"description": "Mobile template common-components project with hybrid app support",
+		"category": "Mobile",
+		"projectName": "egov-mobile-common-components"
+	},
+	{
+		"displayName": "DeviceAPI Web Project",
+		"fileName": "egovframe-mobile-deviceapi.zip",
+		"pomFile": "egovframe-mobile-deviceapi-pom.xml",
+		"description": "Device API integration web project",
+		"category": "Mobile",
+		"projectName": "egov-mobile-deviceapi"
 	},
 	{
 		"displayName": "Boot Batch Template > Scheduler (File)",
-		"fileName": "egovframework.rte.bat.template.sam.scheduler.zip",
-		"pomFile": "egovframework.rte.bat.template.sam.scheduler-pom.xml",
+		"fileName": "egovframe-boot-batch-file-scheduler.zip",
+		"pomFile": "egovframe-boot-batch-file-scheduler-pom.xml",
 		"description": "File-based batch scheduler project",
 		"category": "Batch",
 		"projectName": "egov-boot-batch-scheduler-file"
 	},
 	{
 		"displayName": "Boot Batch Template > CommandLine (File)",
-		"fileName": "egovframework.rte.bat.template.sam.commandline.zip",
-		"pomFile": "egovframework.rte.bat.template.sam.commandline-pom.xml",
+		"fileName": "egovframe-boot-batch-file-commandline.zip",
+		"pomFile": "egovframe-boot-batch-file-commandline-pom.xml",
 		"description": "File-based command line batch project",
 		"category": "Batch",
 		"projectName": "egov-boot-batch-commandline-file"
 	},
 	{
 		"displayName": "Boot Batch Template > Web (File)",
-		"fileName": "egovframework.rte.bat.template.sam.web.zip",
-		"pomFile": "egovframework.rte.bat.template.sam.web-pom.xml",
+		"fileName": "egovframe-boot-batch-file-web.zip",
+		"pomFile": "egovframe-boot-batch-file-web-pom.xml",
 		"description": "File-based web batch project",
 		"category": "Batch",
 		"projectName": "egov-boot-batch-web-file"
 	},
 	{
 		"displayName": "Boot Batch Template > Scheduler (DB)",
-		"fileName": "egovframework.rte.bat.template.db.scheduler.zip",
-		"pomFile": "egovframework.rte.bat.template.db.scheduler-pom.xml",
+		"fileName": "egovframe-boot-batch-db-scheduler.zip",
+		"pomFile": "egovframe-boot-batch-db-scheduler-pom.xml",
 		"description": "Database-based batch scheduler project",
 		"category": "Batch",
 		"projectName": "egov-boot-batch-scheduler-db"
 	},
 	{
 		"displayName": "Boot Batch Template > CommandLine (DB)",
-		"fileName": "egovframework.rte.bat.template.db.commandline.zip",
-		"pomFile": "egovframework.rte.bat.template.db.commandline-pom.xml",
+		"fileName": "egovframe-boot-batch-db-commandline.zip",
+		"pomFile": "egovframe-boot-batch-db-commandline-pom.xml",
 		"description": "Database-based command line batch project",
 		"category": "Batch",
 		"projectName": "egov-boot-batch-commandline-db"
 	},
 	{
 		"displayName": "Boot Batch Template > Web (DB)",
-		"fileName": "egovframework.rte.bat.template.db.web.zip",
-		"pomFile": "egovframework.rte.bat.template.db.web-pom.xml",
+		"fileName": "egovframe-boot-batch-db-web.zip",
+		"pomFile": "egovframe-boot-batch-db-web-pom.xml",
 		"description": "Database-based web batch project",
 		"category": "Batch",
 		"projectName": "egov-boot-batch-web-db"
+	},
+	{
+		"displayName": "Spring AI RAG Project",
+		"fileName": "egovframe-spring-ai-rag-redis-stack.zip",
+		"pomFile": "egovframe-spring-ai-rag-redis-stack-pom.xml",
+		"description": "RAG Project Using Spring AI and Redis Stack",
+		"category": "AI",
+		"projectName": "egov-spring-ai-rag-redis-stack"
 	}
 ]
