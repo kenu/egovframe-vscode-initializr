@@ -668,6 +668,15 @@ git lfs install
 git lfs pull
 ```
 
+#### Git LFS 추적 파일들이 변경되거나 추가 시
+```bash
+# LFS로 추적되는 파일을 Reomte에 Push
+git lfs push --all origin main
+
+# 그 후 소스코드를 Remote에 Push 한다
+git push origin main
+```
+
 
 ## 📈 성능 최적화
 
