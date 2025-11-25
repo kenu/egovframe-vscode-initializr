@@ -31,7 +31,10 @@ const CodeView = () => {
 		autoUpdatePreview,
 		sampleDDLs,
 	} = state
+	// Monaco Editor 테마
 	const [monacoTheme, setMonacoTheme] = useState<"light" | "vs-dark">("vs-dark")
+	// Monaco Editor 포커스 상태
+	const [isEditorFocused, setIsEditorFocused] = useState(false)
 
 	// Helper functions to update state
 	const setDdlContent = (value: string) => updateState({ ddlContent: value })
@@ -446,16 +449,16 @@ const CodeView = () => {
 									fontSize: "12px",
 									backgroundColor: "var(--vscode-input-background)",
 									color: "var(--vscode-input-foreground)",
-									border: "1px solid var(--vscode-input-border)",
+									border: "1px solid var(--vscode-dropdown-border)",
 									borderRadius: "4px",
 									outline: "none",
 									cursor: "pointer",
 								}}
 								onFocus={(e) => {
-									e.target.style.borderColor = "var(--vscode-focusBorder)"
+									e.target.style.border = "1px solid var(--vscode-focusBorder)"
 								}}
 								onBlur={(e) => {
-									e.target.style.borderColor = "var(--vscode-input-border)"
+									e.target.style.border = "1px solid var(--vscode-dropdown-border)"
 								}}>
 								<option value="">직접 입력</option>
 								{sampleDDLs &&
@@ -468,53 +471,65 @@ const CodeView = () => {
 						</div>
 					</div>
 					{/*
-					<textarea
-						rows={15}
+				<textarea
+					rows={15}
+					style={{
+						width: "calc(100% - 24px)",
+						padding: "12px",
+						fontFamily: "monospace",
+						backgroundColor: "var(--vscode-input-background)",
+						color: "var(--vscode-input-foreground)",
+						border: `1px solid ${error ? "var(--vscode-errorBorder)" : "var(--vscode-dropdown-border)"}`,
+						borderRadius: "4px",
+						fontSize: "13px",
+						resize: "vertical",
+						outline: "none",
+						minHeight: "200px",
+					}}
+					onFocus={(e) => {
+						e.target.style.border = "1px solid var(--vscode-focusBorder)"
+					}}
+					onBlur={(e) => {
+						e.target.style.border = "1px solid " + (error ? "var(--vscode-errorBorder)" : "var(--vscode-dropdown-border)")
+					}}
+					placeholder="Enter your DDL statements here..."
+					value={ddlContent}
+					onChange={(e: any) => setDdlContent(e.target.value)}
+				/>
+				*/}
+					<div
 						style={{
-							width: "calc(100% - 24px)",
-							padding: "12px",
-							fontFamily: "monospace",
-							backgroundColor: "var(--vscode-input-background)",
-							color: "var(--vscode-input-foreground)",
-							border: `1px solid ${error ? "var(--vscode-errorBorder)" : "var(--vscode-input-border)"}`,
+							border: `1px solid var(${error ? "--vscode-errorBorder" : isEditorFocused ? "--vscode-focusBorder" : "--vscode-settings-textInputBorder"})`,
 							borderRadius: "4px",
-							fontSize: "13px",
-							resize: "vertical",
-							outline: "none",
-							minHeight: "200px",
-						}}
-						onFocus={(e) => {
-							e.target.style.borderColor = "var(--vscode-focusBorder)"
-						}}
-						onBlur={(e) => {
-							e.target.style.borderColor = error ? "var(--vscode-errorBorder)" : "var(--vscode-input-border)"
-						}}
-						placeholder="Enter your DDL statements here..."
-						value={ddlContent}
-						onChange={(e: any) => setDdlContent(e.target.value)}
-					/>
-					*/}
-					<Editor // Monaco Editor -> SQL Syntax Highlighting
-						height="300px"
-						defaultLanguage="sql"
-						theme={monacoTheme} // 동적 테마 적용
-						value={ddlContent}
-						onChange={(value) => setDdlContent(value || "")}
-						options={{
-							minimap: { enabled: false },
-							scrollBeyondLastLine: false,
-							fontSize: 13,
-							fontFamily: "monospace",
-							wordWrap: "on",
-							folding: false,
-							automaticLayout: true,
-							lineNumbers: "on",
-							lineNumbersMinChars: 2,
-							glyphMargin: false,
-							renderWhitespace: "selection",
-							tabSize: 2,
-						}}
-					/>
+							overflow: "hidden",
+							transition: "border-color 0.1s",
+						}}>
+						<Editor // Monaco Editor -> SQL Syntax Highlighting
+							height="300px"
+							defaultLanguage="sql"
+							theme={monacoTheme} // 동적 테마 적용
+							value={ddlContent}
+							onChange={(value) => setDdlContent(value || "")}
+							onMount={(editor) => {
+								editor.onDidFocusEditorText(() => setIsEditorFocused(true))
+								editor.onDidBlurEditorText(() => setIsEditorFocused(false))
+							}}
+							options={{
+								minimap: { enabled: false },
+								scrollBeyondLastLine: false,
+								fontSize: 13,
+								fontFamily: "monospace",
+								wordWrap: "on",
+								folding: false,
+								automaticLayout: true,
+								lineNumbers: "on",
+								lineNumbersMinChars: 2,
+								glyphMargin: false,
+								renderWhitespace: "selection",
+								tabSize: 2,
+							}}
+						/>
+					</div>
 					{error && (
 						<div
 							style={{

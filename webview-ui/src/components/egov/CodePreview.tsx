@@ -40,6 +40,8 @@ const CodePreview: React.FC<CodePreviewProps> = ({
 }) => {
 	// 미리보기 가시성 상태 (자동 업데이트가 켜져 있으면 기본 표시)
 	const [isPreviewVisible, setIsPreviewVisible] = useState<boolean>(!!autoUpdatePreview)
+	// Monaco Editor 포커스 상태
+	const [isEditorFocused, setIsEditorFocused] = useState(false)
 
 	// 자동 업데이트가 켜질 때는 항상 표시로 전환 (끄는 경우는 사용자 선택 유지)
 	useEffect(() => {
@@ -276,16 +278,16 @@ const CodePreview: React.FC<CodePreviewProps> = ({
 								padding: "8px 12px",
 								backgroundColor: "var(--vscode-input-background)",
 								color: "var(--vscode-input-foreground)",
-								border: "1px solid var(--vscode-input-border)",
+								border: "1px solid var(--vscode-dropdown-border)",
 								borderRadius: "4px",
 								fontSize: "13px",
 								outline: "none",
 							}}
 							onFocus={(e) => {
-								e.target.style.borderColor = "var(--vscode-focusBorder)"
+								e.target.style.border = "1px solid var(--vscode-focusBorder)"
 							}}
 							onBlur={(e) => {
-								e.target.style.borderColor = "var(--vscode-input-border)"
+								e.target.style.border = "1px solid var(--vscode-dropdown-border)"
 							}}>
 							{templateOptions.map((option) => (
 								<option key={option.value} value={option.value}>
@@ -336,15 +338,20 @@ const CodePreview: React.FC<CodePreviewProps> = ({
 					<div
 						style={{
 							backgroundColor: "var(--vscode-editor-background)",
-							border: "1px solid var(--vscode-input-border)",
+							border: `1px solid var(${isEditorFocused ? "--vscode-focusBorder" : "--vscode-settings-textInputBorder"})`,
 							borderRadius: "4px",
 							overflow: "hidden",
+							transition: "border-color 0.1s",
 						}}>
 						<Editor
 							height="400px"
 							language={currentLanguage}
 							theme={monacoTheme || "vs-dark"}
 							value={currentPreview}
+							onMount={(editor) => {
+								editor.onDidFocusEditorText(() => setIsEditorFocused(true))
+								editor.onDidBlurEditorText(() => setIsEditorFocused(false))
+							}}
 							options={{
 								readOnly: true,
 								minimap: { enabled: false },

@@ -174,7 +174,7 @@ const ConfigView: React.FC = () => {
 							padding: "8px 12px",
 							backgroundColor: "var(--vscode-input-background)",
 							color: "var(--vscode-input-foreground)",
-							border: "1px solid var(--vscode-input-border)",
+							border: "1px solid var(--vscode-dropdown-border)",
 							borderRadius: "4px",
 							fontSize: "13px",
 							fontFamily: "inherit",
@@ -184,10 +184,10 @@ const ConfigView: React.FC = () => {
 							MozAppearance: "none",
 						}}
 						onFocus={(e) => {
-							;(e.target as HTMLSelectElement).style.borderColor = "var(--vscode-focusBorder)"
+							;(e.target as HTMLSelectElement).style.border = "1px solid var(--vscode-focusBorder)"
 						}}
 						onBlur={(e) => {
-							;(e.target as HTMLSelectElement).style.borderColor = "var(--vscode-input-border)"
+							;(e.target as HTMLSelectElement).style.border = "1px solid var(--vscode-dropdown-border)"
 						}}>
 						<option value="">Choose a category...</option>
 						{categories.map((category) => (
@@ -211,7 +211,7 @@ const ConfigView: React.FC = () => {
 								padding: "8px 12px",
 								backgroundColor: "var(--vscode-input-background)",
 								color: "var(--vscode-input-foreground)",
-								border: "1px solid var(--vscode-input-border)",
+								border: "1px solid var(--vscode-dropdown-border)",
 								borderRadius: "4px",
 								fontSize: "13px",
 								fontFamily: "inherit",
@@ -221,10 +221,10 @@ const ConfigView: React.FC = () => {
 								MozAppearance: "none",
 							}}
 							onFocus={(e) => {
-								;(e.target as HTMLSelectElement).style.borderColor = "var(--vscode-focusBorder)"
+								;(e.target as HTMLSelectElement).style.border = "1px solid var(--vscode-focusBorder)"
 							}}
 							onBlur={(e) => {
-								;(e.target as HTMLSelectElement).style.borderColor = "var(--vscode-input-border)"
+								;(e.target as HTMLSelectElement).style.border = "1px solid var(--vscode-dropdown-border)"
 							}}>
 							<option value="">Choose a configuration type...</option>
 							{subcategories.map((subcategory) => (

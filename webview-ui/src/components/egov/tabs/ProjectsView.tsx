@@ -392,7 +392,7 @@ export const ProjectsView = () => {
 								padding: "8px 12px",
 								backgroundColor: "var(--vscode-input-background)",
 								color: "var(--vscode-input-foreground)",
-								border: "1px solid var(--vscode-input-border)",
+								border: "1px solid var(--vscode-dropdown-border)",
 								borderRadius: "4px",
 								fontSize: "13px",
 								fontFamily: "inherit",
@@ -402,10 +402,10 @@ export const ProjectsView = () => {
 								MozAppearance: "none",
 							}}
 							onFocus={(e) => {
-								;(e.target as HTMLSelectElement).style.borderColor = "var(--vscode-focusBorder)"
+								e.currentTarget.style.border = "1px solid var(--vscode-focusBorder)"
 							}}
 							onBlur={(e) => {
-								;(e.target as HTMLSelectElement).style.borderColor = "var(--vscode-input-border)"
+								e.currentTarget.style.border = "1px solid var(--vscode-dropdown-border)"
 							}}>
 							{projectCategories.map((category) => (
 								<option key={category} value={category}>
@@ -420,7 +420,7 @@ export const ProjectsView = () => {
 						<h4 style={{ color: "var(--vscode-foreground)", marginBottom: "10px" }}>Template Selection</h4>
 						<div
 							style={{
-								border: "1px solid var(--vscode-input-border)",
+								border: "1px solid var(--vscode-dropdown-border)",
 								borderRadius: "3px",
 								padding: "10px",
 								maxHeight: "200px",
@@ -469,9 +469,6 @@ export const ProjectsView = () => {
 										<div style={{ fontWeight: "bold", fontSize: "13px" }}>{template.displayName}</div>
 										<div style={{ fontSize: "11px", opacity: 0.8, marginTop: "2px" }}>
 											{template.description}
-										</div>
-										<div style={{ fontSize: "10px", opacity: 0.6, marginTop: "2px" }}>
-											File: {template.fileName}
 										</div>
 									</div>
 								))
@@ -605,9 +602,6 @@ export const ProjectsView = () => {
 								<div style={{ fontSize: "11px", color: "var(--vscode-descriptionForeground)" }}>
 									{selectedTemplate.description}
 								</div>
-								<div style={{ fontSize: "10px", color: "var(--vscode-descriptionForeground)", marginTop: "5px" }}>
-									Source: templates/projects/examples/{selectedTemplate.fileName}
-								</div>
 								{selectedTemplate.pomFile && (
 									<div
 										style={{
@@ -615,7 +609,7 @@ export const ProjectsView = () => {
 											color: "var(--vscode-descriptionForeground)",
 											marginTop: "5px",
 										}}>
-										Includes: Maven POM configuration ({selectedTemplate.pomFile})
+										Includes: Maven POM configuration
 									</div>
 								)}
 							</div>
@@ -782,9 +776,6 @@ export const ProjectsView = () => {
 							<strong>AI:</strong> AI app projects
 						</li>
 					</ul>
-					<div style={{ marginTop: "10px", fontSize: "10px", opacity: 0.8 }}>
-						All templates are sourced from templates/projects/examples/ directory
-					</div>
 				</div>
 			</div>
 		</div>

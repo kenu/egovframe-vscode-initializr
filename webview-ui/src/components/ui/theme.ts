@@ -98,7 +98,7 @@ export const createVSCodeTheme = (): VSCodeTheme => ({
 		// Input colors
 		inputBackground: "var(--vscode-input-background)",
 		inputForeground: "var(--vscode-input-foreground)",
-		inputBorder: "var(--vscode-input-border)",
+		inputBorder: "var(--vscode-settings-textInputBorder)",
 		inputBorderFocus: "var(--vscode-focusBorder)",
 
 		// Interactive colors

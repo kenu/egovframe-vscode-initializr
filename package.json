@@ -42,19 +42,19 @@
 			"activitybar": [
 				{
 					"id": "egovframe-ActivityBar",
-					"title": "eGov-Initializr (⌘+')",
+					"title": "eGov-Initializr",
 					"icon": "assets/icons/icon.svg",
 					"when": "isMac"
 				},
 				{
 					"id": "egovframe-ActivityBar",
-					"title": "eGov-Initializr (Ctrl+')",
+					"title": "eGov-Initializr",
 					"icon": "assets/icons/icon.svg",
 					"when": "isWindows"
 				},
 				{
 					"id": "egovframe-ActivityBar",
-					"title": "eGov-Initializr (Ctrl+')",
+					"title": "eGov-Initializr",
 					"icon": "assets/icons/icon.svg",
 					"when": "isLinux || !isMac && !isWindows"
 				}

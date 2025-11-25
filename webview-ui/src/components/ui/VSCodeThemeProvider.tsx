@@ -13,7 +13,7 @@ export const VSCodeThemeProvider: React.FC<VSCodeThemeProviderProps> = ({ childr
 			<div
 				className="min-h-screen transition-colors"
 				style={{
-					backgroundColor: theme.colors.background,
+					backgroundColor: "transparent",
 					color: theme.colors.foreground,
 				}}>
 				{children}
