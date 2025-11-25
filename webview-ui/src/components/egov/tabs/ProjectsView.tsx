@@ -773,7 +773,7 @@ export const ProjectsView = () => {
 							<strong>Batch:</strong> Batch processing projects
 						</li>
 						<li>
-							<strong>AI:</strong> AI app projects
+							<strong>AI:</strong> AI-powered application projects
 						</li>
 					</ul>
 				</div>
