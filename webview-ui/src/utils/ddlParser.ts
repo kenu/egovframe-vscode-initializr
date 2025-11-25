@@ -161,9 +161,15 @@ export function validateDDL(ddl: string): boolean {
 		return false
 	}
 
+	// CREATE TABLE 테이블명 ( ... ) 형식 확인 - 테이블명 뒤에 괄호가 있어야 함
+	if (!/CREATE\s+TABLE\s+[^\s(]+\s*\(/i.test(ddl)) {
+		return false
+	}
+
 	// 괄호 쌍 확인
 	const openParens = (ddl.match(/\(/g) || []).length
 	const closeParens = (ddl.match(/\)/g) || []).length
+	// 괄호 개수가 맞지 않으면 유효하지 않음
 	if (openParens !== closeParens) {
 		return false
 	}
