@@ -376,7 +376,7 @@ const EgovSettingsView = memo(({ onDone }: EgovSettingsViewProps) => {
 							rel="noopener noreferrer"
 							onMouseEnter={(e) => Object.assign(e.currentTarget.style, linkHoverStyle)}
 							onMouseLeave={(e) => (e.currentTarget.style.borderBottom = "1px solid transparent")}>
-							VSCode Extension docs(later)
+							VSCode Extension Manual(later)
 						</a>
 					</div>
 				</div>
