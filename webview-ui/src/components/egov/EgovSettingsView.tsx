@@ -349,7 +349,7 @@ const EgovSettingsView = memo(({ onDone }: EgovSettingsViewProps) => {
 					<span style={sectionTitleStyle}>Guide</span>
 					<div style={itemStyle}>
 						<a
-							href="https://egovframe.go.kr/wiki/doku.php?id=egovframework:개발환경가이드"
+							href="https://egovframe.go.kr/wiki/doku.php"
 							style={linkStyle}
 							target="_blank"
 							rel="noopener noreferrer"
@@ -359,7 +359,7 @@ const EgovSettingsView = memo(({ onDone }: EgovSettingsViewProps) => {
 						</a>
 						{" • "}
 						<a
-							href="https://egovframework.github.io/egovframe-docs/egovframe-development/"
+							href="https://egovframework.github.io/egovframe-docs/"
 							style={linkStyle}
 							target="_blank"
 							rel="noopener noreferrer"
