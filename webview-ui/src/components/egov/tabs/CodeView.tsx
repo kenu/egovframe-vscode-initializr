@@ -7,7 +7,58 @@ import { createSelectOutputPathMessage } from "../../../utils/egovUtils"
 import { vscode } from "../../../utils/vscode"
 import { useCodeViewState } from "../../../context/EgovTabsStateContext"
 import CodePreview from "../CodePreview"
-import Editor from "@monaco-editor/react"
+import Editor, { loader } from "@monaco-editor/react"
+import * as monaco from "monaco-editor"
+
+// Import SQL language contributions
+import "monaco-sql-languages/esm/languages/mysql/mysql.contribution"
+import "monaco-sql-languages/esm/languages/pgsql/pgsql.contribution"
+
+// Configure Monaco Editor loader
+loader.config({ monaco })
+
+// Configure Monaco Environment for SQL Language Workers
+if (typeof window !== "undefined") {
+	;(window as any).MonacoEnvironment = {
+		getWorker(_: any, label: string) {
+			// Development mode: Use direct imports from node_modules
+			if (import.meta.env.DEV) {
+				if (label === "mysql") {
+					return new Worker(new URL("monaco-sql-languages/esm/languages/mysql/mysql.worker.js", import.meta.url), {
+						type: "module",
+					})
+				}
+				if (label === "pgsql") {
+					return new Worker(new URL("monaco-sql-languages/esm/languages/pgsql/pgsql.worker.js", import.meta.url), {
+						type: "module",
+					})
+				}
+			}
+
+			// Production mode: Workers are copied to build/assets by Vite plugin
+			// Use relative path for VSCode webview
+			if (label === "mysql" || label === "pgsql") {
+				// In production, workers are bundled by Vite as inline workers
+				// We use direct import which Vite will handle
+				if (label === "mysql") {
+					return new Worker(new URL("monaco-sql-languages/esm/languages/mysql/mysql.worker.js", import.meta.url), {
+						type: "module",
+					})
+				}
+				if (label === "pgsql") {
+					return new Worker(new URL("monaco-sql-languages/esm/languages/pgsql/pgsql.worker.js", import.meta.url), {
+						type: "module",
+					})
+				}
+			}
+
+			// Fallback to default Monaco worker
+			return new Worker(new URL("monaco-editor/esm/vs/editor/editor.worker.js", import.meta.url), {
+				type: "module",
+			})
+		},
+	}
+}
 
 const CodeView = () => {
 	console.log("CodeView component rendering...")
@@ -35,6 +86,8 @@ const CodeView = () => {
 	const [monacoTheme, setMonacoTheme] = useState<"light" | "vs-dark">("vs-dark")
 	// Monaco Editor 포커스 상태
 	const [isEditorFocused, setIsEditorFocused] = useState(false)
+	// SQL 방언 선택 (MySQL or PostgreSQL)
+	const [sqlDialect, setSqlDialect] = useState<"mysql" | "pgsql">("mysql")
 
 	// Helper functions to update state
 	const setDdlContent = (value: string) => updateState({ ddlContent: value })
@@ -430,44 +483,83 @@ const CodeView = () => {
 							)}
 						</h4>
 
-						{/* 샘플 DDL 선택 드롭다운 */}
-						<div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-							<label
-								htmlFor="sample-ddl-select"
-								style={{
-									fontSize: "12px",
-									color: "var(--vscode-foreground)",
-									userSelect: "none",
-								}}>
-								샘플 선택:
-							</label>
-							<select
-								id="sample-ddl-select"
-								onChange={(e) => handleSampleDDLChange(e.target.value)}
-								style={{
-									padding: "4px 8px",
-									fontSize: "12px",
-									backgroundColor: "var(--vscode-input-background)",
-									color: "var(--vscode-input-foreground)",
-									border: "1px solid var(--vscode-dropdown-border)",
-									borderRadius: "4px",
-									outline: "none",
-									cursor: "pointer",
-								}}
-								onFocus={(e) => {
-									e.target.style.border = "1px solid var(--vscode-focusBorder)"
-								}}
-								onBlur={(e) => {
-									e.target.style.border = "1px solid var(--vscode-dropdown-border)"
-								}}>
-								<option value="">직접 입력</option>
-								{sampleDDLs &&
-									Object.entries(sampleDDLs).map(([key, sample]) => (
-										<option key={key} value={key}>
-											{sample.name}
-										</option>
-									))}
-							</select>
+						{/* SQL 방언 선택 및 샘플 DDL 선택 드롭다운 */}
+						<div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+							{/* SQL 방언 선택 */}
+							<div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+								<label
+									htmlFor="sql-dialect-select"
+									style={{
+										fontSize: "12px",
+										color: "var(--vscode-foreground)",
+										userSelect: "none",
+									}}>
+									SQL:
+								</label>
+								<select
+									id="sql-dialect-select"
+									value={sqlDialect}
+									onChange={(e) => setSqlDialect(e.target.value as "mysql" | "pgsql")}
+									style={{
+										padding: "4px 8px",
+										fontSize: "12px",
+										backgroundColor: "var(--vscode-input-background)",
+										color: "var(--vscode-input-foreground)",
+										border: "1px solid var(--vscode-dropdown-border)",
+										borderRadius: "4px",
+										outline: "none",
+										cursor: "pointer",
+									}}
+									onFocus={(e) => {
+										e.target.style.border = "1px solid var(--vscode-focusBorder)"
+									}}
+									onBlur={(e) => {
+										e.target.style.border = "1px solid var(--vscode-dropdown-border)"
+									}}>
+									<option value="mysql">MySQL</option>
+									<option value="pgsql">PostgreSQL</option>
+								</select>
+							</div>
+
+							{/* 샘플 DDL 선택 드롭다운 */}
+							<div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+								<label
+									htmlFor="sample-ddl-select"
+									style={{
+										fontSize: "12px",
+										color: "var(--vscode-foreground)",
+										userSelect: "none",
+									}}>
+									샘플 선택:
+								</label>
+								<select
+									id="sample-ddl-select"
+									onChange={(e) => handleSampleDDLChange(e.target.value)}
+									style={{
+										padding: "4px 8px",
+										fontSize: "12px",
+										backgroundColor: "var(--vscode-input-background)",
+										color: "var(--vscode-input-foreground)",
+										border: "1px solid var(--vscode-dropdown-border)",
+										borderRadius: "4px",
+										outline: "none",
+										cursor: "pointer",
+									}}
+									onFocus={(e) => {
+										e.target.style.border = "1px solid var(--vscode-focusBorder)"
+									}}
+									onBlur={(e) => {
+										e.target.style.border = "1px solid var(--vscode-dropdown-border)"
+									}}>
+									<option value="">직접 입력</option>
+									{sampleDDLs &&
+										Object.entries(sampleDDLs).map(([key, sample]) => (
+											<option key={key} value={key}>
+												{sample.name}
+											</option>
+										))}
+								</select>
+							</div>
 						</div>
 					</div>
 					{/*
@@ -504,9 +596,9 @@ const CodeView = () => {
 							overflow: "hidden",
 							transition: "border-color 0.1s",
 						}}>
-						<Editor // Monaco Editor -> SQL Syntax Highlighting
+						<Editor // Monaco Editor -> SQL Syntax Highlighting with monaco-sql-languages
 							height="300px"
-							defaultLanguage="sql"
+							language={sqlDialect} // Use selected SQL dialect (mysql or pgsql)
 							theme={monacoTheme} // 동적 테마 적용
 							value={ddlContent}
 							onChange={(value) => setDdlContent(value || "")}
@@ -527,6 +619,10 @@ const CodeView = () => {
 								glyphMargin: false,
 								renderWhitespace: "selection",
 								tabSize: 2,
+								suggest: {
+									showKeywords: true,
+									showSnippets: true,
+								},
 							}}
 						/>
 					</div>

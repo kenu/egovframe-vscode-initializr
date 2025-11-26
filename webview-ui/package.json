@@ -16,8 +16,7 @@
 	},
 	"dependencies": {
 		"@floating-ui/react": "^0.27.4",
-		"@monaco-editor/react": "^4.6.0",
-		"monaco-editor": "^0.44.0",
+		"@monaco-editor/react": "^4.7.0",
 		"clsx": "^2.1.1",
 		"debounce": "^2.1.1",
 		"dompurify": "^3.2.4",
@@ -29,6 +28,8 @@
 		"katex": "^0.16.22",
 		"lucide-react": "^0.511.0",
 		"mermaid": "^11.4.1",
+		"monaco-editor": "^0.31.1",
+		"monaco-sql-languages": "^0.15.1",
 		"package.json": "^2.0.1",
 		"pretty-bytes": "^6.1.1",
 		"react": "^18.3.1",

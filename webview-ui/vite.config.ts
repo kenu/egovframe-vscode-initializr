@@ -4,7 +4,7 @@ import { defineConfig, ViteDevServer, type Plugin } from "vite"
 import tailwindcss from "@tailwindcss/vite"
 import react from "@vitejs/plugin-react-swc"
 import { resolve } from "path"
-import { writeFileSync } from "node:fs"
+import { writeFileSync, copyFileSync, mkdirSync, existsSync } from "node:fs"
 
 // Custom plugin to write the server port to a file
 const writePortToFile = (): Plugin => {
@@ -26,8 +26,43 @@ const writePortToFile = (): Plugin => {
 	}
 }
 
+// Custom plugin to handle Monaco SQL Languages workers
+const monacoSqlLanguagesPlugin = (): Plugin => {
+	return {
+		name: "monaco-sql-languages-plugin",
+		apply: "build",
+		closeBundle() {
+			const sqlLanguages = ["mysql", "pgsql"]
+			const buildDir = resolve(__dirname, "build/assets")
+
+			if (!existsSync(buildDir)) {
+				mkdirSync(buildDir, { recursive: true })
+			}
+
+			// Copy worker files to build directory
+			sqlLanguages.forEach((lang) => {
+				try {
+					const workerPath = resolve(
+						__dirname,
+						`node_modules/monaco-sql-languages/esm/languages/${lang}/${lang}.worker.js`,
+					)
+					const destPath = resolve(buildDir, `${lang}.worker.js`)
+					if (existsSync(workerPath)) {
+						copyFileSync(workerPath, destPath)
+						console.log(`✓ Copied ${lang}.worker.js to build/assets`)
+					} else {
+						console.warn(`⚠ Worker file not found: ${workerPath}`)
+					}
+				} catch (err) {
+					console.warn(`⚠ Failed to copy ${lang}.worker.js:`, err)
+				}
+			})
+		},
+	}
+}
+
 export default defineConfig({
-	plugins: [react(), tailwindcss(), writePortToFile()],
+	plugins: [react(), tailwindcss(), writePortToFile(), monacoSqlLanguagesPlugin()],
 	test: {
 		environment: "jsdom",
 		globals: true,
