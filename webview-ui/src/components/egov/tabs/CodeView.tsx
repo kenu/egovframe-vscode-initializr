@@ -526,19 +526,19 @@ const CodeView = () => {
 							alignItems: "center",
 							marginBottom: "10px",
 						}}>
-						<h4 style={{ color: "var(--vscode-foreground)", margin: 0 }}>
-							DDL Input
+						<h4 style={{ color: "var(--vscode-foreground)", margin: 0 }}>DDL Input</h4>
+
+						<div>
 							{ddlContent.trim() && (
 								<span
 									style={{
-										marginLeft: "10px",
 										fontSize: "12px",
 										color: isValid ? "var(--vscode-terminal-ansiGreen)" : "var(--vscode-errorForeground)",
 									}}>
-									{isValid ? "✓ Valid" : "✗ Invalid"}
+									{isValid ? "✓" : "✗"}
 								</span>
 							)}
-						</h4>
+						</div>
 
 						{/* SQL 방언 선택 및 샘플 DDL 선택 드롭다운 */}
 						<div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
