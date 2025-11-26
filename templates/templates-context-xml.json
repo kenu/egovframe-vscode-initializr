@@ -8,7 +8,7 @@
 		"javaConfigTemplate": "",
 		"yamlTemplate": "",
 		"propertiesTemplate": "",
-		"description": "일반 캐시 설정 파일을 생성합니다."
+		"description": "Creates a general cache configuration file."
 	},
 	{
 		"displayName": "Cache > New Ehcache Configuration",
@@ -19,7 +19,7 @@
 		"javaConfigTemplate": "ehcacheConfigForSpring-java.hbs",
 		"yamlTemplate": "",
 		"propertiesTemplate": "",
-		"description": "Spring 환경에서 CacheManager에 제공할 Ehcache의 경로를 설정하기 위한 파일을 생성합니다."
+		"description": "Creates a file that configures the path to Ehcache to be provided to the CacheManager in a Spring environment."
 	},
 	{
 		"displayName": "Datasource > New Datasource",
@@ -30,7 +30,7 @@
 		"javaConfigTemplate": "datasource-java.hbs",
 		"yamlTemplate": "",
 		"propertiesTemplate": "",
-		"description": "DBCP, C3P0,JDBC 데이터소스 설정을 생성합니다."
+		"description": "Creates datasource configurations for DBCP, C3P0, and JDBC."
 	},
 	{
 		"displayName": "Datasource > New JNDI Datasource",
@@ -41,7 +41,7 @@
 		"javaConfigTemplate": "jndiDatasource-java.hbs",
 		"yamlTemplate": "",
 		"propertiesTemplate": "",
-		"description": "JNDI 기반 데이터소스 설정을 생성합니다."
+		"description": "Creates a JNDI-based datasource configuration."
 	},
 	{
 		"displayName": "ID Generation > New Sequence ID Generation",
@@ -52,7 +52,7 @@
 		"javaConfigTemplate": "xml-id-gnr-sequence-service-java.hbs",
 		"yamlTemplate": "",
 		"propertiesTemplate": "",
-		"description": "시퀀스 기반 ID 생성 서비스 설정을 생성합니다."
+		"description": "Creates a sequence-based ID generation service configuration."
 	},
 	{
 		"displayName": "ID Generation > New Table ID Generation",
@@ -63,7 +63,7 @@
 		"javaConfigTemplate": "xml-id-gnr-table-service-java.hbs",
 		"yamlTemplate": "",
 		"propertiesTemplate": "",
-		"description": "테이블 기반 ID 생성 서비스 설정을 생성합니다."
+		"description": "Creates a table-based ID generation service configuration."
 	},
 	{
 		"displayName": "ID Generation > New UUID Generation",
@@ -74,7 +74,7 @@
 		"javaConfigTemplate": "xml-id-gnr-uuid-service-java.hbs",
 		"yamlTemplate": "",
 		"propertiesTemplate": "",
-		"description": "UUID 기반 ID 생성 서비스 설정을 생성합니다."
+		"description": "Creates a UUID-based ID generation service configuration."
 	},
 	{
 		"displayName": "Logging > New Console Appender",
@@ -85,7 +85,7 @@
 		"javaConfigTemplate": "console-java.hbs",
 		"yamlTemplate": "console-yaml.hbs",
 		"propertiesTemplate": "console-properties.hbs",
-		"description": "콘솔로 로그를 출력하는 Appender 설정을 생성합니다."
+		"description": "Creates an appender configuration that outputs logs to the console."
 	},
 	{
 		"displayName": "Logging > New File Appender",
@@ -96,7 +96,7 @@
 		"javaConfigTemplate": "file-java.hbs",
 		"yamlTemplate": "file-yaml.hbs",
 		"propertiesTemplate": "file-properties.hbs",
-		"description": "파일로 로그를 기록하는 Appender 설정을 생성합니다."
+		"description": "Creates an appender configuration that writes logs to a file."
 	},
 	{
 		"displayName": "Logging > New Rolling File Appender",
@@ -107,7 +107,7 @@
 		"javaConfigTemplate": "rollingFile-java.hbs",
 		"yamlTemplate": "rollingFile-yaml.hbs",
 		"propertiesTemplate": "rollingFile-properties.hbs",
-		"description": "파일 크기에 따라 로그 파일을 롤링하는 Appender 설정을 생성합니다."
+		"description": "Creates an appender configuration that rolls log files based on file size."
 	},
 	{
 		"displayName": "Logging > New Time-Based Rolling File Appender",
@@ -118,7 +118,7 @@
 		"javaConfigTemplate": "timeBasedRollingFile-java.hbs",
 		"yamlTemplate": "timeBasedRollingFile-yaml.hbs",
 		"propertiesTemplate": "timeBasedRollingFile-properties.hbs",
-		"description": "시간에 따라 로그 파일을 롤링하는 Appender 설정을 생성합니다."
+		"description": "Creates an appender configuration that rolls log files based on time."
 	},
 	{
 		"displayName": "Logging > New JDBC Appender",
@@ -129,7 +129,7 @@
 		"javaConfigTemplate": "jdbc-java.hbs",
 		"yamlTemplate": "jdbc-yaml.hbs",
 		"propertiesTemplate": "jdbc-properties.hbs",
-		"description": "데이터베이스에 로그를 적재하는 JDBC Appender 설정을 생성합니다."
+		"description": "Creates a JDBC appender configuration that stores logs in a database."
 	},
 	{
 		"displayName": "Property > New Property",
@@ -140,7 +140,7 @@
 		"javaConfigTemplate": "property-java.hbs",
 		"yamlTemplate": "",
 		"propertiesTemplate": "",
-		"description": "시스템 환경 변수 등의 정보를 외부에서 관리할 수 있게 하는 Property 설정을 생성합니다."
+		"description": "Creates a property configuration that allows external management of information such as system environment variables."
 	},
 	{
 		"displayName": "Scheduling > New Detail Bean Job",
@@ -151,7 +151,7 @@
 		"javaConfigTemplate": "beanJob-java.hbs",
 		"yamlTemplate": "",
 		"propertiesTemplate": "",
-		"description": "작업 실행에 필요한 정보를 객체에 담은 Job(Job Detail)을 생성합니다."
+		"description": "Creates a job (job detail) that encapsulates the information required to execute a task."
 	},
 	{
 		"displayName": "Scheduling > New Method Invoking Job",
@@ -162,7 +162,7 @@
 		"javaConfigTemplate": "methodJob-java.hbs",
 		"yamlTemplate": "",
 		"propertiesTemplate": "",
-		"description": "특정 Bean 객체의 메소드를 주기적으로 호출하는 Job(Job Detail)을 생성합니다."
+		"description": "Creates a job (job detail) that periodically invokes a method of a specific bean object."
 	},
 	{
 		"displayName": "Scheduling > New Simple Trigger",
@@ -173,7 +173,7 @@
 		"javaConfigTemplate": "simpleTrigger-java.hbs",
 		"yamlTemplate": "",
 		"propertiesTemplate": "",
-		"description": "단순 스케줄링으로서, 특정 시간, 반복 회수, 대기 시간 등에 따라 작업을 수행하는 Trigger를 생성합니다."
+		"description": "Creates a trigger for simple scheduling that executes tasks based on specific times, repeat counts, delays, and so on."
 	},
 	{
 		"displayName": "Scheduling > New Cron Trigger",
@@ -184,7 +184,7 @@
 		"javaConfigTemplate": "cronTrigger-java.hbs",
 		"yamlTemplate": "",
 		"propertiesTemplate": "",
-		"description": "Cron 표현식에 기반하여 특정 시간, 요일, 월에 작업을 수행하는 Trigger를 생성합니다."
+		"description": "Creates a trigger that executes tasks at specific times, days, and months based on a cron expression."
 	},
 	{
 		"displayName": "Scheduling > New Scheduler",
@@ -195,7 +195,7 @@
 		"javaConfigTemplate": "scheduler-java.hbs",
 		"yamlTemplate": "",
 		"propertiesTemplate": "",
-		"description": "스케줄링한 작업을 시작하기 위해 Job과 Trigger를 등록하는 Scheduler 설정을 생성합니다."
+		"description": "Creates a scheduler configuration that registers jobs and triggers to start scheduled tasks."
 	},
 	{
 		"displayName": "Transaction > New Datasource Transaction",
@@ -206,7 +206,7 @@
 		"javaConfigTemplate": "datasource-java.hbs",
 		"yamlTemplate": "",
 		"propertiesTemplate": "",
-		"description": "Datasource에 대해 AOP 또는 Annotation을 통해 선언적으로 Transaction을 관리하기 위한 설정을 생성합니다."
+		"description": "Creates a configuration for declaratively managing transactions on a datasource using AOP or annotations."
 	},
 	{
 		"displayName": "Transaction > New JPA Transaction",
@@ -217,7 +217,7 @@
 		"javaConfigTemplate": "jpa-java.hbs",
 		"yamlTemplate": "",
 		"propertiesTemplate": "",
-		"description": "JPA 환경에서 Transaction을 관리하기 위한 설정을 생성합니다."
+		"description": "Creates a configuration for managing transactions in a JPA environment."
 	},
 	{
 		"displayName": "Transaction > New JTA Transaction",
@@ -228,6 +228,6 @@
 		"javaConfigTemplate": "jta-java.hbs",
 		"yamlTemplate": "",
 		"propertiesTemplate": "",
-		"description": "JTA에 기반하여 다중 리소스 간의 분산 Transaction을 관리하기 위한 설정을 생성합니다."
+		"description": "Creates a configuration for managing distributed transactions across multiple resources based on JTA."
 	}
 ]

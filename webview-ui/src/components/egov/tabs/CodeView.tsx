@@ -508,7 +508,7 @@ const CodeView = () => {
 							marginTop: "5px",
 						}}>
 						Generate CRUD operations and database-related code from DDL (Data Definition Language) statements.
-						Supports Oracle, MySQL, PostgreSQL and more. Uses Handlebars template engine. Learn more at{" "}
+						Supports MySQL, PostgreSQL. Uses Handlebars template engine. Learn more at{" "}
 						<Link
 							href="https://github.com/eGovFramework/egovframe-vscode-initializr"
 							style={{ display: "inline", fontSize: "12px" }}>
@@ -587,7 +587,7 @@ const CodeView = () => {
 										color: "var(--vscode-foreground)",
 										userSelect: "none",
 									}}>
-									샘플 선택:
+									Select Sample:
 								</label>
 								<select
 									id="sample-ddl-select"
@@ -608,7 +608,7 @@ const CodeView = () => {
 									onBlur={(e) => {
 										e.target.style.border = "1px solid var(--vscode-dropdown-border)"
 									}}>
-									<option value="">직접 입력</option>
+									<option value="">Enter directly</option>
 									{sampleDDLs &&
 										Object.entries(sampleDDLs).map(([key, sample]) => (
 											<option key={key} value={key}>

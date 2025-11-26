@@ -50,17 +50,17 @@ const CodePreview: React.FC<CodePreviewProps> = ({
 		}
 	}, [autoUpdatePreview])
 	const templateOptions = [
-		{ value: "vo", label: "VO 클래스" },
-		{ value: "defaultVo", label: "Default VO 클래스" },
-		{ value: "controller", label: "Controller 클래스" },
-		{ value: "service", label: "Service 인터페이스" },
-		{ value: "serviceImpl", label: "ServiceImpl 클래스" },
-		{ value: "mapperInterface", label: "Mapper 인터페이스" },
+		{ value: "vo", label: "VO Class" },
+		{ value: "defaultVo", label: "Default VO Class" },
+		{ value: "controller", label: "Controller Class" },
+		{ value: "service", label: "Service Interface" },
+		{ value: "serviceImpl", label: "ServiceImpl Class" },
+		{ value: "mapperInterface", label: "Mapper Interface" },
 		{ value: "mapper", label: "MyBatis Mapper XML" },
-		{ value: "thymeleafList", label: "Thymeleaf 목록 페이지" },
-		{ value: "thymeleafRegister", label: "Thymeleaf 등록 페이지" },
-		{ value: "jspList", label: "JSP 목록 페이지" },
-		{ value: "jspRegister", label: "JSP 등록 페이지" },
+		{ value: "thymeleafList", label: "Thymeleaf List Page" },
+		{ value: "thymeleafRegister", label: "Thymeleaf Register Page" },
+		{ value: "jspList", label: "JSP List Page" },
+		{ value: "jspRegister", label: "JSP Register Page" },
 	]
 
 	// 현재 미리보기 설정
@@ -82,7 +82,9 @@ const CodePreview: React.FC<CodePreviewProps> = ({
 						marginBottom: "20px",
 					}}>
 					<div style={{ marginBottom: "10px" }}>
-						<h4 style={{ color: "var(--vscode-foreground)", marginBottom: "10px", marginTop: 0 }}>템플릿 미리보기</h4>
+						<h4 style={{ color: "var(--vscode-foreground)", marginBottom: "10px", marginTop: 0 }}>
+							Preview templates
+						</h4>
 
 						{/* 자동 업데이트 옵션 */}
 						{onAutoUpdateChange && (
@@ -111,7 +113,7 @@ const CodePreview: React.FC<CodePreviewProps> = ({
 										cursor: "pointer",
 										userSelect: "none",
 									}}>
-									미리보기 항상 열기
+									Always open preview
 								</label>
 							</div>
 						)}
@@ -140,7 +142,7 @@ const CodePreview: React.FC<CodePreviewProps> = ({
 							onMouseOut={(e) => {
 								;(e.target as HTMLButtonElement).style.backgroundColor = "var(--vscode-button-background)"
 							}}>
-							미리보기 열기
+							Open Preview
 						</button>
 					</div>
 				</div>
@@ -164,7 +166,7 @@ const CodePreview: React.FC<CodePreviewProps> = ({
 				}}>
 				<div style={{ marginBottom: "10px" }}>
 					<h4 style={{ color: "var(--vscode-foreground)", marginBottom: "10px", marginTop: 0 }}>
-						템플릿 미리보기
+						Preview templates
 						{packageName && (
 							<span
 								style={{
@@ -173,7 +175,7 @@ const CodePreview: React.FC<CodePreviewProps> = ({
 									marginLeft: "10px",
 									fontWeight: "normal",
 								}}>
-								(패키지: {packageName})
+								(Package: {packageName})
 							</span>
 						)}
 					</h4>
@@ -205,7 +207,7 @@ const CodePreview: React.FC<CodePreviewProps> = ({
 									cursor: "pointer",
 									userSelect: "none",
 								}}>
-								미리보기 항상 열기
+								Always open preview
 							</label>
 						</div>
 					)}
@@ -234,7 +236,7 @@ const CodePreview: React.FC<CodePreviewProps> = ({
 										;(e.target as HTMLButtonElement).style.backgroundColor =
 											"var(--vscode-button-secondaryBackground)"
 									}}>
-									미리보기 닫기
+									Close Preview
 								</button>
 							) : (
 								<button
@@ -262,7 +264,7 @@ const CodePreview: React.FC<CodePreviewProps> = ({
 									onMouseOut={(e) => {
 										;(e.target as HTMLButtonElement).style.backgroundColor = "var(--vscode-button-background)"
 									}}>
-									미리보기 열기
+									Open Preview
 								</button>
 							)}
 						</div>
@@ -315,7 +317,7 @@ const CodePreview: React.FC<CodePreviewProps> = ({
 								borderRadius: "50%",
 								animation: "spin 1s linear infinite",
 							}}></div>
-						<div style={{ marginTop: "10px" }}>미리보기 생성 중...</div>
+						<div style={{ marginTop: "10px" }}>Generating preview...</div>
 					</div>
 				)}
 
