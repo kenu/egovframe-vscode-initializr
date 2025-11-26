@@ -14,6 +14,11 @@ import * as monaco from "monaco-editor"
 import "monaco-sql-languages/esm/languages/mysql/mysql.contribution"
 import "monaco-sql-languages/esm/languages/pgsql/pgsql.contribution"
 
+// Import Workers as inline (Vite will bundle them as base64)
+import MySQLWorker from "monaco-sql-languages/esm/languages/mysql/mysql.worker?worker&inline"
+import PgSQLWorker from "monaco-sql-languages/esm/languages/pgsql/pgsql.worker?worker&inline"
+import EditorWorker from "monaco-editor/esm/vs/editor/editor.worker?worker&inline"
+
 // Configure Monaco Editor loader
 loader.config({ monaco })
 
@@ -21,41 +26,17 @@ loader.config({ monaco })
 if (typeof window !== "undefined") {
 	;(window as any).MonacoEnvironment = {
 		getWorker(_: any, label: string) {
-			// Development mode: Use direct imports from node_modules
-			if (import.meta.env.DEV) {
-				if (label === "mysql") {
-					return new Worker(new URL("monaco-sql-languages/esm/languages/mysql/mysql.worker.js", import.meta.url), {
-						type: "module",
-					})
-				}
-				if (label === "pgsql") {
-					return new Worker(new URL("monaco-sql-languages/esm/languages/pgsql/pgsql.worker.js", import.meta.url), {
-						type: "module",
-					})
-				}
+			// Use inline workers (bundled as base64 by Vite)
+			// This solves CORS issues in VSCode webview environment
+			if (label === "mysql") {
+				return new MySQLWorker()
+			}
+			if (label === "pgsql") {
+				return new PgSQLWorker()
 			}
 
-			// Production mode: Workers are copied to build/assets by Vite plugin
-			// Use relative path for VSCode webview
-			if (label === "mysql" || label === "pgsql") {
-				// In production, workers are bundled by Vite as inline workers
-				// We use direct import which Vite will handle
-				if (label === "mysql") {
-					return new Worker(new URL("monaco-sql-languages/esm/languages/mysql/mysql.worker.js", import.meta.url), {
-						type: "module",
-					})
-				}
-				if (label === "pgsql") {
-					return new Worker(new URL("monaco-sql-languages/esm/languages/pgsql/pgsql.worker.js", import.meta.url), {
-						type: "module",
-					})
-				}
-			}
-
-			// Fallback to default Monaco worker
-			return new Worker(new URL("monaco-editor/esm/vs/editor/editor.worker.js", import.meta.url), {
-				type: "module",
-			})
+			// Fallback to default Monaco editor worker
+			return new EditorWorker()
 		},
 	}
 }
