@@ -24,15 +24,18 @@ loader.config({ monaco })
 
 // Configure Monaco Environment for SQL Language Workers
 if (typeof window !== "undefined") {
+	// 브라우저 환경인지 확인 (Node.js 환경에서는 window가 없없으므로 실행되지 않음)
 	;(window as any).MonacoEnvironment = {
+		// Monaco Editor가 참조하는 전역 설정 객체 (Worker를 어떻게 만들지 정의)
 		getWorker(_: any, label: string) {
+			// Monaco가 Worker가 필요할 때 호출하는 함수 (label을 통해 Monaco가 어떤 언어의 Worker가 필요한지 알려줌)
 			// Use inline workers (bundled as base64 by Vite)
 			// This solves CORS issues in VSCode webview environment
 			if (label === "mysql") {
-				return new MySQLWorker()
+				return new MySQLWorker() // Base64로 번들링된 MySQL Worker 인스턴스 반환
 			}
 			if (label === "pgsql") {
-				return new PgSQLWorker()
+				return new PgSQLWorker() // Base64로 번들링된 PostgreSQL Worker 인스턴스 반환
 			}
 
 			// Fallback to default Monaco editor worker
