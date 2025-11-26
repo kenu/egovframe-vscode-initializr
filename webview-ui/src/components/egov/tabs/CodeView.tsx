@@ -587,7 +587,7 @@ const CodeView = () => {
 										color: "var(--vscode-foreground)",
 										userSelect: "none",
 									}}>
-									Select Sample:
+									Sample:
 								</label>
 								<select
 									id="sample-ddl-select"

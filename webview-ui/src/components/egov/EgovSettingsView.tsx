@@ -368,6 +368,17 @@ const EgovSettingsView = memo(({ onDone }: EgovSettingsViewProps) => {
 							Github docs
 						</a>
 					</div>
+					<div style={itemStyle}>
+						<a
+							href="#"
+							style={linkStyle}
+							target="_blank"
+							rel="noopener noreferrer"
+							onMouseEnter={(e) => Object.assign(e.currentTarget.style, linkHoverStyle)}
+							onMouseLeave={(e) => (e.currentTarget.style.borderBottom = "1px solid transparent")}>
+							VSCode Extension docs(later)
+						</a>
+					</div>
 				</div>
 
 				{/* Additional Info */}
