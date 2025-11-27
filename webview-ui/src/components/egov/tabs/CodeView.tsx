@@ -96,9 +96,90 @@ const CodeView = () => {
 		updateState({ sampleDDLs: value })
 	const setPreviewLanguages = (value: { [key: string]: string } | null) => updateState({ previewLanguages: value })
 
-	// DDL 유효성 검사 및 파싱 (Monaco Editor의 Worker 검증 활용)
+	// DDL 검증 로직을 별도 함수로 분리 (이벤트 기반 실시간 검증)
+	const validateDDLWithMonaco = (currentDdlContent: string) => {
+		try {
+			const editor = editorRef.current
+			const monacoInstance = monacoRef.current
+
+			if (editor && monacoInstance) {
+				const model = editor.getModel()
+				if (model) {
+					// Monaco Worker의 검증 결과 가져오기
+					const markers = monacoInstance.editor.getModelMarkers({
+						resource: model.uri,
+					})
+
+					// 에러만 필터링
+					const errors = markers.filter((m) => m.severity === monacoInstance.MarkerSeverity.Error)
+					const hasErrors = errors.length > 0
+
+					console.log(`Monaco validation: ${errors.length} errors found`)
+
+					// Monaco 검증 결과로 isValid 설정
+					const isValidDDL = !hasErrors
+					setIsValid(isValidDDL)
+
+					if (isValidDDL) {
+						// Monaco 검증 통과 시 DDL 파싱 시도
+						const parsed = parseDDL(currentDdlContent)
+						setParsedDDL(parsed)
+						setError("")
+
+						// 빠른 검증만 요청 (미리보기는 나중에)
+						vscode.postMessage({
+							type: "validateDDLOnly",
+							ddl: currentDdlContent,
+							packageName: packageName,
+						})
+					} else {
+						setParsedDDL(null)
+						// 첫 번째 에러 메시지 표시
+						const firstError = errors[0]
+						setError(
+							`SQL Syntax Error (Line ${firstError.startLineNumber}, Col ${firstError.startColumn}): ${firstError.message}`,
+						)
+						setPreviews(null)
+						setPreviewError("")
+					}
+					return
+				}
+			}
+
+			// Monaco Editor가 없는 경우 fallback으로 기존 validateDDL 사용
+			console.log("Monaco not available, using fallback validation")
+			const isValidDDL = validateDDL(currentDdlContent)
+			setIsValid(isValidDDL)
+
+			if (isValidDDL) {
+				const parsed = parseDDL(currentDdlContent)
+				setParsedDDL(parsed)
+				setError("")
+
+				vscode.postMessage({
+					type: "validateDDLOnly",
+					ddl: currentDdlContent,
+					packageName: packageName,
+				})
+			} else {
+				setParsedDDL(null)
+				setError("Invalid DDL format")
+				setPreviews(null)
+				setPreviewError("")
+			}
+		} catch (err) {
+			console.error("DDL parsing error:", err)
+			setIsValid(false)
+			setParsedDDL(null)
+			setError(err instanceof Error ? err.message : "Parsing error")
+			setPreviews(null)
+			setPreviewError("")
+		}
+	}
+
+	// DDL 내용 변경 시 기본 상태 처리 (빈 값 체크 및 미리보기 무효화)
 	useEffect(() => {
-		console.log("DDL validation effect running...", ddlContent.length)
+		console.log("DDL content changed, length:", ddlContent.length)
 
 		if (!ddlContent.trim()) {
 			setIsValid(false)
@@ -113,111 +194,11 @@ const CodeView = () => {
 		setPreviews(null)
 		setPreviewError("")
 
-		// 디바운스 적용 / 1000ms 적용 / 300ms 적용시 validation check 오류 발생
-		const debounceTimer = setTimeout(() => {
-			try {
-				// Monaco Editor의 마커를 확인하여 validation 수행
-				const editor = editorRef.current
-				const monacoInstance = monacoRef.current
-
-				if (editor && monacoInstance) {
-					const model = editor.getModel()
-					if (model) {
-						// Monaco Worker의 검증 결과 가져오기
-						const markers = monacoInstance.editor.getModelMarkers({
-							resource: model.uri,
-						})
-
-						// 에러만 필터링
-						const errors = markers.filter((m) => m.severity === monacoInstance.MarkerSeverity.Error)
-						const hasErrors = errors.length > 0
-
-						console.log(`Monaco validation: ${errors.length} errors found`)
-
-						// Monaco 검증 결과로 isValid 설정
-						const isValidDDL = !hasErrors
-						setIsValid(isValidDDL)
-
-						if (isValidDDL) {
-							// Monaco 검증 통과 시 DDL 파싱 시도
-							const parsed = parseDDL(ddlContent)
-							setParsedDDL(parsed)
-							setError("")
-
-							// 빠른 검증만 요청 (미리보기는 나중에)
-							vscode.postMessage({
-								type: "validateDDLOnly",
-								ddl: ddlContent,
-								packageName: packageName,
-							})
-						} else {
-							setParsedDDL(null)
-							// 첫 번째 에러 메시지 표시
-							const firstError = errors[0]
-							setError(
-								`SQL Syntax Error (Line ${firstError.startLineNumber}, Col ${firstError.startColumn}): ${firstError.message}`,
-							)
-							setPreviews(null)
-							setPreviewError("")
-						}
-					} else {
-						// Monaco Editor 모델이 없는 경우 fallback으로 기존 validateDDL 사용
-						console.log("Monaco model not available, using fallback validation")
-						const isValidDDL = validateDDL(ddlContent)
-						setIsValid(isValidDDL)
-
-						if (isValidDDL) {
-							const parsed = parseDDL(ddlContent)
-							setParsedDDL(parsed)
-							setError("")
-
-							vscode.postMessage({
-								type: "validateDDLOnly",
-								ddl: ddlContent,
-								packageName: packageName,
-							})
-						} else {
-							setParsedDDL(null)
-							setError("Invalid DDL format")
-							setPreviews(null)
-							setPreviewError("")
-						}
-					}
-				} else {
-					// Monaco Editor가 아직 초기화되지 않은 경우 fallback
-					console.log("Monaco editor not ready, using fallback validation")
-					const isValidDDL = validateDDL(ddlContent)
-					setIsValid(isValidDDL)
-
-					if (isValidDDL) {
-						const parsed = parseDDL(ddlContent)
-						setParsedDDL(parsed)
-						setError("")
-
-						vscode.postMessage({
-							type: "validateDDLOnly",
-							ddl: ddlContent,
-							packageName: packageName,
-						})
-					} else {
-						setParsedDDL(null)
-						setError("Invalid DDL format")
-						setPreviews(null)
-						setPreviewError("")
-					}
-				}
-			} catch (err) {
-				console.error("DDL parsing error:", err)
-				setIsValid(false)
-				setParsedDDL(null)
-				setError(err instanceof Error ? err.message : "Parsing error")
-				setPreviews(null)
-				setPreviewError("")
-			}
-		}, 1000)
-
-		return () => clearTimeout(debounceTimer)
-	}, [ddlContent, packageName])
+		// Monaco가 초기화되지 않은 경우에만 fallback 검증 (초기 로드 시)
+		if (!editorRef.current || !monacoRef.current) {
+			console.log("Monaco not ready yet, will validate on mount")
+		}
+	}, [ddlContent])
 
 	// 자동 미리보기 업데이트 (DDL이 유효하고 자동 업데이트가 활성화된 경우)
 	useEffect(() => {
@@ -660,13 +641,33 @@ const CodeView = () => {
 							value={ddlContent}
 							onChange={(value) => setDdlContent(value || "")}
 							onMount={(editor, monacoInstance) => {
-								// Editor와 Monaco 인스턴스 저장 => Validation 체크시 디바운스 효과를 위해 사용
+								// Editor와 Monaco 인스턴스 저장
 								editorRef.current = editor
 								monacoRef.current = monacoInstance
 
 								// 포커스 이벤트 리스너
 								editor.onDidFocusEditorText(() => setIsEditorFocused(true))
 								editor.onDidBlurEditorText(() => setIsEditorFocused(false))
+
+								// 실시간 검증: Monaco Worker가 마커를 업데이트할 때마다 즉시 검증
+								monacoInstance.editor.onDidChangeMarkers((uris) => {
+									const model = editor.getModel()
+									if (model && uris.some((uri) => uri.toString() === model.uri.toString())) {
+										// Worker 완료 즉시 검증 실행 (딜레이 없음)
+										console.log("Markers changed, validating DDL...")
+										const currentContent = model.getValue()
+										if (currentContent.trim()) {
+											validateDDLWithMonaco(currentContent)
+										}
+									}
+								})
+
+								// 초기 마운트 시에도 검증 실행
+								if (ddlContent.trim()) {
+									console.log("Initial validation on mount")
+									// Worker가 초기 분석을 완료할 때까지 짧은 지연
+									setTimeout(() => validateDDLWithMonaco(ddlContent), 100)
+								}
 							}}
 							options={{
 								minimap: { enabled: false },
