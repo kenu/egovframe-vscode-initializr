@@ -72,6 +72,8 @@ const CodeView = () => {
 	const [isEditorFocused, setIsEditorFocused] = useState(false)
 	// SQL 방언 선택 (MySQL or PostgreSQL)
 	const [sqlDialect, setSqlDialect] = useState<"mysql" | "pgsql">("mysql")
+	// 현재 선택된 샘플 키 추적
+	const [selectedSampleKey, setSelectedSampleKey] = useState<string>("")
 	// Monaco Editor 인스턴스 참조
 	const editorRef = useRef<monaco.editor.IStandaloneCodeEditor | null>(null)
 	const monacoRef = useRef<typeof monaco | null>(null)
@@ -190,9 +192,11 @@ const CodeView = () => {
 			return
 		}
 
-		// DDL이 변경되면 기존 미리보기 무효화
+		// DDL이 변경되면 기존 미리보기 및 에러 상태 초기화
 		setPreviews(null)
 		setPreviewError("")
+		setError("") // 이전 에러 메시지 제거
+		setParsedDDL(null) // 이전 파싱 결과 제거
 
 		// Monaco가 초기화되지 않은 경우에만 fallback 검증 (초기 로드 시)
 		if (!editorRef.current || !monacoRef.current) {
@@ -443,8 +447,10 @@ const CodeView = () => {
 		})
 	}
 
-	// 샘플 DDL 선택 함수
+	// 샘플 DDL 선택 함수 (SQL dialect와 독립적)
 	const handleSampleDDLChange = (sampleKey: string) => {
+		setSelectedSampleKey(sampleKey)
+
 		if (sampleKey === "") {
 			// "직접 입력" 선택 시 DDL 내용을 빈 문자열로 설정
 			setDdlContent("")
@@ -452,10 +458,20 @@ const CodeView = () => {
 			setPreviews(null)
 			setPreviewError("")
 		} else if (sampleKey && sampleDDLs?.[sampleKey]) {
-			setDdlContent(sampleDDLs[sampleKey].ddl)
+			const selectedSample = sampleDDLs[sampleKey]
+
+			// 샘플 DDL만 로드 (SQL dialect는 변경하지 않음)
+			setDdlContent(selectedSample.ddl)
 			// 기존 미리보기 무효화
 			setPreviews(null)
 			setPreviewError("")
+
+			// Monaco Worker가 검증을 완료할 때까지 짧은 지연 후 검증 실행
+			setTimeout(() => {
+				if (editorRef.current && monacoRef.current) {
+					validateDDLWithMonaco(selectedSample.ddl)
+				}
+			}, 150)
 		}
 	}
 
@@ -507,44 +523,23 @@ const CodeView = () => {
 							alignItems: "center",
 							marginBottom: "10px",
 						}}>
-						<h4 style={{ color: "var(--vscode-foreground)", margin: 0 }}>DDL Input</h4>
-
-						<div>
-							{ddlContent.trim() && (
-								<span
-									style={{
-										fontSize: "12px",
-										color: isValid ? "var(--vscode-terminal-ansiGreen)" : "var(--vscode-errorForeground)",
-									}}>
-									{isValid ? "✓" : "✗"}
-								</span>
-							)}
-						</div>
-
-						{/* SQL 방언 선택 및 샘플 DDL 선택 드롭다운 */}
+						{/* 왼쪽: DDL Input 제목, SQL 방언 선택, 검증 상태 */}
 						<div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+							<h4 style={{ color: "var(--vscode-foreground)", margin: 0 }}>DDL Input</h4>
+
 							{/* SQL 방언 선택 */}
-							<div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-								<label
-									htmlFor="sql-dialect-select"
-									style={{
-										fontSize: "12px",
-										color: "var(--vscode-foreground)",
-										userSelect: "none",
-									}}>
-									SQL:
-								</label>
+							<div style={{ display: "flex", alignItems: "center", gap: "6px" }}>
 								<select
 									id="sql-dialect-select"
 									value={sqlDialect}
 									onChange={(e) => setSqlDialect(e.target.value as "mysql" | "pgsql")}
 									style={{
-										padding: "4px 8px",
+										padding: "3px 6px",
 										fontSize: "12px",
 										backgroundColor: "var(--vscode-input-background)",
 										color: "var(--vscode-input-foreground)",
 										border: "1px solid var(--vscode-dropdown-border)",
-										borderRadius: "4px",
+										borderRadius: "3px",
 										outline: "none",
 										cursor: "pointer",
 									}}
@@ -559,45 +554,63 @@ const CodeView = () => {
 								</select>
 							</div>
 
-							{/* 샘플 DDL 선택 드롭다운 */}
-							<div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-								<label
-									htmlFor="sample-ddl-select"
+							{/* 검증 상태 표시 */}
+							{ddlContent.trim() && (
+								<div
 									style={{
-										fontSize: "12px",
-										color: "var(--vscode-foreground)",
-										userSelect: "none",
+										fontSize: "11px",
+										fontWeight: "600",
+										padding: "2px 8px",
+										borderRadius: "3px",
+										backgroundColor: isValid
+											? "var(--vscode-testing-iconPassed)"
+											: "var(--vscode-testing-iconFailed)",
+										color: "white",
 									}}>
-									Sample:
-								</label>
-								<select
-									id="sample-ddl-select"
-									onChange={(e) => handleSampleDDLChange(e.target.value)}
-									style={{
-										padding: "4px 8px",
-										fontSize: "12px",
-										backgroundColor: "var(--vscode-input-background)",
-										color: "var(--vscode-input-foreground)",
-										border: "1px solid var(--vscode-dropdown-border)",
-										borderRadius: "4px",
-										outline: "none",
-										cursor: "pointer",
-									}}
-									onFocus={(e) => {
-										e.target.style.border = "1px solid var(--vscode-focusBorder)"
-									}}
-									onBlur={(e) => {
-										e.target.style.border = "1px solid var(--vscode-dropdown-border)"
-									}}>
-									<option value="">Enter directly</option>
-									{sampleDDLs &&
-										Object.entries(sampleDDLs).map(([key, sample]) => (
-											<option key={key} value={key}>
-												{sample.name}
-											</option>
-										))}
-								</select>
-							</div>
+									{isValid ? "Valid" : "Invalid"}
+								</div>
+							)}
+						</div>
+
+						{/* 오른쪽: 샘플 DDL 선택 */}
+						<div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+							<label
+								htmlFor="sample-ddl-select"
+								style={{
+									fontSize: "12px",
+									color: "var(--vscode-foreground)",
+									userSelect: "none",
+								}}>
+								Sample:
+							</label>
+							<select
+								id="sample-ddl-select"
+								value={selectedSampleKey}
+								onChange={(e) => handleSampleDDLChange(e.target.value)}
+								style={{
+									padding: "4px 8px",
+									fontSize: "12px",
+									backgroundColor: "var(--vscode-input-background)",
+									color: "var(--vscode-input-foreground)",
+									border: "1px solid var(--vscode-dropdown-border)",
+									borderRadius: "4px",
+									outline: "none",
+									cursor: "pointer",
+								}}
+								onFocus={(e) => {
+									e.target.style.border = "1px solid var(--vscode-focusBorder)"
+								}}
+								onBlur={(e) => {
+									e.target.style.border = "1px solid var(--vscode-dropdown-border)"
+								}}>
+								<option value="">Enter directly</option>
+								{sampleDDLs &&
+									Object.entries(sampleDDLs).map(([key, sample]) => (
+										<option key={key} value={key}>
+											{sample.name}
+										</option>
+									))}
+							</select>
 						</div>
 					</div>
 					{/*
