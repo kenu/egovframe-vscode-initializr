@@ -90,11 +90,6 @@ class DatabaseDefinition {
 			FLOAT: "java.lang.Float",
 			REAL: "java.lang.Double",
 			DOUBLE: "java.lang.Double",
-
-			SMALLSERIAL: "java.lang.Short",
-			SERIAL: "java.lang.Integer",
-			BIGSERIAL: "java.lang.Long",
-
 			DATE: "java.sql.Date",
 			TIME: "java.sql.Time",
 			DATETIME: "java.util.Date",
@@ -102,6 +97,12 @@ class DatabaseDefinition {
 			BOOLEAN: "java.lang.Boolean",
 			BIT: "java.lang.Boolean",
 			MEDIUMTEXT: "java.lang.String",
+			ENUM: "java.lang.String",
+			SET: "java.lang.String",
+
+			SMALLSERIAL: "java.lang.Short",
+			SERIAL: "java.lang.Integer",
+			BIGSERIAL: "java.lang.Long",
 		}
 	}
 

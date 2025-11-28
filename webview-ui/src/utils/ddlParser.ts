@@ -52,6 +52,10 @@ const predefinedDataTypes: { [key: string]: string } = {
 	MEDIUMTEXT: "java.lang.String",
 	ENUM: "java.lang.String",
 	SET: "java.lang.String",
+
+	SMALLSERIAL: "java.lang.Short",
+	SERIAL: "java.lang.Integer",
+	BIGSERIAL: "java.lang.Long",
 }
 
 export function getJavaClassName(dataType: string): string {
