@@ -83,7 +83,7 @@
 		<dependency>
 			<groupId>jakarta.servlet</groupId>
 			<artifactId>jakarta.servlet-api</artifactId>
-			<version>6.1.0</version>
+			<version>5.0.0</version>
 		</dependency>
 		<!-- JSP 구문을 지원하기 위한 표준 사양 -->
 		<dependency>

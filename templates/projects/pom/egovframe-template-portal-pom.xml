@@ -77,12 +77,29 @@
 			<artifactId>egovframe-rte-fdl-crypto</artifactId>
 			<version>${egovframe.rte.version}</version>
 		</dependency>
+		<dependency>
+			<groupId>org.egovframe.rte</groupId>
+			<artifactId>egovframe-rte-ptl-reactive</artifactId>
+			<version>${egovframe.rte.version}</version>
+		</dependency>
+
+		<!-- Jakarta Bean Validation -->
+		<dependency>
+			<groupId>jakarta.validation</groupId>
+			<artifactId>jakarta.validation-api</artifactId>
+			<version>3.0.2</version>
+		</dependency>
+		<dependency>
+			<groupId>org.hibernate.validator</groupId>
+			<artifactId>hibernate-validator</artifactId>
+			<version>8.0.1.Final</version>
+		</dependency>
 
 		<!-- Jakarta -->
 		<dependency>
 			<groupId>jakarta.servlet</groupId>
 			<artifactId>jakarta.servlet-api</artifactId>
-			<version>6.1.0</version>
+			<version>5.0.0</version>
 			<scope>provided</scope>
 		</dependency>
 		<!-- JSP 구문을 지원하기 위한 표준 사양 -->
