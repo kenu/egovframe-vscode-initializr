@@ -90,6 +90,11 @@ class DatabaseDefinition {
 			FLOAT: "java.lang.Float",
 			REAL: "java.lang.Double",
 			DOUBLE: "java.lang.Double",
+
+			SMALLSERIAL: "java.lang.Short",
+			SERIAL: "java.lang.Integer",
+			BIGSERIAL: "java.lang.Long",
+
 			DATE: "java.sql.Date",
 			TIME: "java.sql.Time",
 			DATETIME: "java.util.Date",
