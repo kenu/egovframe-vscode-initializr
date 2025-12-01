@@ -129,6 +129,7 @@ export interface ConfigFormData {
 
 	// Transaction 관련
 	txtTransactionTemplate?: string
+	txtTransactionTemplateName?: string
 	txtTransactionName?: string
 	txtDataSourceName?: string
 	chkAopConfigTransaction?: boolean
