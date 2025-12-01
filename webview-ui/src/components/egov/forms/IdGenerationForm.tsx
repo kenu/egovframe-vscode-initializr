@@ -27,7 +27,7 @@ const IdGenerationForm: React.FC<FormComponentProps> = ({ onSubmit, onCancel, te
 		generationType: ConfigGenerationType.XML,
 		txtConfigPackage: "egovframework.example.config",
 		txtFileName: getDefaultFileName(ConfigGenerationType.XML),
-		txtIdServiceName: "sequenceIdGnrService",
+		txtIdServiceName: "idGnrService",
 		// sequence, table 공통
 		txtDatasourceName: "dataSource",
 		// sequence, uuid 공통
@@ -208,60 +208,61 @@ const IdGenerationForm: React.FC<FormComponentProps> = ({ onSubmit, onCancel, te
 					padding: "15px",
 					marginTop: "20px",
 				}}>
-				{formType === "sequence" && (
-					<>
-						{/*
-						<h4 style={{ color: "var(--vscode-foreground)", marginBottom: "10px", marginTop: 0 }}>DB Schema:</h4>
-						<div style={{ fontSize: "11px", color: "var(--vscode-foreground)", marginBottom: "10px" }}>
-							{(() => {
-								// formData.txtQuery에서 "SELECT "와 ".NEXTVAL" 사이의 테이블명 추출 (대소문자 구분 없이)
-								const query = formData.txtQuery || ""
-								let seqName = "SEQ_SAMPLE"
-								// 정규식에서 'i' 플래그로 대소문자 무시, 그리고 .NEXTVAL도 대소문자 무시
-								const match = query.match(/select\s+([A-Za-z0-9_]+)\.nextval/i)
-								if (match && match[1]) {
-									seqName = match[1]
-								} else {
-									seqName = "SEQ_SAMPLE"
-								}
-								// Sequence Table 이름을 동적으로 처리
-								return `CREATE SEQUENCE ${seqName} MINVALUE 0;`
-							})()}
-						</div>
-						*/}
-					</>
-				)}
+				<h4 style={{ color: "var(--vscode-foreground)", marginBottom: "10px", marginTop: 0 }}>Guide:</h4>
+				<div style={{ marginBottom: "10px" }}>
+					<Link
+						href="https://egovframework.github.io/egovframe-docs/egovframe-runtime/foundation-layer/id-generated/"
+						style={{ display: "inline", fontSize: "12px" }}>
+						ID Generation Guide Here
+					</Link>
+				</div>
+
 				{formType === "table" && (
 					<>
-						<h4 style={{ color: "var(--vscode-foreground)", marginBottom: "10px", marginTop: 0 }}>DB Schema:</h4>
-						<div style={{ fontSize: "11px", color: "var(--vscode-foreground)", marginBottom: "10px" }}>
+						<h4 style={{ color: "var(--vscode-foreground)", marginBottom: "10px", marginTop: "12px" }}>DB Schema:</h4>
+						<div
+							style={{
+								fontSize: "11px",
+								color: "var(--vscode-foreground)",
+								marginBottom: "10px",
+								fontFamily: "monospace",
+								backgroundColor: "var(--vscode-textCodeBlock-background)",
+								padding: "10px",
+								borderRadius: "3px",
+							}}>
 							<div>{`CREATE TABLE ${formData.txtTable} (`}</div>
 							<div style={{ paddingLeft: "20px" }}>{`TABLE_NAME varchar(16) NOT NULL,`}</div>
 							<div style={{ paddingLeft: "20px" }}>NEXT_ID INTEGER NOT NULL,</div>
 							<div style={{ paddingLeft: "20px" }}>PRIMARY KEY (TABLE_NAME)</div>
 							<div>);</div>
-							<div>{`INSERT INTO ${formData.txtTable} VALUES('${formData.txtTableNameFieldValue}','1');`}</div>
+							<div
+								style={{
+									marginTop: "8px",
+								}}>{`INSERT INTO ${formData.txtTable} VALUES('${formData.txtTableNameFieldValue}','1');`}</div>
 						</div>
 					</>
 				)}
-				{formType === "uuid" && (
-					<>
-						{/*
-						<h4 style={{ color: "var(--vscode-foreground)", marginBottom: "10px", marginTop: 0 }}>UUID:</h4>
-						<div style={{ fontSize: "11px", color: "var(--vscode-foreground)", marginBottom: "10px" }}>
-							<li>Default : Math.random()</li>
-							<li>MAC Address : e.g., 12:34:56:78:9A:AB</li>
-							<li>IP Address : e.g., 192.168.120.107</li>
-						</div>
-						*/}
-					</>
-				)}
-				<h4 style={{ color: "var(--vscode-foreground)", marginBottom: "10px", marginTop: 0 }}>Guide:</h4>
-				<Link
-					href="https://egovframework.github.io/egovframe-docs/egovframe-runtime/foundation-layer/id-generated/"
-					style={{ display: "inline", fontSize: "12px" }}>
-					ID Generation Guide Here
-				</Link>
+
+				<div style={{ fontSize: "11px", color: "var(--vscode-descriptionForeground)", marginTop: "8px" }}>
+					<strong>Requirements:</strong>
+					<ul style={{ margin: "5px 0", paddingLeft: "20px" }}>
+						<li>Spring Framework 6.x</li>
+						<li>JDK 17+</li>
+						<li>Jakarta EE 9</li>
+						{(formType === "sequence" || formType === "table") && <li>DataSource configured</li>}
+					</ul>
+				</div>
+				<div style={{ fontSize: "11px", color: "var(--vscode-descriptionForeground)", marginTop: "8px" }}>
+					<strong>Required Dependencies:</strong>
+					<ul style={{ margin: "5px 0", paddingLeft: "20px" }}>
+						<li>egovframework-rte-fdl-idgnr (eGov ID Generation Service)</li>
+						<li>spring-context (Spring Framework 6.x)</li>
+						{(formType === "sequence" || formType === "table") && (
+							<li>Database driver (e.g., H2, MySQL, Oracle, PostgreSQL)</li>
+						)}
+						{(formType === "sequence" || formType === "table") && <li>spring-jdbc (for DataSource)</li>}
+					</ul>
+				</div>
 			</div>
 
 			{/* Validation Errors */}

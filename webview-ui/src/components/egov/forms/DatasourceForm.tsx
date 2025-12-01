@@ -132,11 +132,29 @@ const DatasourceForm: React.FC<FormComponentProps> = ({ onSubmit, onCancel, temp
 					marginTop: "20px",
 				}}>
 				<h4 style={{ color: "var(--vscode-foreground)", marginBottom: "10px", marginTop: 0 }}>Guide:</h4>
-				<Link
-					href="https://egovframework.github.io/egovframe-docs/egovframe-runtime/persistence-layer/data-source/"
-					style={{ display: "inline", fontSize: "12px" }}>
-					Datasource Guide Here
-				</Link>
+				<div style={{ marginBottom: "10px" }}>
+					<Link
+						href="https://egovframework.github.io/egovframe-docs/egovframe-runtime/persistence-layer/data-source/"
+						style={{ display: "inline", fontSize: "12px" }}>
+						Datasource Guide Here
+					</Link>
+				</div>
+				<div style={{ fontSize: "11px", color: "var(--vscode-descriptionForeground)", marginTop: "8px" }}>
+					<strong>Requirements:</strong>
+					<ul style={{ margin: "5px 0", paddingLeft: "20px" }}>
+						<li>Spring Framework 6.x</li>
+						<li>JDK 17+</li>
+						<li>Jakarta EE 9</li>
+					</ul>
+				</div>
+				<div style={{ fontSize: "11px", color: "var(--vscode-descriptionForeground)", marginTop: "8px" }}>
+					<strong>Required Dependencies:</strong>
+					<ul style={{ margin: "5px 0", paddingLeft: "20px" }}>
+						<li>DBCP: commons-dbcp2:2.12.0</li>
+						<li>C3P0: c3p0:0.10.1</li>
+						<li>JDBC Driver: mysql-connector-j, mariadb-java-client, postgresql, etc.</li>
+					</ul>
+				</div>
 			</div>
 
 			{/* Validation Errors */}

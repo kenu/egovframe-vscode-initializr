@@ -223,11 +223,29 @@ const TransactionForm: React.FC<FormComponentProps> = ({ onSubmit, onCancel, tem
 					marginTop: "20px",
 				}}>
 				<h4 style={{ color: "var(--vscode-foreground)", marginBottom: "10px", marginTop: 0 }}>Guide:</h4>
-				<Link
-					href="https://egovframework.github.io/egovframe-docs/egovframe-runtime/persistence-layer/transaction/"
-					style={{ display: "inline", fontSize: "12px" }}>
-					Transaction Guide Here
-				</Link>
+				<div style={{ marginBottom: "10px" }}>
+					<Link
+						href="https://egovframework.github.io/egovframe-docs/egovframe-runtime/persistence-layer/transaction/"
+						style={{ display: "inline", fontSize: "12px" }}>
+						Transaction Guide Here
+					</Link>
+				</div>
+				<div style={{ fontSize: "11px", color: "var(--vscode-descriptionForeground)", marginTop: "8px" }}>
+					<strong>Requirements:</strong>
+					<ul style={{ margin: "5px 0", paddingLeft: "20px" }}>
+						<li>Spring Framework 6.x</li>
+						<li>JDK 17+</li>
+						<li>Jakarta EE 9+</li>
+					</ul>
+				</div>
+				<div style={{ fontSize: "11px", color: "var(--vscode-descriptionForeground)", marginTop: "8px" }}>
+					<strong>Required Dependencies:</strong>
+					<ul style={{ margin: "5px 0", paddingLeft: "20px" }}>
+						<li>Datasource: spring-jdbc (Spring Framework 6.x)</li>
+						<li>JPA: spring-orm, hibernate-core (Jakarta Persistence 3.x)</li>
+						<li>JTA: spring-tx, atomikos (Jakarta Transaction API)</li>
+					</ul>
+				</div>
 			</div>
 
 			{/* Validation Errors */}

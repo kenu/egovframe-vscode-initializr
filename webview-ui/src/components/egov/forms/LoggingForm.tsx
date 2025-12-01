@@ -257,11 +257,32 @@ const LoggingForm: React.FC<FormComponentProps> = ({ onSubmit, onCancel, templat
 					marginTop: "20px",
 				}}>
 				<h4 style={{ color: "var(--vscode-foreground)", marginBottom: "10px", marginTop: 0 }}>Guide:</h4>
-				<Link
-					href="https://egovframework.github.io/egovframe-docs/egovframe-runtime/foundation-layer/logging/logging-log4j2/logging-log4j2-configuration_file/"
-					style={{ display: "inline", fontSize: "12px" }}>
-					Logging Guide Here
-				</Link>
+				<div style={{ marginBottom: "10px" }}>
+					<Link
+						href="https://egovframework.github.io/egovframe-docs/egovframe-runtime/foundation-layer/logging/logging-log4j2/logging-log4j2-configuration_file/"
+						style={{ display: "inline", fontSize: "12px" }}>
+						Logging Guide Here
+					</Link>
+				</div>
+				<div style={{ fontSize: "11px", color: "var(--vscode-descriptionForeground)", marginTop: "8px" }}>
+					<strong>Requirements:</strong>
+					<ul style={{ margin: "5px 0", paddingLeft: "20px" }}>
+						<li>Spring Framework 6.x</li>
+						<li>JDK 17+</li>
+						<li>Log4j 2.x (2.20.0+)</li>
+						{formType === "jdbc" && <li>Database driver (e.g., MySQL, Oracle, PostgreSQL)</li>}
+					</ul>
+				</div>
+				<div style={{ fontSize: "11px", color: "var(--vscode-descriptionForeground)", marginTop: "8px" }}>
+					<strong>Required Dependencies:</strong>
+					<ul style={{ margin: "5px 0", paddingLeft: "20px" }}>
+						<li>log4j-api (Log4j 2.x)</li>
+						<li>log4j-core (Log4j 2.x)</li>
+						<li>log4j-slf4j2-impl (SLF4J bridge for Log4j 2.x)</li>
+						{formType === "jdbc" && <li>log4j-jdbc-appender (for JDBC logging)</li>}
+						{formType === "jdbc" && <li>Database JDBC driver</li>}
+					</ul>
+				</div>
 			</div>
 
 			{/* Validation Errors */}

@@ -54,6 +54,8 @@ const SchedulingForm: React.FC<FormComponentProps> = ({ template, onSubmit, onCa
 
 		// Method Invoking Job 전용
 		txtServiceName: "jobService",
+		txtServiceMethod: "executeSample",
+		cboConcurrent: "false",
 
 		// Simple Trigger & Cron Trigger & Scheduler 공통
 		cboJobDetailType: "JobDetailFactoryBean",
@@ -154,6 +156,8 @@ const SchedulingForm: React.FC<FormComponentProps> = ({ template, onSubmit, onCa
 					{ field: "txtJobName" as keyof typeof formData, label: "Job Name" },
 					{ field: "txtServiceClass" as keyof typeof formData, label: "Service Class" },
 					{ field: "txtServiceName" as keyof typeof formData, label: "Service Name" },
+					{ field: "txtServiceMethod" as keyof typeof formData, label: "Service Method" },
+					{ field: "cboConcurrent" as keyof typeof formData, label: "Concurrent" },
 				)
 				break
 			case "simpleTrigger":
@@ -269,11 +273,27 @@ const SchedulingForm: React.FC<FormComponentProps> = ({ template, onSubmit, onCa
 					marginTop: "20px",
 				}}>
 				<h4 style={{ color: "var(--vscode-foreground)", marginBottom: "10px", marginTop: 0 }}>Guide:</h4>
-				<Link
-					href="https://egovframework.github.io/egovframe-docs/egovframe-runtime/foundation-layer/scheduling/"
-					style={{ display: "inline", fontSize: "12px" }}>
-					Scheduling Guide Here
-				</Link>
+				<div style={{ marginBottom: "10px" }}>
+					<Link
+						href="https://egovframework.github.io/egovframe-docs/egovframe-runtime/foundation-layer/scheduling/"
+						style={{ display: "inline", fontSize: "12px" }}>
+						Scheduling Guide Here
+					</Link>
+				</div>
+				<div style={{ fontSize: "11px", color: "var(--vscode-descriptionForeground)", marginTop: "8px" }}>
+					<strong>Requirements:</strong>
+					<ul style={{ margin: "5px 0", paddingLeft: "20px" }}>
+						<li>Spring Framework 6.x</li>
+						<li>JDK 17+</li>
+					</ul>
+				</div>
+				<div style={{ fontSize: "11px", color: "var(--vscode-descriptionForeground)", marginTop: "8px" }}>
+					<strong>Required Dependencies:</strong>
+					<ul style={{ margin: "5px 0", paddingLeft: "20px" }}>
+						<li>spring-context-support</li>
+						<li>quartz:2.3.2+</li>
+					</ul>
+				</div>
 			</div>
 
 			{/* Validation Errors */}
@@ -435,6 +455,35 @@ const SchedulingForm: React.FC<FormComponentProps> = ({ template, onSubmit, onCa
 								/>
 								<div style={{ fontSize: "10px", color: "var(--vscode-descriptionForeground)", marginTop: "2px" }}>
 									서비스 로직이 담긴 클래스에서 설정한 Bean(e.g., @Service)의 이름을 입력하세요.
+								</div>
+							</div>
+
+							<div style={{ width: "calc(100% - 24px)", marginBottom: "15px" }}>
+								<TextField
+									label="Service Method"
+									value={formData.txtServiceMethod}
+									onChange={(e: any) => handleInputChange("txtServiceMethod", e.target.value)}
+									placeholder="Enter service method name"
+									isRequired
+								/>
+								<div style={{ fontSize: "10px", color: "var(--vscode-descriptionForeground)", marginTop: "2px" }}>
+									스케줄러가 실행할 서비스 메소드명을 입력하세요.
+								</div>
+							</div>
+
+							<div style={{ marginBottom: "15px" }}>
+								<Select
+									label="Concurrent"
+									value={formData.cboConcurrent}
+									onChange={(e) => handleInputChange("cboConcurrent", e.target.value)}
+									isRequired
+									options={[
+										{ value: "false", label: "False (Sequential)" },
+										{ value: "true", label: "True (Concurrent)" },
+									]}
+								/>
+								<div style={{ fontSize: "10px", color: "var(--vscode-descriptionForeground)", marginTop: "2px" }}>
+									동시 실행 여부 (false: 순차 실행, true: 동시 실행 허용)
 								</div>
 							</div>
 

@@ -1,21 +1,57 @@
-<ehcache>
-    <diskStore path="{{txtDiskStore}}"/>
-    <defaultCache 
-        maxElementsInMemory="{{txtDftMaxElements}}" 
-        eternal="{{txtDftEternal}}" 
-        timeToIdleSeconds="{{txtDftIdelTime}}" 
-        timeToLiveSeconds="{{txtDftLiveTime}}" 
-        overflowToDisk="{{txtDftOverfow}}" 
-        diskPersistent="{{txtDftDiskPersistence}}"  
-        diskExpiryThreadIntervalSeconds="{{txtDftDiskExpiry}}"/>
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Ehcache 3.x Configuration for Spring Framework 6.x
+  
+  Requirements:
+  - Spring Framework 6.x
+  - JDK 17+
+  - Ehcache 3.10.8+ (jakarta classifier)
+  - jakarta.cache-api 3.1.1+ (JCache/JSR-107)
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns="http://www.ehcache.org/v3"
+        xmlns:jsr107="http://www.ehcache.org/v3/jsr107"
+        xsi:schemaLocation="http://www.ehcache.org/v3 http://www.ehcache.org/schema/ehcache-core-3.0.xsd
+                            http://www.ehcache.org/v3/jsr107 http://www.ehcache.org/schema/ehcache-107-ext-3.0.xsd">
 
-    <cache name="{{txtCacheName}}"
-        maxElementsInMemory="{{txtMaxElements}}"
-        eternal="{{txtEternal}}"
-        timeToIdleSeconds="{{txtIdleTime}}"
-        timeToLiveSeconds="{{txtLiveTime}}"
-        overflowToDisk="{{txtOverflowToDisk}}"
-        diskPersistent="{{txtDiskPersistent}}"  
-        memoryStoreEvictionPolicy="{{cboMemoryPolicy}}">
-    </cache>    
-</ehcache>
+    <!-- Disk Store Configuration -->
+    <persistence directory="{{txtDiskStore}}"/>
+
+    <!-- Default Cache Template -->
+    <cache-template name="defaultTemplate">
+        <expiry>
+{{#if txtDftEternal}}
+            <none/>
+{{else}}
+            <ttl unit="seconds">{{txtDftLiveTime}}</ttl>
+{{/if}}
+        </expiry>
+        <resources>
+            <heap unit="entries">{{txtDftMaxElements}}</heap>
+{{#if txtDftOverfow}}
+            <disk unit="MB" persistent="{{txtDftDiskPersistence}}">100</disk>
+{{/if}}
+        </resources>
+    </cache-template>
+
+    <!-- Custom Cache Configuration -->
+    <cache alias="{{txtCacheName}}" uses-template="defaultTemplate">
+        <expiry>
+{{#if txtEternal}}
+            <none/>
+{{else}}
+            <tti unit="seconds">{{txtIdleTime}}</tti>
+{{/if}}
+        </expiry>
+        <resources>
+            <heap unit="entries">{{txtMaxElements}}</heap>
+{{#if txtOverflowToDisk}}
+            <disk unit="MB" persistent="{{txtDiskPersistent}}">100</disk>
+{{/if}}
+        </resources>
+        <heap-store-settings>
+            <max-object-size unit="MB">10</max-object-size>
+        </heap-store-settings>
+    </cache>
+
+</config>
