@@ -721,7 +721,7 @@ const CodeView = () => {
 								editor.onDidFocusEditorText(() => setIsEditorFocused(true))
 								editor.onDidBlurEditorText(() => setIsEditorFocused(false))
 
-								// 실시간 검증: 모델 내용이 변경될 때마다 즉시 검증 (테이블 이름 변경 등 모든 변경사항 감지)
+								// 실시간 검증: 모델 내용이 변경될 때마다 디바운스 후 검증 (테이블 이름 변경 등 모든 변경사항 감지)
 								editor.onDidChangeModelContent(() => {
 									const model = editor.getModel()
 									if (model) {
@@ -764,6 +764,19 @@ const CodeView = () => {
 
 										if (currentContent.trim()) {
 											// 새로운 SQL Worker가 적용되므로 즉시 검증
+											validateDDLWithMonaco(currentContent)
+										}
+									}
+								})
+
+								// 실시간 검증: Monaco Worker가 마커(에러 내용)를 업데이트할 때마다 즉시 검증
+								monacoInstance.editor.onDidChangeMarkers((uris) => {
+									const model = editor.getModel()
+									if (model && uris.some((uri) => uri.toString() === model.uri.toString())) {
+										// Worker 완료 즉시 검증 실행 (딜레이 없음)
+										console.log("Markers changed, validating DDL...")
+										const currentContent = model.getValue()
+										if (currentContent.trim()) {
 											validateDDLWithMonaco(currentContent)
 										}
 									}
