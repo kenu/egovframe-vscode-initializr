@@ -77,6 +77,8 @@ const CodeView = () => {
 	// Monaco Editor 인스턴스 참조
 	const editorRef = useRef<monaco.editor.IStandaloneCodeEditor | null>(null)
 	const monacoRef = useRef<typeof monaco | null>(null)
+	// DDL 검증 디바운스 타이머
+	const ddlValidationTimeoutRef = useRef<NodeJS.Timeout | null>(null)
 
 	// Helper functions to update state
 	const setDdlContent = (value: string) => updateState({ ddlContent: value })
@@ -98,7 +100,7 @@ const CodeView = () => {
 		updateState({ sampleDDLs: value })
 	const setPreviewLanguages = (value: { [key: string]: string } | null) => updateState({ previewLanguages: value })
 
-	// DDL 검증 로직을 별도 함수로 분리 (이벤트 기반 실시간 검증)
+	// DDL 검증 로직을 별도 함수로 분리 (이벤트 기반 실시간 검증) => 주의) 마커(오류 내용)가 변경될 경우에만 동작함
 	const validateDDLWithMonaco = (currentDdlContent: string) => {
 		try {
 			const editor = editorRef.current
@@ -232,6 +234,28 @@ const CodeView = () => {
 			handleRequestPreview()
 		}
 	}, [isValid, ddlContent, autoUpdatePreview, previews])
+
+	// packageName 변경 시 프리뷰 업데이트
+	useEffect(() => {
+		if (isValid && ddlContent.trim() && autoUpdatePreview && previews && packageName.trim()) {
+			// 자동 업데이트가 켜져있고, 유효한 DDL이 있고, 이미 프리뷰가 생성된 상태일 때만
+			console.log("Auto-updating preview due to packageName change...")
+			handleRequestPreview()
+		} else if (!autoUpdatePreview) {
+			// 자동 업데이트가 꺼져있을 때만 프리뷰 초기화
+			setPreviews(null)
+			setPreviewError("")
+		}
+	}, [packageName])
+
+	// 컴포넌트 언마운트 시 디바운스 타이머 정리
+	useEffect(() => {
+		return () => {
+			if (ddlValidationTimeoutRef.current) {
+				clearTimeout(ddlValidationTimeoutRef.current)
+			}
+		}
+	}, [])
 
 	// 컴포넌트 마운트 시 초기 테마 요청 (VSCode 익스텐션으로부터 메시지 수신)
 	useEffect(() => {
@@ -697,14 +721,49 @@ const CodeView = () => {
 								editor.onDidFocusEditorText(() => setIsEditorFocused(true))
 								editor.onDidBlurEditorText(() => setIsEditorFocused(false))
 
-								// 실시간 검증: Monaco Worker가 마커를 업데이트할 때마다 즉시 검증
-								monacoInstance.editor.onDidChangeMarkers((uris) => {
+								// 실시간 검증: 모델 내용이 변경될 때마다 즉시 검증 (테이블 이름 변경 등 모든 변경사항 감지)
+								editor.onDidChangeModelContent(() => {
 									const model = editor.getModel()
-									if (model && uris.some((uri) => uri.toString() === model.uri.toString())) {
-										// Worker 완료 즉시 검증 실행 (딜레이 없음)
-										console.log("Markers changed, validating DDL...")
+									if (model) {
 										const currentContent = model.getValue()
+										console.log("Model content changed, validating DDL...")
+
+										// 디바운스 처리: 타이핑 중에는 0.5초 대기 후 검증
+										if (ddlValidationTimeoutRef.current) {
+											clearTimeout(ddlValidationTimeoutRef.current)
+										}
+
 										if (currentContent.trim()) {
+											ddlValidationTimeoutRef.current = setTimeout(() => {
+												validateDDLWithMonaco(currentContent)
+											}, 500)
+										} else {
+											// 내용이 비어있으면 즉시 초기화
+											setParsedDDL(null)
+											setIsValid(false)
+											setError("")
+											setPreviews(null)
+											setPreviewError("")
+										}
+									}
+								})
+
+								// 언어 변경 시 즉시 재검증 (SQL 방언 변경: MySQL ↔ PostgreSQL)
+								editor.onDidChangeModelLanguage((e) => {
+									const model = editor.getModel()
+									if (model) {
+										const currentContent = model.getValue()
+										console.log(`Language changed to ${e.newLanguage}, re-validating DDL...`)
+
+										// 언어 변경은 즉시 검증 (디바운스 없음)
+										// 기존 디바운스 타이머가 있다면 취소
+										if (ddlValidationTimeoutRef.current) {
+											clearTimeout(ddlValidationTimeoutRef.current)
+											ddlValidationTimeoutRef.current = null
+										}
+
+										if (currentContent.trim()) {
+											// 새로운 SQL Worker가 적용되므로 즉시 검증
 											validateDDLWithMonaco(currentContent)
 										}
 									}
