@@ -150,7 +150,7 @@ const DatasourceForm: React.FC<FormComponentProps> = ({ onSubmit, onCancel, temp
 				<div style={{ fontSize: "11px", color: "var(--vscode-descriptionForeground)", marginTop: "8px" }}>
 					<strong>Required Dependencies:</strong>
 					<ul style={{ margin: "5px 0", paddingLeft: "20px" }}>
-						<li>DBCP: commons-dbcp2:2.12.0</li>
+						<li>DBCP: commons-dbcp2:2.13.0</li>
 						<li>C3P0: c3p0:0.10.1</li>
 						<li>JDBC Driver: mysql-connector-j, mariadb-java-client, postgresql, etc.</li>
 					</ul>
