@@ -12,19 +12,15 @@ const CacheForm: React.FC<FormComponentProps> = ({ onSubmit, onCancel, template,
 		txtDiskStore: "user.dir/second",
 		txtDftMaxElements: "10000",
 		txtDftEternal: "false",
-		txtDftIdelTime: "120",
 		txtDftLiveTime: "120",
 		txtDftOverfow: "true",
 		txtDftDiskPersistence: "true",
-		txtDftDiskExpiry: "120",
 		txtCacheName: "cache",
 		txtMaxElements: "100",
 		txtEternal: "false",
 		txtIdleTime: "360",
-		txtLiveTime: "1000",
 		txtOverflowToDisk: "false",
 		txtDiskPersistent: "false",
-		cboMemoryPolicy: "LRU",
 		...initialData,
 	})
 	//const [selectedOutputFolder, setSelectedOutputFolder] = useState<string | null>(null) // 지금은 없어도 됨
@@ -85,11 +81,9 @@ const CacheForm: React.FC<FormComponentProps> = ({ onSubmit, onCancel, template,
 
 			{ field: "txtDftMaxElements" as keyof typeof formData, label: "Default Cache Max Elements" },
 			{ field: "txtDftEternal" as keyof typeof formData, label: "Default Cache Eternal" },
-			{ field: "txtDftIdelTime" as keyof typeof formData, label: "Default Cache Idle Time" },
 			{ field: "txtDftLiveTime" as keyof typeof formData, label: "Default Cache Live Time" },
 			{ field: "txtDftOverfow" as keyof typeof formData, label: "Default Cache Overflow to Disk" },
 			{ field: "txtDftDiskPersistence" as keyof typeof formData, label: "Default Cache Disk Persistent" },
-			{ field: "txtDftDiskExpiry" as keyof typeof formData, label: "Default Cache Disk Expiry" },
 		]
 
 		if (currentPage === 2) {
@@ -98,10 +92,8 @@ const CacheForm: React.FC<FormComponentProps> = ({ onSubmit, onCancel, template,
 				{ field: "txtMaxElements" as keyof typeof formData, label: "Max Elements" },
 				{ field: "txtEternal" as keyof typeof formData, label: "Eternal" },
 				{ field: "txtIdleTime" as keyof typeof formData, label: "Idle Time" },
-				{ field: "txtLiveTime" as keyof typeof formData, label: "Live Time" },
 				{ field: "txtOverflowToDisk" as keyof typeof formData, label: "Overflow to Disk" },
 				{ field: "txtDiskPersistent" as keyof typeof formData, label: "Disk Persistent" },
-				{ field: "cboMemoryPolicy" as keyof typeof formData, label: "Memory Store Eviction Policy" },
 			)
 		}
 
@@ -156,11 +148,30 @@ const CacheForm: React.FC<FormComponentProps> = ({ onSubmit, onCancel, template,
 					marginTop: "20px",
 				}}>
 				<h4 style={{ color: "var(--vscode-foreground)", marginBottom: "10px", marginTop: 0 }}>Guide:</h4>
-				<Link
-					href="https://egovframework.github.io/egovframe-docs/egovframe-runtime/foundation-layer/cache/ehCache/"
-					style={{ display: "inline", fontSize: "12px" }}>
-					Cache Guide Here
-				</Link>
+				<div style={{ marginBottom: "10px" }}>
+					<Link
+						href="https://egovframework.github.io/egovframe-docs/egovframe-runtime/foundation-layer/cache/ehCache/"
+						style={{ display: "inline", fontSize: "12px" }}>
+						Cache Guide Here
+					</Link>
+				</div>
+				<div style={{ fontSize: "11px", color: "var(--vscode-descriptionForeground)", marginTop: "8px" }}>
+					<strong>Requirements:</strong>
+					<ul style={{ margin: "5px 0", paddingLeft: "20px" }}>
+						<li>Spring Framework 6.x</li>
+						<li>JDK 17+</li>
+						<li>Ehcache 3.10.8+ (jakarta classifier)</li>
+						<li>jakarta.cache-api 3.1.1+ (JCache/JSR-107)</li>
+					</ul>
+				</div>
+				<div style={{ fontSize: "11px", color: "var(--vscode-descriptionForeground)", marginTop: "8px" }}>
+					<strong>Required Dependencies:</strong>
+					<ul style={{ margin: "5px 0", paddingLeft: "20px" }}>
+						<li>org.ehcache:ehcache:3.10.8:jakarta</li>
+						<li>jakarta.cache:jakarta.cache-api:3.1.1</li>
+						<li>spring-context-support</li>
+					</ul>
+				</div>
 			</div>
 
 			{/* Validation Errors */}
@@ -211,11 +222,9 @@ const CacheForm: React.FC<FormComponentProps> = ({ onSubmit, onCancel, template,
 									placeholder="Enter file name"
 									isRequired
 								/>
-								{/* 필요할 경우 아래 코드에 설명 추가}
 								<div style={{ fontSize: "10px", color: "var(--vscode-descriptionForeground)", marginTop: "2px" }}>
-									설명
+									Ehcache 3.x XML 설정 파일 이름 (예: ehcache-default.xml)
 								</div>
-								*/}
 							</div>
 						</div>
 
@@ -230,11 +239,17 @@ const CacheForm: React.FC<FormComponentProps> = ({ onSubmit, onCancel, template,
 									placeholder="Enter disk store path"
 									isRequired
 								/>
+								<div style={{ fontSize: "10px", color: "var(--vscode-descriptionForeground)", marginTop: "2px" }}>
+									디스크 캐시를 저장할 경로 (예: user.dir/second 또는 /tmp/cache)
+								</div>
 							</div>
 						</div>
 
 						<div style={{ marginBottom: "20px" }}>
 							<h3 style={{ color: "var(--vscode-foreground)", marginBottom: "10px" }}>Set Default Cache</h3>
+							<div style={{ fontSize: "11px", color: "var(--vscode-descriptionForeground)", marginBottom: "10px" }}>
+								모든 캐시에 기본적으로 적용될 설정입니다.
+							</div>
 
 							<div style={{ width: "calc(100% - 24px)", marginBottom: "15px" }}>
 								<TextField
@@ -244,6 +259,9 @@ const CacheForm: React.FC<FormComponentProps> = ({ onSubmit, onCancel, template,
 									placeholder="Enter default cache max elements"
 									isRequired
 								/>
+								<div style={{ fontSize: "10px", color: "var(--vscode-descriptionForeground)", marginTop: "2px" }}>
+									힙 메모리에 저장할 최대 엔트리 수
+								</div>
 							</div>
 
 							{/* 업데이트 전 Select 코드
@@ -267,16 +285,9 @@ const CacheForm: React.FC<FormComponentProps> = ({ onSubmit, onCancel, template,
 									onChange={(e) => handleInputChange("txtDftEternal", e.target.value)}
 									isRequired
 								/>
-							</div>
-
-							<div style={{ width: "calc(100% - 24px)", marginBottom: "15px" }}>
-								<TextField
-									label="Default Cache Idle Time (sec)"
-									value={formData.txtDftIdelTime}
-									onChange={(e) => handleInputChange("txtDftIdelTime", e.target.value)}
-									placeholder="Enter default cache idle time (sec)"
-									isRequired
-								/>
+								<div style={{ fontSize: "10px", color: "var(--vscode-descriptionForeground)", marginTop: "2px" }}>
+									True: 만료되지 않음, False: TTL/TTI 적용
+								</div>
 							</div>
 
 							<div style={{ width: "calc(100% - 24px)", marginBottom: "15px" }}>
@@ -287,6 +298,9 @@ const CacheForm: React.FC<FormComponentProps> = ({ onSubmit, onCancel, template,
 									placeholder="Enter default cache live time (sec)"
 									isRequired
 								/>
+								<div style={{ fontSize: "10px", color: "var(--vscode-descriptionForeground)", marginTop: "2px" }}>
+									TTL (Time To Live): 생성 후 만료 시간 (초)
+								</div>
 							</div>
 
 							<div style={{ marginBottom: "15px" }}>
@@ -300,9 +314,12 @@ const CacheForm: React.FC<FormComponentProps> = ({ onSubmit, onCancel, template,
 									onChange={(e) => handleInputChange("txtDftOverfow", e.target.value)}
 									isRequired
 								/>
+								<div style={{ fontSize: "10px", color: "var(--vscode-descriptionForeground)", marginTop: "2px" }}>
+									힙 메모리가 가득 차면 디스크에 저장 (Ehcache 3.x: disk tier 사용)
+								</div>
 							</div>
 
-							<div style={{ marginBottom: "15px" }}>
+							<div style={{ marginBottom: "20px" }}>
 								<Select
 									label="Default Cache Disk Persistent"
 									options={[
@@ -313,16 +330,9 @@ const CacheForm: React.FC<FormComponentProps> = ({ onSubmit, onCancel, template,
 									onChange={(e) => handleInputChange("txtDftDiskPersistence", e.target.value)}
 									isRequired
 								/>
-							</div>
-
-							<div style={{ width: "calc(100% - 24px)", marginBottom: "20px" }}>
-								<TextField
-									label="Default Cache Disk Expiry (sec)"
-									value={formData.txtDftDiskExpiry}
-									onChange={(e) => handleInputChange("txtDftDiskExpiry", e.target.value)}
-									placeholder="Enter default cache disk expiry (sec)"
-									isRequired
-								/>
+								<div style={{ fontSize: "10px", color: "var(--vscode-descriptionForeground)", marginTop: "2px" }}>
+									JVM 재시작 시 디스크 캐시 유지 여부
+								</div>
 							</div>
 						</div>
 
@@ -339,6 +349,9 @@ const CacheForm: React.FC<FormComponentProps> = ({ onSubmit, onCancel, template,
 					<div>
 						<div style={{ marginBottom: "20px" }}>
 							<h3 style={{ color: "var(--vscode-foreground)", marginBottom: "10px" }}>Set Custom Cache</h3>
+							<div style={{ fontSize: "11px", color: "var(--vscode-descriptionForeground)", marginBottom: "10px" }}>
+								특정 용도에 맞는 커스텀 캐시 설정입니다.
+							</div>
 
 							<div style={{ width: "calc(100% - 24px)", marginBottom: "15px" }}>
 								<TextField
@@ -348,6 +361,9 @@ const CacheForm: React.FC<FormComponentProps> = ({ onSubmit, onCancel, template,
 									placeholder="Enter cache name"
 									isRequired
 								/>
+								<div style={{ fontSize: "10px", color: "var(--vscode-descriptionForeground)", marginTop: "2px" }}>
+									애플리케이션에서 사용할 캐시 이름 (예: userCache, productCache)
+								</div>
 							</div>
 
 							<div style={{ width: "calc(100% - 24px)", marginBottom: "15px" }}>
@@ -381,16 +397,9 @@ const CacheForm: React.FC<FormComponentProps> = ({ onSubmit, onCancel, template,
 									placeholder="Enter idle time (sec)"
 									isRequired
 								/>
-							</div>
-
-							<div style={{ width: "calc(100% - 24px)", marginBottom: "15px" }}>
-								<TextField
-									label="Live Time (sec)"
-									value={formData.txtLiveTime}
-									onChange={(e) => handleInputChange("txtLiveTime", e.target.value)}
-									placeholder="Enter live time (sec)"
-									isRequired
-								/>
+								<div style={{ fontSize: "10px", color: "var(--vscode-descriptionForeground)", marginTop: "2px" }}>
+									TTI (Time To Idle): 마지막 접근 후 만료 시간 (초)
+								</div>
 							</div>
 
 							<div style={{ marginBottom: "15px" }}>
@@ -406,7 +415,7 @@ const CacheForm: React.FC<FormComponentProps> = ({ onSubmit, onCancel, template,
 								/>
 							</div>
 
-							<div style={{ marginBottom: "15px" }}>
+							<div style={{ marginBottom: "20px" }}>
 								<Select
 									label="Disk Persistent"
 									options={[
@@ -417,20 +426,9 @@ const CacheForm: React.FC<FormComponentProps> = ({ onSubmit, onCancel, template,
 									onChange={(e) => handleInputChange("txtDiskPersistent", e.target.value)}
 									isRequired
 								/>
-							</div>
-
-							<div style={{ marginBottom: "20px" }}>
-								<Select
-									label="Memory Store Eviction Policy"
-									options={[
-										{ value: "LRU", label: "LRU" },
-										{ value: "LFU", label: "LFU" },
-										{ value: "FIFO", label: "FIFO" },
-									]}
-									value={formData.cboMemoryPolicy}
-									onChange={(e) => handleInputChange("cboMemoryPolicy", e.target.value)}
-									isRequired
-								/>
+								<div style={{ fontSize: "10px", color: "var(--vscode-descriptionForeground)", marginTop: "2px" }}>
+									JVM 재시작 시 디스크 캐시 유지 여부
+								</div>
 							</div>
 						</div>
 

@@ -151,11 +151,30 @@ const EhcacheForm: React.FC<FormComponentProps> = ({ onSubmit, onCancel, templat
 					marginTop: "20px",
 				}}>
 				<h4 style={{ color: "var(--vscode-foreground)", marginBottom: "10px", marginTop: 0 }}>Guide:</h4>
-				<Link
-					href="https://egovframework.github.io/egovframe-docs/egovframe-runtime/foundation-layer/cache/ehCache/"
-					style={{ display: "inline", fontSize: "12px" }}>
-					Cache Guide Here
-				</Link>
+				<div style={{ marginBottom: "10px" }}>
+					<Link
+						href="https://egovframework.github.io/egovframe-docs/egovframe-runtime/foundation-layer/cache/ehCache/"
+						style={{ display: "inline", fontSize: "12px" }}>
+						Cache Guide Here
+					</Link>
+				</div>
+				<div style={{ fontSize: "11px", color: "var(--vscode-descriptionForeground)", marginTop: "8px" }}>
+					<strong>Requirements:</strong>
+					<ul style={{ margin: "5px 0", paddingLeft: "20px" }}>
+						<li>Ehcache 3.x (jakarta classifier)</li>
+						<li>Spring Framework 6.x with JCache (JSR-107)</li>
+						<li>Jakarta EE 9+</li>
+						<li>JDK 17+</li>
+					</ul>
+				</div>
+				<div style={{ fontSize: "11px", color: "var(--vscode-descriptionForeground)", marginTop: "8px" }}>
+					<strong>Required Dependencies:</strong>
+					<ul style={{ margin: "5px 0", paddingLeft: "20px" }}>
+						<li>org.ehcache:ehcache:3.10.8:jakarta</li>
+						<li>jakarta.cache:jakarta.cache-api:3.1.1</li>
+						<li>spring-context-support</li>
+					</ul>
+				</div>
 			</div>
 
 			{/* Validation Errors */}
@@ -189,6 +208,9 @@ const EhcacheForm: React.FC<FormComponentProps> = ({ onSubmit, onCancel, templat
 							{ value: ConfigGenerationType.JAVA_CONFIG, label: "JavaConfig" },
 						]}
 					/>
+					<div style={{ fontSize: "10px", color: "var(--vscode-descriptionForeground)", marginTop: "5px" }}>
+						Spring 캐시 설정을 XML 또는 Java Config 방식으로 생성합니다. (Spring 6.x + JCache 표준 사용)
+					</div>
 				</div>
 
 				{formData.generationType === ConfigGenerationType.JAVA_CONFIG && (
@@ -200,6 +222,9 @@ const EhcacheForm: React.FC<FormComponentProps> = ({ onSubmit, onCancel, templat
 							placeholder="Enter package name"
 							isRequired
 						/>
+						<div style={{ fontSize: "10px", color: "var(--vscode-descriptionForeground)", marginTop: "2px" }}>
+							Java Config 클래스의 패키지명 (예: egovframework.example.config)
+						</div>
 					</div>
 				)}
 
@@ -215,6 +240,11 @@ const EhcacheForm: React.FC<FormComponentProps> = ({ onSubmit, onCancel, templat
 						}
 						isRequired
 					/>
+					<div style={{ fontSize: "10px", color: "var(--vscode-descriptionForeground)", marginTop: "2px" }}>
+						{formData.generationType === ConfigGenerationType.JAVA_CONFIG
+							? "Java Config 클래스명 (예: EgovEhcacheSpringConfig)"
+							: "Spring 설정 파일명 (예: context-cache.xml)"}
+					</div>
 				</div>
 
 				<div style={{ marginBottom: "15px" }}>
@@ -263,7 +293,9 @@ const EhcacheForm: React.FC<FormComponentProps> = ({ onSubmit, onCancel, templat
 						</button>
 					</div>
 					<div style={{ fontSize: "10px", color: "var(--vscode-descriptionForeground)", marginTop: "2px" }}>
-						ehcache 설정이 담긴 파일(e.g. 'New Cache'로 생성한 파일)을 선택해주세요.
+						<strong>중요:</strong> Ehcache 3.x XML 형식의 설정 파일을 선택해주세요. (예: 'New Cache'로 생성한 파일)
+						<br />
+						Ehcache 2.x 형식의 파일은 호환되지 않습니다.
 					</div>
 				</div>
 
