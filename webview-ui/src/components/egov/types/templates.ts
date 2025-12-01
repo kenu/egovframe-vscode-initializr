@@ -117,12 +117,15 @@ export interface ConfigFormData {
 	txtPropertyName?: string
 	txtPropertyValue?: string
 	txtServiceName?: string
+	txtServiceMethod?: string
+	cboConcurrent?: string
 	cboJobDetailType?: string
 	txtTriggerName?: string
 	txtStartDelay?: string
 	txtCronExpression?: string
 	txtRepeatInterval?: string
 	txtSchedulerName?: string
+	cboTriggerType?: string
 
 	// Transaction 관련
 	txtTransactionTemplate?: string
