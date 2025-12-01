@@ -214,7 +214,10 @@ const CodeView = () => {
 		setPreviews(null)
 		setPreviewError("")
 		setError("") // 이전 에러 메시지 제거
-		setParsedDDL(null) // 이전 파싱 결과 제거
+		//setParsedDDL(null) // ddl 수정시 Package Name, Output Path 입력란이 사라지는 문제 해결
+		// ↑ 이 useEffect에서 `parsedDDL = null`로 설정하고(이 때 입력란이 사라짐) 비동기로 처리하는 중에,
+		// Monaco Worker 검증이 완료되어 validateDDLWithMonaco(currentContent)가 실행되어 `isValid = true`, `parsedDDL = (새로운 파싱 결과)` 설정이 되는데,
+		// 계속 여기서 setParsedDDL(null)로 설정한 결과가 유지되어 두 입력란이 사라진 상태가 유지되는 문제 발생.
 
 		// Monaco가 초기화되지 않은 경우에만 fallback 검증 (초기 로드 시)
 		if (!editorRef.current || !monacoRef.current) {
