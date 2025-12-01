@@ -2,6 +2,7 @@ import * as vscode from "vscode"
 import * as path from "path"
 import * as fs from "fs-extra"
 import * as Handlebars from "handlebars"
+import { getJavaClassName as getJavaClassNameFromShared } from "../shared/dataTypes"
 
 // 데이터베이스 컬럼의 정보를 담는 인터페이스
 export interface Column {
@@ -69,48 +70,6 @@ function registerHandlebarsHelpers() {
 	})
 }
 
-// 데이터베이스의 다양한 데이터 타입을 Java의 데이터 타입으로 매핑하는 기능을 제공하는 클래스
-class DatabaseDefinition {
-	private readonly predefinedDataTypes: { [key: string]: string }
-
-	constructor() {
-		this.predefinedDataTypes = {
-			VARCHAR: "java.lang.String",
-			VARCHAR2: "java.lang.String",
-			CHAR: "java.lang.String",
-			TEXT: "java.lang.String",
-			INT: "java.lang.Integer",
-			INTEGER: "java.lang.Integer",
-			NUMBER: "java.lang.Integer",
-			BIGINT: "java.lang.Long",
-			SMALLINT: "java.lang.Short",
-			TINYINT: "java.lang.Byte",
-			DECIMAL: "java.math.BigDecimal",
-			NUMERIC: "java.math.BigDecimal",
-			FLOAT: "java.lang.Float",
-			REAL: "java.lang.Double",
-			DOUBLE: "java.lang.Double",
-			DATE: "java.sql.Date",
-			TIME: "java.sql.Time",
-			DATETIME: "java.util.Date",
-			TIMESTAMP: "java.sql.Timestamp",
-			BOOLEAN: "java.lang.Boolean",
-			BIT: "java.lang.Boolean",
-			MEDIUMTEXT: "java.lang.String",
-			ENUM: "java.lang.String",
-			SET: "java.lang.String",
-
-			SMALLSERIAL: "java.lang.Short",
-			SERIAL: "java.lang.Integer",
-			BIGSERIAL: "java.lang.Long",
-		}
-	}
-
-	public getPredefinedDataTypeDefinition(dataType: string): string {
-		return this.predefinedDataTypes[dataType.toUpperCase()] || "java.lang.Object"
-	}
-}
-
 // renderTemplate 함수는 Handlebars를 사용하여 템플릿을 렌더링한다.
 export async function renderTemplate(templateFilePath: string, context: TemplateContext): Promise<string> {
 	registerHandlebarsHelpers()
@@ -119,10 +78,9 @@ export async function renderTemplate(templateFilePath: string, context: Template
 	return compiledTemplate(context)
 }
 
-// DatabaseDefinition 클래스를 이용해 데이터베이스 데이터 타입을 Java 타입으로 변환한다.
+// 데이터베이스 데이터 타입을 Java 타입으로 변환한다.
 export function getJavaClassName(dataType: string): string {
-	const databaseDefinition = new DatabaseDefinition()
-	return databaseDefinition.getPredefinedDataTypeDefinition(dataType)
+	return getJavaClassNameFromShared(dataType)
 }
 
 // getFilePathForOutput 함수는 생성된 파일의 경로를 반환한다.

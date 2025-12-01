@@ -1,3 +1,5 @@
+import { getJavaClassName } from "../../../src/shared/dataTypes"
+
 export interface Column {
 	ccName: string // camelCase name
 	columnName: string // original column name
@@ -26,41 +28,7 @@ function convertCamelcaseToPascalcase(name: string): string {
 	return name.charAt(0).toUpperCase() + name.slice(1)
 }
 
-// 데이터베이스의 다양한 데이터 타입을 Java의 데이터 타입으로 매핑
-const predefinedDataTypes: { [key: string]: string } = {
-	VARCHAR: "java.lang.String",
-	VARCHAR2: "java.lang.String",
-	CHAR: "java.lang.String",
-	TEXT: "java.lang.String",
-	INT: "java.lang.Integer",
-	INTEGER: "java.lang.Integer",
-	NUMBER: "java.lang.Integer",
-	BIGINT: "java.lang.Long",
-	SMALLINT: "java.lang.Short",
-	TINYINT: "java.lang.Byte",
-	DECIMAL: "java.math.BigDecimal",
-	NUMERIC: "java.math.BigDecimal",
-	FLOAT: "java.lang.Float",
-	REAL: "java.lang.Double",
-	DOUBLE: "java.lang.Double",
-	DATE: "java.sql.Date",
-	TIME: "java.sql.Time",
-	DATETIME: "java.util.Date",
-	TIMESTAMP: "java.sql.Timestamp",
-	BOOLEAN: "java.lang.Boolean",
-	BIT: "java.lang.Boolean",
-	MEDIUMTEXT: "java.lang.String",
-	ENUM: "java.lang.String",
-	SET: "java.lang.String",
-
-	SMALLSERIAL: "java.lang.Short",
-	SERIAL: "java.lang.Integer",
-	BIGSERIAL: "java.lang.Long",
-}
-
-export function getJavaClassName(dataType: string): string {
-	return predefinedDataTypes[dataType.toUpperCase()] || "java.lang.Object"
-}
+// Note: getJavaClassName is now imported from shared/dataTypes.ts
 
 // DDL 파싱 함수
 export function parseDDL(ddl: string): ParsedDDL {

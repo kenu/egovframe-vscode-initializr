@@ -1,4 +1,5 @@
-import { Column, getJavaClassName } from "./codeGeneratorUtils"
+import { Column } from "./codeGeneratorUtils"
+import { getJavaClassName } from "../shared/dataTypes"
 
 export interface ParsedDDL {
 	tableName: string

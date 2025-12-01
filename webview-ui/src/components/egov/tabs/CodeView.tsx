@@ -120,22 +120,32 @@ const CodeView = () => {
 
 					// Monaco 검증 결과로 isValid 설정
 					const isValidDDL = !hasErrors
-					setIsValid(isValidDDL)
 
 					if (isValidDDL) {
 						// Monaco 검증 통과 시 DDL 파싱 시도
-						const parsed = parseDDL(currentDdlContent)
-						setParsedDDL(parsed)
-						setError("")
+						try {
+							const parsed = parseDDL(currentDdlContent)
+							setParsedDDL(parsed)
+							setIsValid(true)
+							setError("")
 
-						// 빠른 검증만 요청 (미리보기는 나중에)
-						vscode.postMessage({
-							type: "validateDDLOnly",
-							ddl: currentDdlContent,
-							packageName: packageName,
-						})
+							// 빠른 검증만 요청 (미리보기는 나중에)
+							vscode.postMessage({
+								type: "validateDDLOnly",
+								ddl: currentDdlContent,
+								packageName: packageName,
+							})
+						} catch (parseError) {
+							// 파싱 실패 시 isValid도 false로 설정
+							setParsedDDL(null)
+							setIsValid(false)
+							setError(parseError instanceof Error ? parseError.message : "DDL parsing failed")
+							setPreviews(null)
+							setPreviewError("")
+						}
 					} else {
 						setParsedDDL(null)
+						setIsValid(false)
 						// 첫 번째 에러 메시지 표시
 						const firstError = errors[0]
 						setError(
@@ -151,20 +161,28 @@ const CodeView = () => {
 			// Monaco Editor가 없는 경우 fallback으로 기존 validateDDL 사용
 			console.log("Monaco not available, using fallback validation")
 			const isValidDDL = validateDDL(currentDdlContent)
-			setIsValid(isValidDDL)
 
 			if (isValidDDL) {
-				const parsed = parseDDL(currentDdlContent)
-				setParsedDDL(parsed)
-				setError("")
+				try {
+					const parsed = parseDDL(currentDdlContent)
+					setParsedDDL(parsed)
+					setIsValid(true)
+					setError("")
 
-				vscode.postMessage({
-					type: "validateDDLOnly",
-					ddl: currentDdlContent,
-					packageName: packageName,
-				})
+					vscode.postMessage({
+						type: "validateDDLOnly",
+						ddl: currentDdlContent,
+						packageName: packageName,
+					})
+				} catch (parseError) {
+					setParsedDDL(null)
+					setIsValid(false)
+					setError(parseError instanceof Error ? parseError.message : "DDL parsing failed")
+					setPreviews(null)
+				}
 			} else {
 				setParsedDDL(null)
+				setIsValid(false)
 				setError("Invalid DDL format")
 				setPreviews(null)
 				setPreviewError("")
@@ -387,7 +405,21 @@ const CodeView = () => {
 	const handleDownloadTemplateContext = () => {
 		console.log("Download template context clicked")
 		try {
-			const context = getTemplateContext(parsedDDL!.tableName, parsedDDL!.attributes, parsedDDL!.pkAttributes)
+			// State의 parsedDDL을 사용하지 않고 현재 DDL을 직접 파싱
+			// (React state 업데이트는 비동기이므로 최신 상태가 아닐 수 있음)
+			if (!isValid || !ddlContent.trim()) {
+				setError("Please enter a valid DDL statement first")
+				return
+			}
+
+			// 현재 DDL 내용을 직접 파싱
+			const currentParsedDDL = parseDDL(ddlContent)
+			const context = getTemplateContext(
+				currentParsedDDL.tableName,
+				currentParsedDDL.attributes,
+				currentParsedDDL.pkAttributes,
+				packageName,
+			)
 			vscode.postMessage({
 				type: "downloadTemplateContext",
 				ddl: ddlContent,
