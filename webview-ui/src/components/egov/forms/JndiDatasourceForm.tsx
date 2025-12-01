@@ -135,11 +135,30 @@ const JndiDatasourceForm: React.FC<FormComponentProps> = ({ onSubmit, onCancel, 
 					marginTop: "20px",
 				}}>
 				<h4 style={{ color: "var(--vscode-foreground)", marginBottom: "10px", marginTop: 0 }}>Guide:</h4>
-				<Link
-					href="https://egovframework.github.io/egovframe-docs/egovframe-runtime/persistence-layer/data-source/"
-					style={{ display: "inline", fontSize: "12px" }}>
-					Datasource Guide Here
-				</Link>
+				<div style={{ marginBottom: "10px" }}>
+					<Link
+						href="https://egovframework.github.io/egovframe-docs/egovframe-runtime/persistence-layer/data-source/"
+						style={{ display: "inline", fontSize: "12px" }}>
+						Datasource Guide Here
+					</Link>
+				</div>
+				<div style={{ fontSize: "11px", color: "var(--vscode-descriptionForeground)", marginTop: "8px" }}>
+					<strong>Requirements:</strong>
+					<ul style={{ margin: "5px 0", paddingLeft: "20px" }}>
+						<li>Spring Framework 6.x</li>
+						<li>JDK 17+</li>
+						<li>Jakarta EE 9</li>
+						<li>Servlet 5.0 (jakarta.servlet.*)</li>
+						<li>Tomcat 10.0+</li>
+					</ul>
+				</div>
+				<div style={{ fontSize: "11px", color: "var(--vscode-descriptionForeground)", marginTop: "8px" }}>
+					<strong>Required Dependencies:</strong>
+					<ul style={{ margin: "5px 0", paddingLeft: "20px" }}>
+						<li>spring-context (Spring Framework 6.x)</li>
+						<li>commons-dbcp2:2.12.0 (optional, for connection pooling)</li>
+					</ul>
+				</div>
 			</div>
 
 			{/* Validation Errors */}
