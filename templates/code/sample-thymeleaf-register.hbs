@@ -24,7 +24,7 @@
 
     <script th:inline="javascript" defer>
 	    function fn_egov_list() {
-            $(location).attr('href', contextPath + '{{listPath}}');
+            $('#detailForm').attr('method', 'get').attr('action', contextPath + '{{listPath}}').submit();
         }
 
         function fn_egov_add() {
@@ -75,12 +75,16 @@
 	</h2>
 
 	<form id="detailForm" name="detailForm" th:object="{{concat "${" voInstanceName "}"}}"
+    <input type="hidden" th:id="searchCondition" th:name="searchCondition" th:value="{{concat "${" voInstanceName ".searchCondition}"}}" />
+    <input type="hidden" th:id="searchKeyword" th:name="searchKeyword" th:value="{{concat "${" voInstanceName ".searchKeyword}"}}" />
+    <input type="hidden" th:id="pageIndex" th:name="pageIndex" th:value="{{concat "${" voInstanceName ".pageIndex}"}}" />
 
 		<div class="conts-wrap">
 	        <div class="fieldset input-form">
 				{{#each attributes}}
 				  {{#if isPrimaryKey}}
                 <div class="form-group" th:if="{{concat "${" @root.voInstanceName "." ccName " != null}"}}">
+                <div class="form-group" th:if="{{concat "${not #strings.isEmpty(" @root.voInstanceName "." ccName ")}"}}">
                     <div class="form-tit">
                         <label for="{{ccName}}">{{pcName}}</label>
                     </div>

@@ -21,16 +21,6 @@
 		    return !(value === '' || value == null || (typeof value == 'object' && !Object.keys(value).length));
 		}
 
-		// 키보드 접근성
-		document.addEventListener("keydown", function(event) {
-		    if (event.key === "Enter") {
-		        const targetElement = event.target;
-		        if (targetElement.hasAttribute("onclick")) {
-		            targetElement.onclick();
-		        }
-		    }
-		});
-
 		function fn_egov_selectList() {
             if (notNullCheck($('#searchKeyword').val())) {
 				$('#listForm').attr('method', 'get').attr('action', contextPath + '{{listPath}}').submit();
@@ -45,7 +35,7 @@
         }
 
         function fn_egov_addView() {
-        	$(location).attr('href', contextPath + '{{addViewPath}}');
+        	$('#listForm').attr('method', `post`).attr('action', contextPath + '{{addViewPath}}').submit();
         }
 
         function fn_egov_select({{#if pkAttributes.length}}{{#each pkAttributes}}{{ccName}}{{#unless @last}}, {{/unless}}{{/each}}{{else}}{{attributes.[0].ccName}}{{/if}}) {
@@ -56,7 +46,7 @@
 			{{else}}
 			$('#{{attributes.[0].ccName}}').val({{attributes.[0].ccName}});
 			{{/if}}
-            $('#listForm').attr('method', 'get').attr('action', contextPath + '{{updateViewPath}}').submit();
+            $('#listForm').attr('method', 'post').attr('action', contextPath + '{{updateViewPath}}').submit();
         }
     </script>
 </head>

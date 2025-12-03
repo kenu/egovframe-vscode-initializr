@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.support.SessionStatus;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import {{packageName}}.service.{{className}}Service;
 import {{packageName}}.service.{{className}}VO;
@@ -92,8 +93,11 @@ public class {{className}}Controller {
 	 * @return "{{classNameFirstCharLower}}Register"
 	 * @exception Exception
 	 */
-	@GetMapping("/{{classNameFirstCharLower}}/add{{className}}View.do")
+	@PostMapping("/{{classNameFirstCharLower}}/add{{className}}View.do")
 	public String add{{className}}View(@ModelAttribute("{{classNameFirstCharLower}}VO") {{className}}VO {{classNameFirstCharLower}}VO, Model model) throws Exception {
+
+		model.addAttribute("{{classNameFirstCharLower}}VO", {{classNameFirstCharLower}}VO);
+
 		return "{{classNameFirstCharLower}}/{{classNameFirstCharLower}}Register";
 	}
 
@@ -118,10 +122,6 @@ public class {{className}}Controller {
 		{{classNameFirstCharLower}}Service.insert{{className}}({{classNameFirstCharLower}}VO);
 		status.setComplete();
 
-		model.addAttribute("searchCondition", {{classNameFirstCharLower}}VO.getSearchCondition());
-		model.addAttribute("searchKeyword", {{classNameFirstCharLower}}VO.getSearchKeyword());
-		model.addAttribute("pageIndex", {{classNameFirstCharLower}}VO.getPageIndex());
-
 		return "redirect:/{{classNameFirstCharLower}}/{{classNameFirstCharLower}}List.do";
 	}
 
@@ -138,28 +138,16 @@ public class {{className}}Controller {
 	 * @return "{{classNameFirstCharLower}}Register"
 	 * @exception Exception
 	 */
-	@GetMapping("/{{classNameFirstCharLower}}/update{{className}}View.do")
-	public String update{{className}}View({{#if pkAttributes.length}}{{#each pkAttributes}}@RequestParam("{{ccName}}") {{javaType}} {{ccName}}, {{/each}}{{else}}@RequestParam("{{attributes.[0].ccName}}") {{attributes.[0].javaType}} {{attributes.[0].ccName}}, {{/if}}Model model) throws Exception {
-		{{className}}VO {{classNameFirstCharLower}}VO = new {{className}}VO();
-		{{#if pkAttributes.length}}
-		  {{#each pkAttributes}}
-		{{../classNameFirstCharLower}}VO.set{{pcName}}({{ccName}});
-		  {{/each}}
-		{{else}}
-		{{classNameFirstCharLower}}VO.set{{attributes.[0].pcName}}({{attributes.[0].ccName}});
-		{{/if}}
-		model.addAttribute(select{{className}}({{classNameFirstCharLower}}VO));
-		return "{{classNameFirstCharLower}}/{{classNameFirstCharLower}}Register";
-	}
+	@PostMapping("/{{classNameFirstCharLower}}/update{{className}}View.do")
+	public String update{{className}}View({{@ModelAttribute("{{classNameFirstCharLower}}VO") {{className}}VO {{classNameFirstCharLower}}VO ,Model model) throws Exception {
 
-	/**
-	 * 글을 조회한다.
-	 * @param {{classNameFirstCharLower}}VO - 조회할 정보가 담긴 VO
-	 * @return @ModelAttribute("{{classNameFirstCharLower}}VO") - 조회한 정보
-	 * @exception Exception
-	 */
-	public {{className}}VO select{{className}}(@ModelAttribute("{{classNameFirstCharLower}}VO") {{className}}VO {{classNameFirstCharLower}}VO) throws Exception {
-		return {{classNameFirstCharLower}}Service.select{{className}}({{classNameFirstCharLower}}VO);
+		{{className}}VO {{classNameFirstCharLower}}VO = {{classNameFirstCharLower}}Service.select{{className}}({{classNameFirstCharLower}}VO);
+		{{classNameFirstCharLower}}VO.setSearchCondition({{classNameFirstCharLower}}VO.getSearchCondition());
+		{{classNameFirstCharLower}}VO.setSearchKeyword({{classNameFirstCharLower}}VO.getSearchKeyword());
+		{{classNameFirstCharLower}}VO.setPageIndex({{classNameFirstCharLower}}VO.getPageIndex());
+
+		model.addAttribute("{{classNameFirstCharLower}}VO", {{classNameFirstCharLower}}VO);
+		return "{{classNameFirstCharLower}}/{{classNameFirstCharLower}}Register";
 	}
 
 	/**
@@ -172,7 +160,7 @@ public class {{className}}Controller {
 	 * @exception Exception
 	 */
 	@PostMapping("/{{classNameFirstCharLower}}/update{{className}}.do")
-	public String update{{className}}(@Valid @ModelAttribute("{{classNameFirstCharLower}}VO") {{className}}VO {{classNameFirstCharLower}}VO, BindingResult bindingResult, Model model, SessionStatus status) throws Exception {
+	public String update{{className}}(@Valid @ModelAttribute("{{classNameFirstCharLower}}VO") {{className}}VO {{classNameFirstCharLower}}VO, BindingResult bindingResult, Model model, RedirectAttributes redirectAttributes, SessionStatus status) throws Exception {
 
 		// Server-Side Validation
 		if (bindingResult.hasErrors()) {
@@ -183,9 +171,9 @@ public class {{className}}Controller {
 		{{classNameFirstCharLower}}Service.update{{className}}({{classNameFirstCharLower}}VO);
 		status.setComplete();
 
-		model.addAttribute("searchCondition", {{classNameFirstCharLower}}VO.getSearchCondition());
-		model.addAttribute("searchKeyword", {{classNameFirstCharLower}}VO.getSearchKeyword());
-		model.addAttribute("pageIndex", {{classNameFirstCharLower}}VO.getPageIndex());
+		redirectAttributes.addAttribute("searchCondition", {{classNameFirstCharLower}}VO.getSearchCondition());
+		redirectAttributes.addAttribute("searchKeyword", {{classNameFirstCharLower}}VO.getSearchKeyword());
+		redirectAttributes.addAttribute("pageIndex", {{classNameFirstCharLower}}VO.getPageIndex());
 
 		return "redirect:/{{classNameFirstCharLower}}/{{classNameFirstCharLower}}List.do";
 	}
@@ -199,13 +187,13 @@ public class {{className}}Controller {
 	 * @exception Exception
 	 */
 	@PostMapping("/{{classNameFirstCharLower}}/delete{{className}}.do")
-	public String delete{{className}}(@ModelAttribute("{{classNameFirstCharLower}}VO") {{className}}VO {{classNameFirstCharLower}}VO, Model model, SessionStatus status) throws Exception {
+	public String delete{{className}}(@ModelAttribute("{{classNameFirstCharLower}}VO") {{className}}VO {{classNameFirstCharLower}}VO, RedirectAttributes redirectAttributes, SessionStatus status) throws Exception {
 		{{classNameFirstCharLower}}Service.delete{{className}}({{classNameFirstCharLower}}VO);
 		status.setComplete();
 
-		model.addAttribute("searchCondition", {{classNameFirstCharLower}}VO.getSearchCondition());
-		model.addAttribute("searchKeyword", {{classNameFirstCharLower}}VO.getSearchKeyword());
-		model.addAttribute("pageIndex", {{classNameFirstCharLower}}VO.getPageIndex());
+		redirectAttributes.addAttribute("searchCondition", {{classNameFirstCharLower}}VO.getSearchCondition());
+		redirectAttributes.addAttribute("searchKeyword", {{classNameFirstCharLower}}VO.getSearchKeyword());
+		redirectAttributes.addAttribute("pageIndex", {{classNameFirstCharLower}}VO.getPageIndex());
 
 		return "redirect:/{{classNameFirstCharLower}}/{{classNameFirstCharLower}}List.do";
 	}
