@@ -160,11 +160,11 @@
 		"projectName": "egov-boot-batch-web-db"
 	},
 	{
-		"displayName": "Spring-AI Redis-Stack RAG Project",
-		"fileName": "egovframe-ai-rag-redis-stack.zip",
-		"pomFile": "egovframe-ai-rag-redis-stack-pom.xml",
+		"displayName": "AI > RAG Project",
+		"fileName": "egovframe-ai-rag.zip",
+		"pomFile": "egovframe-ai-rag-pom.xml",
 		"description": "RAG Project Using Spring AI and Redis Stack",
 		"category": "AI",
-		"projectName": "egov-ai-spring-rag-redis-stack"
+		"projectName": "egov-ai-rag"
 	}
 ]
