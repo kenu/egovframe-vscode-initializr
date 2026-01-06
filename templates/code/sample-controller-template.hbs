@@ -139,7 +139,7 @@ public class {{className}}Controller {
 	 * @exception Exception
 	 */
 	@PostMapping("/{{classNameFirstCharLower}}/update{{className}}View.do")
-	public String update{{className}}View({{@ModelAttribute("{{classNameFirstCharLower}}VO") {{className}}VO {{classNameFirstCharLower}}VO ,Model model) throws Exception {
+	public String update{{className}}View(@ModelAttribute("{{classNameFirstCharLower}}VO") {{className}}VO {{classNameFirstCharLower}}VO ,Model model) throws Exception {
 
 		{{className}}VO {{classNameFirstCharLower}}VO = {{classNameFirstCharLower}}Service.select{{className}}({{classNameFirstCharLower}}VO);
 		{{classNameFirstCharLower}}VO.setSearchCondition({{classNameFirstCharLower}}VO.getSearchCondition());
