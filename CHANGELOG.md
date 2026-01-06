@@ -7,4 +7,7 @@ Initial Beta Release
 ## 5.0.1 Beta버전 (2026-01-06)
 
 - package-lock.json의 version을 package.json과 동기화
-- Sample-controller-template.hbs 핸들바 파싱 오류 수정
+- sample-controller-template.hbs 핸들바 파싱 오류 수정
+
+## 5.0.2 Beta버전 (2026-01-06)
+- sample-thymeleaf-register.hbs 핸들바 파싱 오류 수정

@@ -141,12 +141,13 @@ public class {{className}}Controller {
 	@PostMapping("/{{classNameFirstCharLower}}/update{{className}}View.do")
 	public String update{{className}}View(@ModelAttribute("{{classNameFirstCharLower}}VO") {{className}}VO {{classNameFirstCharLower}}VO ,Model model) throws Exception {
 
-		{{className}}VO {{classNameFirstCharLower}}VO = {{classNameFirstCharLower}}Service.select{{className}}({{classNameFirstCharLower}}VO);
-		{{classNameFirstCharLower}}VO.setSearchCondition({{classNameFirstCharLower}}VO.getSearchCondition());
-		{{classNameFirstCharLower}}VO.setSearchKeyword({{classNameFirstCharLower}}VO.getSearchKeyword());
-		{{classNameFirstCharLower}}VO.setPageIndex({{classNameFirstCharLower}}VO.getPageIndex());
+		{{className}}VO detail = {{classNameFirstCharLower}}Service.select{{className}}({{classNameFirstCharLower}}VO);
+		detail.setSearchCondition({{classNameFirstCharLower}}VO.getSearchCondition());
+		detail.setSearchKeyword({{classNameFirstCharLower}}VO.getSearchKeyword());
+		detail.setPageIndex({{classNameFirstCharLower}}VO.getPageIndex());
 
-		model.addAttribute("{{classNameFirstCharLower}}VO", {{classNameFirstCharLower}}VO);
+		model.addAttribute("{{classNameFirstCharLower}}VO", detail);
+		
 		return "{{classNameFirstCharLower}}/{{classNameFirstCharLower}}Register";
 	}
 

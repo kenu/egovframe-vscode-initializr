@@ -74,7 +74,7 @@
 	    <span th:if="${registerFlag == 'create'}">Regist</span>
 	</h2>
 
-	<form id="detailForm" name="detailForm" th:object="{{concat "${" voInstanceName "}"}}"
+	<form id="detailForm" name="detailForm" th:object="{{concat "${" voInstanceName "}"}}">
     <input type="hidden" th:id="searchCondition" th:name="searchCondition" th:value="{{concat "${" voInstanceName ".searchCondition}"}}" />
     <input type="hidden" th:id="searchKeyword" th:name="searchKeyword" th:value="{{concat "${" voInstanceName ".searchKeyword}"}}" />
     <input type="hidden" th:id="pageIndex" th:name="pageIndex" th:value="{{concat "${" voInstanceName ".pageIndex}"}}" />
