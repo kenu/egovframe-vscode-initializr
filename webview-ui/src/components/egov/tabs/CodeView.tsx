@@ -5,6 +5,7 @@ import { getTemplateContext } from "../../../utils/templateContext"
 import { WebviewMessage, ExtensionResponse } from "../../../utils/messageTypes"
 import { createSelectOutputPathMessage } from "../../../utils/egovUtils"
 import { vscode } from "../../../utils/vscode"
+import { validateCodeConfig, type CodeConfig } from "../../../utils/codeUtils"
 import { useCodeViewState } from "../../../context/EgovTabsStateContext"
 import CodePreview from "../CodePreview"
 import Editor, { loader } from "@monaco-editor/react"
@@ -54,6 +55,7 @@ const CodeView = () => {
 		isValid,
 		isLoading,
 		error,
+		validationErrors,
 		outputPath,
 		packageName,
 		defaultPackageName,
@@ -86,6 +88,7 @@ const CodeView = () => {
 	const setIsValid = (value: boolean) => updateState({ isValid: value })
 	const setIsLoading = (value: boolean) => updateState({ isLoading: value })
 	const setError = (value: string) => updateState({ error: value })
+	const setValidationErrors = (value: string[]) => updateState({ validationErrors: value })
 	const setOutputPath = (value: string) => updateState({ outputPath: value })
 	const setPackageName = (value: string) => updateState({ packageName: value })
 	const setDefaultPackageName = (value: string) => updateState({ defaultPackageName: value })
@@ -296,6 +299,7 @@ const CodeView = () => {
 					case "selectedOutputPath":
 						if (message.text) {
 							setOutputPath(message.text)
+							setValidationErrors([]) // Clear validation errors
 						}
 						break
 					case "currentWorkspacePath":
@@ -361,6 +365,7 @@ const CodeView = () => {
 							console.log("Received egovSettings, setting packageName to:", message.settings.defaultPackageName)
 							setDefaultPackageName(message.settings.defaultPackageName)
 							setPackageName(message.settings.defaultPackageName)
+							setValidationErrors([]) // Clear validation errors
 						}
 						break
 
@@ -383,17 +388,19 @@ const CodeView = () => {
 			return
 		}
 
-		// Validate required fields
-		if (!packageName.trim()) {
-			setError("Package name is required")
-			return
-		}
-		if (!outputPath.trim()) {
-			setError("Output path is required")
+		// Validate configuration using validateCodeConfig
+		const configValidation = validateCodeConfig({
+			packageName: packageName.trim(),
+			outputPath: outputPath.trim(),
+		})
+
+		if (configValidation.length > 0) {
+			setValidationErrors(configValidation)
 			return
 		}
 
 		setIsLoading(true)
+		setValidationErrors([])
 		setError("")
 		try {
 			vscode.postMessage({
@@ -416,6 +423,7 @@ const CodeView = () => {
 		}
 
 		setIsLoading(true)
+		setValidationErrors([])
 		setError("")
 		try {
 			vscode.postMessage({
@@ -488,6 +496,7 @@ const CodeView = () => {
 		console.log("Reset to default package name clicked")
 		if (defaultPackageName) {
 			setPackageName(defaultPackageName)
+			setValidationErrors([])
 		}
 	}
 
@@ -877,7 +886,10 @@ const CodeView = () => {
 									<TextField
 										label="Package Name"
 										value={packageName}
-										onChange={(e: any) => setPackageName(e.target.value)}
+										onChange={(e: any) => {
+											setPackageName(e.target.value)
+											setValidationErrors([]) // Clear validation errors
+										}}
 										placeholder="e.g., com.example.project"
 										isRequired
 									/>
@@ -927,7 +939,10 @@ const CodeView = () => {
 									<TextField
 										label="Output Path"
 										value={outputPath}
-										onChange={(e: any) => setOutputPath(e.target.value)}
+										onChange={(e: any) => {
+											setOutputPath(e.target.value)
+											setValidationErrors([]) // Clear validation errors
+										}}
 										placeholder="Select output directory"
 										isRequired
 									/>
@@ -975,6 +990,29 @@ const CodeView = () => {
 				{/* Generation Options */}
 				<div style={{ marginBottom: "20px" }}>
 					<h4 style={{ color: "var(--vscode-foreground)", marginBottom: "10px" }}>Code Generation</h4>
+
+					{/* Validation Errors */}
+					{validationErrors.length > 0 && (
+						<div style={{ marginBottom: "20px" }}>
+							<div
+								style={{
+									backgroundColor: "var(--vscode-inputValidation-errorBackground)",
+									border: "1px solid var(--vscode-inputValidation-errorBorder)",
+									color: "var(--vscode-inputValidation-errorForeground)",
+									padding: "10px",
+									borderRadius: "3px",
+								}}>
+								<div style={{ fontWeight: "bold", marginBottom: "5px" }}>Validation Errors:</div>
+								<ul style={{ margin: 0, paddingLeft: "20px" }}>
+									{validationErrors.map((error, index) => (
+										<li key={index} style={{ fontSize: "12px" }}>
+											{error}
+										</li>
+									))}
+								</ul>
+							</div>
+						</div>
+					)}
 
 					<div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
 						<button

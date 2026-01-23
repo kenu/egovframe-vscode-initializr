@@ -10,6 +10,7 @@ interface CodeViewState {
 	isValid: boolean
 	isLoading: boolean
 	error: string
+	validationErrors: string[]
 	outputPath: string
 	packageName: string
 	defaultPackageName: string // VSCode 설정에서 가져온 기본값
@@ -81,6 +82,7 @@ const initialCodeViewState: CodeViewState = {
 	isValid: false,
 	isLoading: false,
 	error: "",
+	validationErrors: [],
 	outputPath: "",
 	packageName: "egovframework.example.sample", // VSCode 설정에서 가져온 값으로 곧 업데이트됨 (CodeView.tsx - useEffect - handleMessage - case "egovSettings")
 	defaultPackageName: "egovframework.example.sample", // VSCode 설정에서 가져온 기본값 (CodeView.tsx - useEffect - handleMessage - case "egovSettings")
