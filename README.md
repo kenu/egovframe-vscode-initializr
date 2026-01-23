@@ -4,8 +4,11 @@
 
 **eGovFrame VSCode Initializr**는 전자정부 표준프레임워크(eGovFrame) 프로젝트 생성 및 설정을 위한 Visual Studio Code 확장 프로그램입니다. 개발자가 eGovFrame 기반 프로젝트를 쉽고 빠르게 시작할 수 있도록 도와주는 통합 도구입니다.
 
-- **컨트리뷰션 참여에 앞서 [컨트리뷰션 가이드 문서](./CONTRIBUTING.md)를 반드시 확인 부탁드립니다.**
-- eGovFrame VSCode Initializr를 개발하시거나 이 소스코드를 기반으로 자신만의 Extension을 개발하시려는 분은 [개발자 가이드 문서](./docs/DEVELOPER.md)를 확인 부탁드립니다. [기술 스택](./docs/DEVELOPER.md#기술-스택)도 해당 문서에서 확인 가능합니다.
+가이드 문서들 목록은 다음과 같습니다.
+- **README.md**: Extension 사용자를 위한 기능 활용 방법 소개
+- **[CONTRIBUTING.md](https://github.com/eGovFramework/egovframe-vscode-initializr?tab=contributing-ov-file#contributing-guide)**: 컨트리뷰션 참여자를 위한 컨트리뷰션 참여 방법 소개
+- **[DEVELOPER.md](./docs/DEVELOPER.md)**: Extension 개발자를 위한 기능, 시스템, 기술스택 소개
+- **[ARCHITECTURE.md](./docs/ARCHITECTURE.md)**: Extension 개발자를 위한 아키텍쳐, 폴더 구조 소개
 
 ## 주요 기능
 
