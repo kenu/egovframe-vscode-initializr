@@ -43,6 +43,15 @@ const EgovSettingsView = memo(({ onDone }: EgovSettingsViewProps) => {
 	const [extensionInfo, setExtensionInfo] = useState<ExtensionInfo | null>(null)
 	const [isLoading, setIsLoading] = useState(true)
 	const [isCompact, setIsCompact] = useState(false)
+	const [saveStatus, setSaveStatus] = useState<{
+		isSaving: boolean
+		message: string
+		type: "success" | "error" | null
+	}>({
+		isSaving: false,
+		message: "",
+		type: null,
+	})
 
 	// 화면 크기 감지 및 컴팩트 모드 설정
 	useEffect(() => {
@@ -79,6 +88,36 @@ const EgovSettingsView = memo(({ onDone }: EgovSettingsViewProps) => {
 					setIsLoading(false)
 				}
 			}
+			if (message.type === "success") {
+				setSaveStatus({
+					isSaving: false,
+					message: message.message || "설정이 성공적으로 저장되었습니다.",
+					type: "success",
+				})
+				// 3초 후 메시지 숨기기
+				setTimeout(() => {
+					setSaveStatus({
+						isSaving: false,
+						message: "",
+						type: null,
+					})
+				}, 3000)
+			}
+			if (message.type === "error") {
+				setSaveStatus({
+					isSaving: false,
+					message: message.message || "설정 저장에 실패했습니다.",
+					type: "error",
+				})
+				// 5초 후 에러 메시지 숨기기
+				setTimeout(() => {
+					setSaveStatus({
+						isSaving: false,
+						message: "",
+						type: null,
+					})
+				}, 5000)
+			}
 		}
 
 		window.addEventListener("message", handleMessage)
@@ -92,6 +131,11 @@ const EgovSettingsView = memo(({ onDone }: EgovSettingsViewProps) => {
 
 	// 설정 저장
 	const handleSaveSettings = () => {
+		setSaveStatus({
+			isSaving: true,
+			message: "",
+			type: null,
+		})
 		vscode.postMessage({
 			type: "updateEgovSettings",
 			settings,
@@ -191,11 +235,37 @@ const EgovSettingsView = memo(({ onDone }: EgovSettingsViewProps) => {
 				</div>
 			</div>
 
-			{/* 저장 버튼 */}
+			{/* 저장 버튼 및 상태 메시지 */}
 			<div style={{ marginTop: "24px" }}>
-				<Button onClick={handleSaveSettings} variant="primary">
-					Save Settings
+				<Button onClick={handleSaveSettings} variant="primary" disabled={saveStatus.isSaving}>
+					{saveStatus.isSaving ? "저장 중..." : "Save Settings"}
 				</Button>
+
+				{/* 저장 상태 메시지 */}
+				{saveStatus.message && (
+					<div
+						style={{
+							marginTop: "12px",
+							padding: "10px",
+							borderRadius: "3px",
+							fontSize: "12px",
+							backgroundColor:
+								saveStatus.type === "success"
+									? "var(--vscode-inputValidation-infoBackground)"
+									: "var(--vscode-inputValidation-errorBackground)",
+							border: `1px solid ${
+								saveStatus.type === "success"
+									? "var(--vscode-inputValidation-infoBorder)"
+									: "var(--vscode-inputValidation-errorBorder)"
+							}`,
+							color:
+								saveStatus.type === "success"
+									? "var(--vscode-inputValidation-infoForeground)"
+									: "var(--vscode-inputValidation-errorForeground)",
+						}}>
+						{saveStatus.message}
+					</div>
+				)}
 			</div>
 		</div>
 	)
