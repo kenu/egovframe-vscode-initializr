@@ -1,6 +1,7 @@
 import { memo, useState, useEffect } from "react"
 import { Button, TextField, useVSCodeTheme, ResponsiveMenuButton } from "../ui"
 import { vscode } from "../../utils/vscode"
+import { validateEgovSettings } from "../../utils/settingsUtils"
 
 interface EgovSettingsViewProps {
 	onDone: () => void
@@ -52,6 +53,7 @@ const EgovSettingsView = memo(({ onDone }: EgovSettingsViewProps) => {
 		message: "",
 		type: null,
 	})
+	const [validationErrors, setValidationErrors] = useState<string[]>([])
 
 	// 화면 크기 감지 및 컴팩트 모드 설정
 	useEffect(() => {
@@ -131,6 +133,14 @@ const EgovSettingsView = memo(({ onDone }: EgovSettingsViewProps) => {
 
 	// 설정 저장
 	const handleSaveSettings = () => {
+		// Validate settings before saving
+		const validation = validateEgovSettings(settings)
+		if (validation.length > 0) {
+			setValidationErrors(validation)
+			return
+		}
+
+		setValidationErrors([])
 		setSaveStatus({
 			isSaving: true,
 			message: "",
@@ -145,6 +155,7 @@ const EgovSettingsView = memo(({ onDone }: EgovSettingsViewProps) => {
 	// 설정 값 변경 핸들러
 	const handleSettingChange = (key: keyof EgovSettings, value: string) => {
 		setSettings((prev) => ({ ...prev, [key]: value }))
+		setValidationErrors([]) // Clear validation errors when any setting changes
 	}
 
 	const renderVSCodeSettings = () => (
@@ -234,6 +245,29 @@ const EgovSettingsView = memo(({ onDone }: EgovSettingsViewProps) => {
 					/>
 				</div>
 			</div>
+
+			{/* Validation Errors */}
+			{validationErrors.length > 0 && (
+				<div style={{ marginTop: "20px", marginBottom: "20px" }}>
+					<div
+						style={{
+							backgroundColor: "var(--vscode-inputValidation-errorBackground)",
+							border: "1px solid var(--vscode-inputValidation-errorBorder)",
+							color: "var(--vscode-inputValidation-errorForeground)",
+							padding: "10px",
+							borderRadius: "3px",
+						}}>
+						<div style={{ fontWeight: "bold", marginBottom: "5px" }}>Validation Errors:</div>
+						<ul style={{ margin: 0, paddingLeft: "20px" }}>
+							{validationErrors.map((error, index) => (
+								<li key={index} style={{ fontSize: "12px" }}>
+									{error}
+								</li>
+							))}
+						</ul>
+					</div>
+				</div>
+			)}
 
 			{/* 저장 버튼 및 상태 메시지 */}
 			<div style={{ marginTop: "24px" }}>
