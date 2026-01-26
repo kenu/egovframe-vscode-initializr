@@ -600,7 +600,10 @@ const CodeView = () => {
 								<select
 									id="sql-dialect-select"
 									value={sqlDialect}
-									onChange={(e) => setSqlDialect(e.target.value as "mysql" | "pgsql")}
+									onChange={(e) => {
+										setSqlDialect(e.target.value as "mysql" | "pgsql")
+										setSelectedSampleKey("")
+									}}
 									style={{
 										padding: "3px 6px",
 										fontSize: "12px",
@@ -673,11 +676,13 @@ const CodeView = () => {
 								}}>
 								<option value="">Enter directly</option>
 								{sampleDDLs &&
-									Object.entries(sampleDDLs).map(([key, sample]) => (
-										<option key={key} value={key}>
-											{sample.name}
-										</option>
-									))}
+									Object.entries(sampleDDLs)
+										.filter(([key, sample]) => sample.dialect === sqlDialect)
+										.map(([key, sample]) => (
+											<option key={key} value={key}>
+												{sample.name}
+											</option>
+										))}
 							</select>
 						</div>
 					</div>

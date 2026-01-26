@@ -23,7 +23,7 @@ interface CodeViewState {
 	// 자동 미리보기 업데이트 옵션
 	autoUpdatePreview: boolean
 	// 샘플 DDL 목록
-	sampleDDLs: { [key: string]: { name: string; ddl: string } } | null
+	sampleDDLs: { [key: string]: { name: string; dialect: string; ddl: string } } | null
 }
 
 // ProjectsView 상태

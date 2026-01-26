@@ -1,7 +1,7 @@
 // 샘플 DDL 정의 (DBMS별로 구분)
 export const SAMPLE_DDLS = {
 	"board-mysql": {
-		name: "Board Table (MySQL)",
+		name: "Board Table",
 		dialect: "mysql",
 		ddl: `CREATE TABLE board(
   id INT PRIMARY KEY AUTO_INCREMENT COMMENT 'Board ID',
@@ -15,7 +15,7 @@ export const SAMPLE_DDLS = {
 	},
 
 	"board-pgsql": {
-		name: "Board Table (PostgreSQL)",
+		name: "Board Table",
 		dialect: "pgsql",
 		ddl: `CREATE TABLE board(
   id SERIAL PRIMARY KEY,
@@ -38,7 +38,7 @@ COMMENT ON COLUMN board.updated_at IS 'Updated At';`,
 	},
 
 	"user-mysql": {
-		name: "User Table (MySQL)",
+		name: "User Table",
 		dialect: "mysql",
 		ddl: `CREATE TABLE users(
   id INT PRIMARY KEY AUTO_INCREMENT COMMENT 'User ID',
@@ -54,7 +54,7 @@ COMMENT ON COLUMN board.updated_at IS 'Updated At';`,
 	},
 
 	"user-pgsql": {
-		name: "User Table (PostgreSQL)",
+		name: "User Table",
 		dialect: "pgsql",
 		ddl: `CREATE TABLE users(
   id SERIAL PRIMARY KEY,
@@ -81,7 +81,7 @@ COMMENT ON COLUMN users.updated_at IS 'Updated At';`,
 	},
 
 	"product-mysql": {
-		name: "Product Table (MySQL)",
+		name: "Product Table",
 		dialect: "mysql",
 		ddl: `CREATE TABLE products(
   id INT PRIMARY KEY AUTO_INCREMENT COMMENT 'Product ID',
@@ -98,7 +98,7 @@ COMMENT ON COLUMN users.updated_at IS 'Updated At';`,
 	},
 
 	"product-pgsql": {
-		name: "Product Table (PostgreSQL)",
+		name: "Product Table",
 		dialect: "pgsql",
 		ddl: `CREATE TABLE products(
   id SERIAL PRIMARY KEY,
@@ -127,7 +127,7 @@ COMMENT ON COLUMN products.updated_at IS 'Updated At';`,
 	},
 
 	"order-mysql": {
-		name: "Order Table (MySQL)",
+		name: "Order Table",
 		dialect: "mysql",
 		ddl: `CREATE TABLE orders(
   id INT PRIMARY KEY AUTO_INCREMENT COMMENT 'Order ID',
@@ -144,7 +144,7 @@ COMMENT ON COLUMN products.updated_at IS 'Updated At';`,
 	},
 
 	"order-pgsql": {
-		name: "Order Table (PostgreSQL)",
+		name: "Order Table",
 		dialect: "pgsql",
 		ddl: `CREATE TABLE orders(
   id SERIAL PRIMARY KEY,
@@ -172,7 +172,7 @@ COMMENT ON COLUMN orders.updated_at IS 'Updated At';`,
 	},
 
 	"comment-mysql": {
-		name: "Comment Table (MySQL)",
+		name: "Comment Table",
 		dialect: "mysql",
 		ddl: `CREATE TABLE comments(
   id INT PRIMARY KEY AUTO_INCREMENT COMMENT 'Comment ID',
@@ -189,7 +189,7 @@ COMMENT ON COLUMN orders.updated_at IS 'Updated At';`,
 	},
 
 	"comment-pgsql": {
-		name: "Comment Table (PostgreSQL)",
+		name: "Comment Table",
 		dialect: "pgsql",
 		ddl: `CREATE TABLE comments(
   id SERIAL PRIMARY KEY,

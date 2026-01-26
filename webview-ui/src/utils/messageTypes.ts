@@ -118,7 +118,7 @@ export interface ValidationResultResponse {
 
 export interface SampleDDLsResponse {
 	type: "sampleDDLs"
-	data: { [key: string]: { name: string; ddl: string } }
+	data: { [key: string]: { name: string; ddl: string; dialect: string } }
 }
 
 export interface CurrentThemeResponse {
