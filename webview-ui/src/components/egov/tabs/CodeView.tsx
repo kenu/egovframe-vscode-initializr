@@ -72,8 +72,8 @@ const CodeView = () => {
 	const [monacoTheme, setMonacoTheme] = useState<"light" | "vs-dark">("vs-dark")
 	// Monaco Editor 포커스 상태
 	const [isEditorFocused, setIsEditorFocused] = useState(false)
-	// SQL 방언 선택 (MySQL or PostgreSQL)
-	const [sqlDialect, setSqlDialect] = useState<"mysql" | "pgsql">("mysql")
+	// SQL 방언 선택 (MySQL or PostgreSQL or etc)
+	const [sqlDialect, setSqlDialect] = useState<"mysql" | "pgsql" | "etc">("mysql")
 	// 현재 선택된 샘플 키 추적
 	const [selectedSampleKey, setSelectedSampleKey] = useState<string>("")
 	// Monaco Editor 인스턴스 참조
@@ -601,7 +601,7 @@ const CodeView = () => {
 									id="sql-dialect-select"
 									value={sqlDialect}
 									onChange={(e) => {
-										setSqlDialect(e.target.value as "mysql" | "pgsql")
+										setSqlDialect(e.target.value as "mysql" | "pgsql" | "etc")
 										setSelectedSampleKey("")
 									}}
 									style={{
@@ -622,6 +622,7 @@ const CodeView = () => {
 									}}>
 									<option value="mysql">MySQL</option>
 									<option value="pgsql">PostgreSQL</option>
+									<option value="etc">etc</option>
 								</select>
 							</div>
 
@@ -675,7 +676,8 @@ const CodeView = () => {
 									e.target.style.border = "1px solid var(--vscode-dropdown-border)"
 								}}>
 								<option value="">Enter directly</option>
-								{sampleDDLs &&
+								{sqlDialect !== "etc" &&
+									sampleDDLs &&
 									Object.entries(sampleDDLs)
 										.filter(([key, sample]) => sample.dialect === sqlDialect)
 										.map(([key, sample]) => (
@@ -722,7 +724,7 @@ const CodeView = () => {
 						}}>
 						<Editor // Monaco Editor -> SQL Syntax Highlighting with monaco-sql-languages
 							height="300px"
-							language={sqlDialect} // Use selected SQL dialect (mysql or pgsql)
+							language={sqlDialect === "etc" ? "sql" : sqlDialect} // Use selected SQL dialect (mysql, pgsql, or generic sql for etc)
 							theme={monacoTheme} // 동적 테마 적용
 							value={ddlContent}
 							onChange={(value) => setDdlContent(value || "")}
@@ -831,6 +833,11 @@ const CodeView = () => {
 								marginTop: "5px",
 							}}>
 							{error}
+						</div>
+					)}
+					{sqlDialect === "etc" && (
+						<div style={{ fontSize: "12px", color: "var(--vscode-foreground)", marginTop: "5px" }}>
+							'DDL Input: etc' supports basic SQL validation only.
 						</div>
 					)}
 				</div>
