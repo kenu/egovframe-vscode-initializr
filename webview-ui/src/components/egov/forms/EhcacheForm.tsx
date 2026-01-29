@@ -3,12 +3,19 @@ import { Button, TextField, RadioGroup, Link } from "../../ui"
 import { ConfigFormData, ConfigGenerationType, FormComponentProps } from "../types/templates"
 import { vscode } from "../../../utils/vscode"
 import { createSelectConfigFilePathMessage } from "../../../utils/egovUtils"
+import {
+	validatePackageName,
+	validateFileName,
+	validateRequiredFields,
+	validateSpecialCharacters,
+} from "../../../utils/codeUtils"
 
 const EhcacheForm: React.FC<FormComponentProps> = ({ onSubmit, onCancel, template, initialData }) => {
 	const [formData, setFormData] = useState<ConfigFormData>({
 		// 아래는 입력값들에 대한 초기값
 		generationType: ConfigGenerationType.XML,
 		txtConfigPackage: "egovframework.example.config",
+		txtComponentScanBasePackage: "egovframework.example",
 		txtFileName: "context-cache",
 		txtConfigLocation: "",
 		...initialData,
@@ -85,28 +92,54 @@ const EhcacheForm: React.FC<FormComponentProps> = ({ onSubmit, onCancel, templat
 	const handleSubmit = (e: React.FormEvent) => {
 		e.preventDefault()
 
-		// Validate required fields
-		const requiredFields: { field: keyof typeof formData; label: string }[] = [
-			{ field: "generationType" as keyof typeof formData, label: "Generation Type" },
-			{ field: "txtConfigLocation" as keyof typeof formData, label: "Config Location" },
-		]
+		// 1. Package Name 유효성 검증 (JavaConfig일 때만)
+		if (formData.generationType === ConfigGenerationType.JAVA_CONFIG) {
+			const packageNameError = validatePackageName(formData.txtConfigPackage || "")
+			if (packageNameError) {
+				setValidationError(packageNameError)
+				return
+			}
+		}
 
+		// 2. File Name / Class Name 유효성 검증
+		const fileNameError = validateFileName(
+			formData.txtFileName || "",
+			formData.generationType === ConfigGenerationType.JAVA_CONFIG,
+		)
+		if (fileNameError) {
+			setValidationError(fileNameError)
+			return
+		}
+
+		// 3. Missing Fields 유효성 검증
+		const requiredFields: Array<{ field: string; label: string }> = [
+			{ field: "generationType", label: "Generation Type" },
+			{ field: "txtComponentScanBasePackage", label: "Component Scan Base Package" },
+			{ field: "txtConfigLocation", label: "Config Location" },
+		]
 		// 조건부로 txtFileName, txtConfigPackage 필드 추가
 		if (formData.generationType === ConfigGenerationType.JAVA_CONFIG) {
 			requiredFields.push(
-				{ field: "txtFileName" as keyof typeof formData, label: "Class Name" },
-				{ field: "txtConfigPackage" as keyof typeof formData, label: "Package Name" },
+				{ field: "txtFileName", label: "Class Name" },
+				{ field: "txtConfigPackage", label: "Package Name" },
 			)
 		} else {
-			requiredFields.push({ field: "txtFileName" as keyof typeof formData, label: "File Name" })
+			requiredFields.push({ field: "txtFileName", label: "File Name" })
+		}
+		const missingFieldsMessage = validateRequiredFields(requiredFields, formData)
+		if (missingFieldsMessage) {
+			setValidationError(missingFieldsMessage)
+			return
 		}
 
-		const missingFields = requiredFields.filter(({ field }) => !formData[field]?.toString().trim())
-
-		if (missingFields.length > 0) {
-			const fieldNames = missingFields.map(({ label }) => label).join(", ")
-			//alert(`Please fill in the following required fields: ${fieldNames}`)
-			setValidationError(`Please fill in the following required fields: ${fieldNames}`)
+		// 4. 특수문자 유효성 검증
+		const notSpecialCharactersFields: Array<{ field: string; label: string }> = [
+			{ field: "txtComponentScanBasePackage", label: "Component Scan Base Package" },
+			{ field: "txtConfigLocation", label: "Config Location" },
+		]
+		const specialCharacterMessage = validateSpecialCharacters(notSpecialCharactersFields, formData)
+		if (specialCharacterMessage) {
+			setValidationError(specialCharacterMessage)
 			return
 		}
 
@@ -161,7 +194,7 @@ const EhcacheForm: React.FC<FormComponentProps> = ({ onSubmit, onCancel, templat
 				<div style={{ fontSize: "11px", color: "var(--vscode-descriptionForeground)", marginTop: "8px" }}>
 					<strong>Requirements:</strong>
 					<ul style={{ margin: "5px 0", paddingLeft: "20px" }}>
-						<li>Ehcache 3.x (jakarta classifier)</li>
+						<li>Ehcache 3.x</li>
 						<li>Spring Framework 6.x with JCache (JSR-107)</li>
 						<li>Jakarta EE 9+</li>
 						<li>JDK 17+</li>
@@ -170,8 +203,10 @@ const EhcacheForm: React.FC<FormComponentProps> = ({ onSubmit, onCancel, templat
 				<div style={{ fontSize: "11px", color: "var(--vscode-descriptionForeground)", marginTop: "8px" }}>
 					<strong>Required Dependencies:</strong>
 					<ul style={{ margin: "5px 0", paddingLeft: "20px" }}>
-						<li>org.ehcache:ehcache:3.10.8:jakarta</li>
-						<li>jakarta.cache:jakarta.cache-api:3.1.1</li>
+						<li>org.ehcache:ehcache:3.10.8</li>
+						<li>javax.cache:cache-api:1.1.1</li>
+						<li>javax.xml.bind:jaxb-api:2.3.1</li>
+						<li>org.glassfish.jaxb:jaxb-runtime:2.3.9</li>
 						<li>spring-context-support</li>
 					</ul>
 				</div>
@@ -227,6 +262,19 @@ const EhcacheForm: React.FC<FormComponentProps> = ({ onSubmit, onCancel, templat
 						</div>
 					</div>
 				)}
+
+				<div style={{ width: "calc(100% - 24px)", marginBottom: "20px" }}>
+					<TextField
+						label="Component Scan Base Package"
+						value={formData.txtComponentScanBasePackage}
+						onChange={(e) => handleInputChange("txtComponentScanBasePackage", e.target.value)}
+						placeholder="Enter component scan base package"
+						isRequired
+					/>
+					<div style={{ fontSize: "10px", color: "var(--vscode-descriptionForeground)", marginTop: "2px" }}>
+						@Cacheable 어노테이션을 스캔할 베이스 패키지 (예: egovframework.example)
+					</div>
+				</div>
 
 				<div style={{ width: "calc(100% - 24px)", marginBottom: "20px" }}>
 					<TextField

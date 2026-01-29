@@ -2,6 +2,13 @@ import React, { useState, useEffect } from "react"
 import { Button, TextField, RadioGroup, Select, Checkbox, Link } from "../../ui"
 import { ConfigFormData, ConfigGenerationType, FormComponentProps } from "../types/templates"
 import { vscode } from "../../../utils/vscode"
+import {
+	validatePackageName,
+	validateFileName,
+	validateRequiredFields,
+	validateSpecialCharacters,
+	validateNumber,
+} from "../../../utils/codeUtils"
 
 const CacheForm: React.FC<FormComponentProps> = ({ onSubmit, onCancel, template, initialData }) => {
 	const [currentPage, setCurrentPage] = useState(1)
@@ -10,17 +17,17 @@ const CacheForm: React.FC<FormComponentProps> = ({ onSubmit, onCancel, template,
 		generationType: ConfigGenerationType.XML,
 		txtFileName: "ehcache-default",
 		txtDiskStore: "user.dir/second",
-		txtDftMaxElements: "10000",
+		// 기본 캐시 템플릿 설정
 		txtDftEternal: "false",
-		txtDftLiveTime: "120",
-		txtDftOverfow: "true",
-		txtDftDiskPersistence: "true",
+		txtDftLiveTime: "10", // TTL (Time To Live) - 생성 후 만료 시간 (분)
+		txtDftHeapEntries: "100", // 힙 엔트리 수 (빈 값이면 미사용)
+		txtDftOffheapSize: "", // 오프힙 크기 MB (빈 값이면 미사용)
+		txtDftDiskPersistence: "true", // 디스크 영속성
+		// 사용자 캐시 설정
 		txtCacheName: "cache",
-		txtMaxElements: "100",
 		txtEternal: "false",
-		txtIdleTime: "360",
-		txtOverflowToDisk: "false",
-		txtDiskPersistent: "false",
+		txtIdleTime: "300", // TTI (Time To Idle) - 사용 후 만료 시간 (초)
+		txtHeapEntries: "10", // 힙 엔트리 수 (빈 값이면 미사용)
 		...initialData,
 	})
 	//const [selectedOutputFolder, setSelectedOutputFolder] = useState<string | null>(null) // 지금은 없어도 됨
@@ -72,37 +79,56 @@ const CacheForm: React.FC<FormComponentProps> = ({ onSubmit, onCancel, template,
 	const handleSubmit = (e: React.FormEvent) => {
 		e.preventDefault()
 
-		// Validate required fields
-		const requiredFields: { field: keyof typeof formData; label: string }[] = [
-			{ field: "generationType" as keyof typeof formData, label: "Generation Type" },
-			{ field: "txtFileName" as keyof typeof formData, label: "File Name" },
+		// 1. Package Name 유효성 검증 (JavaConfig일 때만)
+		// CacheForm은 txtConfigPackage가 없으므로 생략
 
-			{ field: "txtDiskStore" as keyof typeof formData, label: "Disk Store Path" },
-
-			{ field: "txtDftMaxElements" as keyof typeof formData, label: "Default Cache Max Elements" },
-			{ field: "txtDftEternal" as keyof typeof formData, label: "Default Cache Eternal" },
-			{ field: "txtDftLiveTime" as keyof typeof formData, label: "Default Cache Live Time" },
-			{ field: "txtDftOverfow" as keyof typeof formData, label: "Default Cache Overflow to Disk" },
-			{ field: "txtDftDiskPersistence" as keyof typeof formData, label: "Default Cache Disk Persistent" },
-		]
-
-		if (currentPage === 2) {
-			requiredFields.push(
-				{ field: "txtCacheName" as keyof typeof formData, label: "Cache Name" },
-				{ field: "txtMaxElements" as keyof typeof formData, label: "Max Elements" },
-				{ field: "txtEternal" as keyof typeof formData, label: "Eternal" },
-				{ field: "txtIdleTime" as keyof typeof formData, label: "Idle Time" },
-				{ field: "txtOverflowToDisk" as keyof typeof formData, label: "Overflow to Disk" },
-				{ field: "txtDiskPersistent" as keyof typeof formData, label: "Disk Persistent" },
-			)
+		// 2. File Name / Class Name 유효성 검증
+		const fileNameError = validateFileName(formData.txtFileName, formData.generationType === ConfigGenerationType.JAVA_CONFIG)
+		if (fileNameError) {
+			setValidationError(fileNameError)
+			return
 		}
 
-		const missingFields = requiredFields.filter(({ field }) => !formData[field]?.toString().trim())
+		// 3. Missing Fields 유효성 검증
+		const requiredFields: Array<{ field: string; label: string }> = [
+			{ field: "generationType", label: "Generation Type" },
+			{ field: "txtFileName", label: "File Name" },
+			{ field: "txtDftEternal", label: "Default Cache Eternal" },
+		]
+		if (currentPage === 2) {
+			requiredFields.push({ field: "txtCacheName", label: "Cache Name" }, { field: "txtEternal", label: "Eternal" })
+		}
+		const missingFieldsMessage = validateRequiredFields(requiredFields, formData)
+		if (missingFieldsMessage) {
+			setValidationError(missingFieldsMessage)
+			return
+		}
 
-		if (missingFields.length > 0) {
-			const fieldNames = missingFields.map(({ label }) => label).join(", ")
-			//alert(`Please fill in the following required fields: ${fieldNames}`)
-			setValidationError(`Please fill in the following required fields: ${fieldNames}`)
+		// 4. 특수문자 유효성 검증
+		const notSpecialCharactersFields: Array<{ field: string; label: string }> = [
+			{ field: "txtDiskStore", label: "Disk Store Path" },
+			{ field: "txtDftEternal", label: "Default Cache Eternal" },
+			{ field: "txtDftDiskPersistence", label: "Use Disk Storage" },
+			{ field: "txtCacheName", label: "Cache Name" },
+			{ field: "txtEternal", label: "Eternal" },
+		]
+		const specialCharacterMessage = validateSpecialCharacters(notSpecialCharactersFields, formData)
+		if (specialCharacterMessage) {
+			setValidationError(specialCharacterMessage)
+			return
+		}
+
+		// 5. 숫자 유효성 검증
+		const numberFields: Array<{ field: string; label: string }> = [
+			{ field: "txtDftLiveTime", label: "Default Cache Live Time" },
+			{ field: "txtDftHeapEntries", label: "Heap Entries" },
+			{ field: "txtDftOffheapSize", label: "Offheap Size" },
+			{ field: "txtIdleTime", label: "Idle Time" },
+			{ field: "txtHeapEntries", label: "Heap Entries" },
+		]
+		const numberMessage = validateNumber(numberFields, formData)
+		if (numberMessage) {
+			setValidationError(numberMessage)
 			return
 		}
 
@@ -223,7 +249,7 @@ const CacheForm: React.FC<FormComponentProps> = ({ onSubmit, onCancel, template,
 									isRequired
 								/>
 								<div style={{ fontSize: "10px", color: "var(--vscode-descriptionForeground)", marginTop: "2px" }}>
-									Ehcache 3.x XML 설정 파일 이름 (예: ehcache-default.xml)
+									Ehcache 3.x XML 설정 파일 이름
 								</div>
 							</div>
 						</div>
@@ -248,32 +274,10 @@ const CacheForm: React.FC<FormComponentProps> = ({ onSubmit, onCancel, template,
 						<div style={{ marginBottom: "20px" }}>
 							<h3 style={{ color: "var(--vscode-foreground)", marginBottom: "10px" }}>Set Default Cache</h3>
 							<div style={{ fontSize: "11px", color: "var(--vscode-descriptionForeground)", marginBottom: "10px" }}>
-								모든 캐시에 기본적으로 적용될 설정입니다.
+								모든 캐시에 기본적으로 적용될 설정입니다
 							</div>
 
-							<div style={{ width: "calc(100% - 24px)", marginBottom: "15px" }}>
-								<TextField
-									label="Default Cache Max Elements"
-									value={formData.txtDftMaxElements}
-									onChange={(e) => handleInputChange("txtDftMaxElements", e.target.value)}
-									placeholder="Enter default cache max elements"
-									isRequired
-								/>
-								<div style={{ fontSize: "10px", color: "var(--vscode-descriptionForeground)", marginTop: "2px" }}>
-									힙 메모리에 저장할 최대 엔트리 수
-								</div>
-							</div>
-
-							{/* 업데이트 전 Select 코드
-							<div style={{ marginBottom: "15px" }}>
-								<label style={{ display: "block", marginBottom: "5px", color: "var(--vscode-foreground)" }}>
-									 Cache Eternal <span style={{ color: "var(--vscode-errorForeground)" }}>*</span>
-								</label>
-								<Select options={[]} />
-							</div>
-							*/}
-
-							{/* 업데이트 후 Select 코드 */}
+							{/* Expiry 설정 */}
 							<div style={{ marginBottom: "15px" }}>
 								<Select
 									label="Default Cache Eternal"
@@ -286,52 +290,74 @@ const CacheForm: React.FC<FormComponentProps> = ({ onSubmit, onCancel, template,
 									isRequired
 								/>
 								<div style={{ fontSize: "10px", color: "var(--vscode-descriptionForeground)", marginTop: "2px" }}>
-									True: 만료되지 않음, False: TTL/TTI 적용
+									True: 만료되지 않음 (none), False: TTL 적용
+								</div>
+							</div>
+
+							{formData.txtDftEternal === "false" && (
+								<div style={{ width: "calc(100% - 24px)", marginBottom: "15px" }}>
+									<TextField
+										label="Default Cache Live Time (Minutes)"
+										value={formData.txtDftLiveTime}
+										onChange={(e) => handleInputChange("txtDftLiveTime", e.target.value)}
+										placeholder="Enter default cache live time (sec)"
+									/>
+									<div
+										style={{
+											fontSize: "10px",
+											color: "var(--vscode-descriptionForeground)",
+											marginTop: "2px",
+										}}>
+										TTL (Time To Live): 생성 후 만료 시간 (분)
+									</div>
+								</div>
+							)}
+
+							{/* Resources 설정 */}
+							<h4 style={{ color: "var(--vscode-foreground)", marginBottom: "10px", marginTop: "20px" }}>
+								Storage Resources
+							</h4>
+							<div style={{ fontSize: "10px", color: "var(--vscode-descriptionForeground)", marginBottom: "10px" }}>
+								값을 입력하면 해당 저장소가 활성화됩니다. 빈 값이면 미사용.
+							</div>
+
+							<div style={{ width: "calc(100% - 24px)", marginBottom: "15px" }}>
+								<TextField
+									label="Heap Entries"
+									value={formData.txtDftHeapEntries}
+									onChange={(e) => handleInputChange("txtDftHeapEntries", e.target.value)}
+									placeholder="Enter heap max entries (e.g. 10000)"
+								/>
+								<div style={{ fontSize: "10px", color: "var(--vscode-descriptionForeground)", marginTop: "2px" }}>
+									힙 메모리에 저장할 최대 엔트리 수 (빈 값이면 미사용)
 								</div>
 							</div>
 
 							<div style={{ width: "calc(100% - 24px)", marginBottom: "15px" }}>
 								<TextField
-									label="Default Cache Live Time (sec)"
-									value={formData.txtDftLiveTime}
-									onChange={(e) => handleInputChange("txtDftLiveTime", e.target.value)}
-									placeholder="Enter default cache live time (sec)"
-									isRequired
+									label="OffHeap Size (MB)"
+									value={formData.txtDftOffheapSize}
+									onChange={(e) => handleInputChange("txtDftOffheapSize", e.target.value)}
+									placeholder="Enter offheap size in MB (e.g. 50)"
 								/>
 								<div style={{ fontSize: "10px", color: "var(--vscode-descriptionForeground)", marginTop: "2px" }}>
-									TTL (Time To Live): 생성 후 만료 시간 (초)
+									오프힙 메모리 크기 MB (빈 값이면 미사용)
 								</div>
 							</div>
 
+							{/* Resources 설정 - Disk */}
 							<div style={{ marginBottom: "15px" }}>
 								<Select
-									label="Default Cache Overflow to Disk"
-									options={[
-										{ value: "true", label: "True" },
-										{ value: "false", label: "False" },
-									]}
-									value={formData.txtDftOverfow}
-									onChange={(e) => handleInputChange("txtDftOverfow", e.target.value)}
-									isRequired
-								/>
-								<div style={{ fontSize: "10px", color: "var(--vscode-descriptionForeground)", marginTop: "2px" }}>
-									힙 메모리가 가득 차면 디스크에 저장 (Ehcache 3.x: disk tier 사용)
-								</div>
-							</div>
-
-							<div style={{ marginBottom: "20px" }}>
-								<Select
-									label="Default Cache Disk Persistent"
+									label="Use Disk Storage"
 									options={[
 										{ value: "true", label: "True" },
 										{ value: "false", label: "False" },
 									]}
 									value={formData.txtDftDiskPersistence}
 									onChange={(e) => handleInputChange("txtDftDiskPersistence", e.target.value)}
-									isRequired
 								/>
 								<div style={{ fontSize: "10px", color: "var(--vscode-descriptionForeground)", marginTop: "2px" }}>
-									JVM 재시작 시 디스크 캐시 유지 여부
+									디스크 저장소 사용 여부
 								</div>
 							</div>
 						</div>
@@ -350,12 +376,12 @@ const CacheForm: React.FC<FormComponentProps> = ({ onSubmit, onCancel, template,
 						<div style={{ marginBottom: "20px" }}>
 							<h3 style={{ color: "var(--vscode-foreground)", marginBottom: "10px" }}>Set Custom Cache</h3>
 							<div style={{ fontSize: "11px", color: "var(--vscode-descriptionForeground)", marginBottom: "10px" }}>
-								특정 용도에 맞는 커스텀 캐시 설정입니다.
+								특정 용도에 맞는 커스텀 캐시 설정입니다. (defaultCache 템플릿을 상속받음)
 							</div>
 
 							<div style={{ width: "calc(100% - 24px)", marginBottom: "15px" }}>
 								<TextField
-									label="Cache Name"
+									label="Cache Name (alias)"
 									value={formData.txtCacheName}
 									onChange={(e) => handleInputChange("txtCacheName", e.target.value)}
 									placeholder="Enter cache name"
@@ -366,16 +392,7 @@ const CacheForm: React.FC<FormComponentProps> = ({ onSubmit, onCancel, template,
 								</div>
 							</div>
 
-							<div style={{ width: "calc(100% - 24px)", marginBottom: "15px" }}>
-								<TextField
-									label="Max Elements"
-									value={formData.txtMaxElements}
-									onChange={(e) => handleInputChange("txtMaxElements", e.target.value)}
-									placeholder="Enter max elements"
-									isRequired
-								/>
-							</div>
-
+							{/* Expiry 설정 */}
 							<div style={{ marginBottom: "15px" }}>
 								<Select
 									label="Eternal"
@@ -387,47 +404,47 @@ const CacheForm: React.FC<FormComponentProps> = ({ onSubmit, onCancel, template,
 									onChange={(e) => handleInputChange("txtEternal", e.target.value)}
 									isRequired
 								/>
+								<div style={{ fontSize: "10px", color: "var(--vscode-descriptionForeground)", marginTop: "2px" }}>
+									True: 만료되지 않음 (none), False: TTI 적용
+								</div>
+							</div>
+
+							{formData.txtEternal === "false" && (
+								<div style={{ width: "calc(100% - 24px)", marginBottom: "15px" }}>
+									<TextField
+										label="Idle Time (sec)"
+										value={formData.txtIdleTime}
+										onChange={(e) => handleInputChange("txtIdleTime", e.target.value)}
+										placeholder="Enter idle time (sec)"
+									/>
+									<div
+										style={{
+											fontSize: "10px",
+											color: "var(--vscode-descriptionForeground)",
+											marginTop: "2px",
+										}}>
+										TTI (Time To Idle): 마지막 접근 후 만료 시간 (초)
+									</div>
+								</div>
+							)}
+
+							{/* Resources 설정 */}
+							<h4 style={{ color: "var(--vscode-foreground)", marginBottom: "10px", marginTop: "20px" }}>
+								Storage Resources
+							</h4>
+							<div style={{ fontSize: "10px", color: "var(--vscode-descriptionForeground)", marginBottom: "10px" }}>
+								값을 입력하면 해당 저장소가 활성화됩니다. 빈 값이면 미사용.
 							</div>
 
 							<div style={{ width: "calc(100% - 24px)", marginBottom: "15px" }}>
 								<TextField
-									label="Idle Time (sec)"
-									value={formData.txtIdleTime}
-									onChange={(e) => handleInputChange("txtIdleTime", e.target.value)}
-									placeholder="Enter idle time (sec)"
-									isRequired
+									label="Heap Entries"
+									value={formData.txtHeapEntries}
+									onChange={(e) => handleInputChange("txtHeapEntries", e.target.value)}
+									placeholder="Enter heap max entries (e.g. 100)"
 								/>
 								<div style={{ fontSize: "10px", color: "var(--vscode-descriptionForeground)", marginTop: "2px" }}>
-									TTI (Time To Idle): 마지막 접근 후 만료 시간 (초)
-								</div>
-							</div>
-
-							<div style={{ marginBottom: "15px" }}>
-								<Select
-									label="Overflow to Disk"
-									options={[
-										{ value: "true", label: "True" },
-										{ value: "false", label: "False" },
-									]}
-									value={formData.txtOverflowToDisk}
-									onChange={(e) => handleInputChange("txtOverflowToDisk", e.target.value)}
-									isRequired
-								/>
-							</div>
-
-							<div style={{ marginBottom: "20px" }}>
-								<Select
-									label="Disk Persistent"
-									options={[
-										{ value: "true", label: "True" },
-										{ value: "false", label: "False" },
-									]}
-									value={formData.txtDiskPersistent}
-									onChange={(e) => handleInputChange("txtDiskPersistent", e.target.value)}
-									isRequired
-								/>
-								<div style={{ fontSize: "10px", color: "var(--vscode-descriptionForeground)", marginTop: "2px" }}>
-									JVM 재시작 시 디스크 캐시 유지 여부
+									힙 메모리에 저장할 최대 엔트리 수 (빈 값이면 미사용)
 								</div>
 							</div>
 						</div>

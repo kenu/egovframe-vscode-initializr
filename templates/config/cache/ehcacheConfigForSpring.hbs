@@ -6,13 +6,17 @@
   - Spring Framework 6.x
   - JDK 17+
   - Ehcache 3.10.8+ (jakarta classifier)
-  - jakarta.cache-api 3.1.1+ (JCache/JSR-107)
+  - jakarta.cache-api 1.1.1+ (JCache/JSR-107)
 -->
-<beans xmlns="http://www.springframework.org/schema/beans"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xmlns:cache="http://www.springframework.org/schema/cache"
+    xmlns:context="http://www.springframework.org/schema/context"
     xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
-                        http://www.springframework.org/schema/cache http://www.springframework.org/schema/cache/spring-cache.xsd">
+                        http://www.springframework.org/schema/cache http://www.springframework.org/schema/cache/spring-cache.xsd
+                        http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+
+    <!-- Component Scan -->
+    <context:component-scan base-package="{{txtComponentScanBasePackage}}" />
 
     <!-- Enable Spring Cache Annotations -->
     <cache:annotation-driven />
@@ -23,12 +27,10 @@
     </bean>
 
     <!-- JCache CacheManager Configuration with Ehcache 3.x -->
-    <bean id="jCacheCacheManager" 
-          class="org.springframework.cache.jcache.JCacheManagerFactoryBean">
+    <bean id="jCacheCacheManager" class="org.springframework.cache.jcache.JCacheManagerFactoryBean">
         <property name="cacheManagerUri" value="classpath:{{txtConfigLocation}}" />
         <property name="cachingProvider">
-            <bean class="org.ehcache.jsr107.EhcacheCachingProvider" 
-                  factory-method="getInstance" />
+            <bean class="org.ehcache.jsr107.EhcacheCachingProvider" factory-method="getInstance" />
         </property>
     </bean>
 

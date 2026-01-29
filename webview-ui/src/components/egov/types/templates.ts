@@ -86,6 +86,10 @@ export interface ConfigFormData {
 	txtDiskPersistent?: string
 	cboMemoryPolicy?: string
 	txtConfigLocation?: string
+	txtComponentScanBasePackage?: string
+	txtDftHeapEntries?: string
+	txtDftOffheapSize?: string
+	txtHeapEntries?: string
 
 	// Property 관련
 	txtPropertyServiceName?: string

@@ -2,6 +2,13 @@ import React, { useState, useEffect } from "react"
 import { Button, TextField, TextArea, Select, RadioGroup, Checkbox, ProgressRing, Link, Divider } from "../../ui"
 import { ConfigFormData, ConfigGenerationType, FormComponentProps } from "../types/templates"
 import { vscode } from "../../../utils/vscode"
+import {
+	validatePackageName,
+	validateFileName,
+	validateRequiredFields,
+	validateSpecialCharacters,
+	validateNumber,
+} from "../../../utils/codeUtils"
 
 const IdGenerationForm: React.FC<FormComponentProps> = ({ onSubmit, onCancel, template, formType, initialData }) => {
 	const getDefaultFileName = (type: ConfigGenerationType) => {
@@ -94,65 +101,111 @@ const IdGenerationForm: React.FC<FormComponentProps> = ({ onSubmit, onCancel, te
 	const handleSubmit = (e: React.FormEvent) => {
 		e.preventDefault()
 
-		// Validate required fields
-		const requiredFields: { field: keyof typeof formData; label: string }[] = []
+		// 1. Package Name 유효성 검증 (JavaConfig일 때만)
+		if (formData.generationType === ConfigGenerationType.JAVA_CONFIG) {
+			const packageNameError = validatePackageName(formData.txtConfigPackage || "")
+			if (packageNameError) {
+				setValidationError(packageNameError)
+				return
+			}
+		}
 
+		// 2. File Name / Class Name 유효성 검증
+		const fileNameError = validateFileName(
+			formData.txtFileName || "",
+			formData.generationType === ConfigGenerationType.JAVA_CONFIG,
+		)
+		if (fileNameError) {
+			setValidationError(fileNameError)
+			return
+		}
+
+		// 3. Missing Fields 유효성 검증
+		const requiredFields: Array<{ field: string; label: string }> = []
 		// 조건부로 txtFileName, txtConfigPackage 필드 추가
 		if (formData.generationType === ConfigGenerationType.JAVA_CONFIG) {
 			requiredFields.push(
-				{ field: "txtFileName" as keyof typeof formData, label: "Class Name" },
-				{ field: "txtConfigPackage" as keyof typeof formData, label: "Package Name" },
+				{ field: "txtFileName", label: "Class Name" },
+				{ field: "txtConfigPackage", label: "Package Name" },
 			)
 		} else {
-			requiredFields.push({ field: "txtFileName" as keyof typeof formData, label: "File Name" })
+			requiredFields.push({ field: "txtFileName", label: "File Name" })
 		}
 
 		switch (formType) {
 			case "sequence":
 				requiredFields.push(
-					{ field: "generationType" as keyof typeof formData, label: "Generation Type" },
-					{ field: "txtIdServiceName" as keyof typeof formData, label: "Bean Name" },
-					{ field: "txtDatasourceName" as keyof typeof formData, label: "Data Source Name" },
-					{ field: "txtQuery" as keyof typeof formData, label: "Query" },
-					{ field: "rdoIdType" as keyof typeof formData, label: "ID Type" },
+					{ field: "generationType", label: "Generation Type" },
+					{ field: "txtIdServiceName", label: "Bean Name" },
+					{ field: "txtDatasourceName", label: "Data Source Name" },
+					{ field: "txtQuery", label: "Query" },
+					{ field: "rdoIdType", label: "ID Type" },
 				)
 				break
 			case "table":
 				requiredFields.push(
-					{ field: "generationType" as keyof typeof formData, label: "Generation Type" },
-					{ field: "txtIdServiceName" as keyof typeof formData, label: "Bean Name" },
-					{ field: "txtDatasourceName" as keyof typeof formData, label: "Data Source Name" },
-					{ field: "txtTable" as keyof typeof formData, label: "Table Name" },
-					{ field: "txtTableNameFieldValue" as keyof typeof formData, label: "TABLE_NAME Column's Value" },
-					{ field: "txtBlockSize" as keyof typeof formData, label: "Block Size" },
+					{ field: "generationType", label: "Generation Type" },
+					{ field: "txtIdServiceName", label: "Bean Name" },
+					{ field: "txtDatasourceName", label: "Data Source Name" },
+					{ field: "txtTable", label: "Table Name" },
+					{ field: "txtTableNameFieldValue", label: "TABLE_NAME Column's Value" },
+					{ field: "txtBlockSize", label: "Block Size" },
 				)
 				// Strategy 관련 필드는 chkStrategy가 true일 때만 필수
 				if (formData.chkStrategy) {
 					requiredFields.push(
-						{ field: "txtStrategyName" as keyof typeof formData, label: "Strategy Name" },
-						{ field: "txtPrefix" as keyof typeof formData, label: "Prefix" },
-						{ field: "txtCipers" as keyof typeof formData, label: "Cipers" },
-						{ field: "txtFillChar" as keyof typeof formData, label: "Fill Char" },
+						{ field: "txtStrategyName", label: "Strategy Name" },
+						{ field: "txtPrefix", label: "Prefix" },
+						{ field: "txtCipers", label: "Cipers" },
+						{ field: "txtFillChar", label: "Fill Char" },
 					)
 				}
 				break
 			case "uuid":
 				requiredFields.push(
-					{ field: "generationType" as keyof typeof formData, label: "Generation Type" },
-					{ field: "txtIdServiceName" as keyof typeof formData, label: "Bean Name" },
+					{ field: "generationType", label: "Generation Type" },
+					{ field: "txtIdServiceName", label: "Bean Name" },
 				)
 				// Address는 rdoIdType이 Address일 때만 필수
 				if (formData.rdoIdType === "Address") {
-					requiredFields.push({ field: "txtAddress" as keyof typeof formData, label: "Address" })
+					requiredFields.push({ field: "txtAddress", label: "Address" })
 				}
 				break
 		}
+		const missingFieldsMessage = validateRequiredFields(requiredFields, formData)
+		if (missingFieldsMessage) {
+			setValidationError(missingFieldsMessage)
+			return
+		}
 
-		const missingFields = requiredFields.filter(({ field }) => !formData[field]?.toString().trim())
+		// 4. 특수문자 유효성 검증
+		const notSpecialCharactersFields: Array<{ field: string; label: string }> = [
+			{ field: "txtIdServiceName", label: "Bean Name" },
+			{ field: "txtDatasourceName", label: "Data Source Name" },
+			{ field: "txtTable", label: "Table Name" },
+			{ field: "txtTableNameFieldValue", label: "TABLE_NAME Column's Value" },
+			{ field: "txtStrategyName", label: "Strategy Name" },
+		]
+		// 조건부로 다른 label을 가지는 rdoIdType 필드 추가
+		if (formType === "sequence") {
+			notSpecialCharactersFields.push({ field: "rdoIdType", label: "ID Type" })
+		} else if (formType === "uuid") {
+			notSpecialCharactersFields.push({ field: "rdoIdType", label: "UUID Type" })
+		}
+		const specialCharacterMessage = validateSpecialCharacters(notSpecialCharactersFields, formData)
+		if (specialCharacterMessage) {
+			setValidationError(specialCharacterMessage)
+			return
+		}
 
-		if (missingFields.length > 0) {
-			const fieldNames = missingFields.map(({ label }) => label).join(", ")
-			setValidationError(`Please fill in the following required fields: ${fieldNames}`)
+		// 5. 숫자 유효성 검증
+		const numberFields: Array<{ field: string; label: string }> = [
+			{ field: "txtBlockSize", label: "Block Size" },
+			{ field: "txtCipers", label: "Cipers" },
+		]
+		const numberMessage = validateNumber(numberFields, formData)
+		if (numberMessage) {
+			setValidationError(numberMessage)
 			return
 		}
 

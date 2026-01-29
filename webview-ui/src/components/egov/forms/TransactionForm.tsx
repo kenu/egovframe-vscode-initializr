@@ -2,6 +2,13 @@ import React, { useState, useEffect } from "react"
 import { Button, TextField, RadioGroup, Select, Checkbox, Link } from "../../ui"
 import { ConfigFormData, ConfigGenerationType, FormComponentProps } from "../types/templates"
 import { vscode } from "../../../utils/vscode"
+import {
+	validatePackageName,
+	validateFileName,
+	validateRequiredFields,
+	validateSpecialCharacters,
+	validateNumber,
+} from "../../../utils/codeUtils"
 
 const TransactionForm: React.FC<FormComponentProps> = ({ onSubmit, onCancel, template, formType, initialData }) => {
 	// Get default file name based on generation type and form type
@@ -108,65 +115,109 @@ const TransactionForm: React.FC<FormComponentProps> = ({ onSubmit, onCancel, tem
 	const handleSubmit = (e: React.FormEvent) => {
 		e.preventDefault()
 
-		// 두 트랜잭션 관리 방식 중 최소 하나는 선택되어야 함
+		// 0. 추가 비즈니스 검증 (트랜잭션 관리 방식 선택 확인)
 		if (!formData.chkAopConfigTransaction && !formData.chkAnnotationTransaction) {
 			setValidationError("Please select at least one transaction management type (AOP Config or Annotation)")
 			return
 		}
 
-		// Validate required fields
-		const requiredFields: { field: keyof typeof formData; label: string }[] = [
-			{ field: "generationType" as keyof typeof formData, label: "Generation Type" },
-			{ field: "txtTransactionName" as keyof typeof formData, label: "Transaction Manager Name" },
-			{ field: "txtDataSourceName" as keyof typeof formData, label: "Data Source Name" },
-		]
-
-		// 조건부로 txtFileName, txtConfigPackage 필드 추가
+		// 1. Package Name 유효성 검증 (JavaConfig일 때만)
 		if (formData.generationType === ConfigGenerationType.JAVA_CONFIG) {
-			requiredFields.push(
-				{ field: "txtFileName" as keyof typeof formData, label: "Class Name" },
-				{ field: "txtConfigPackage" as keyof typeof formData, label: "Package Name" },
-			)
-		} else {
-			requiredFields.push({ field: "txtFileName" as keyof typeof formData, label: "File Name" })
-		}
-
-		// formType별 필수 필드 추가
-		switch (formType) {
-			case "datasource":
-				//requiredFields.push({ field: "txtTransactionTemplateName" as keyof typeof formData, label: "Transaction Template" })
-				break
-			case "jpa":
-				requiredFields.push(
-					{ field: "txtEntityManagerFactory" as keyof typeof formData, label: "Entity Manager Factory" },
-					{ field: "txtPackagesToScan" as keyof typeof formData, label: "Packages to Scan" },
-					{ field: "txtSpringDataJpaRepositoriesPackage" as keyof typeof formData, label: "Repository Package" },
-				)
-				break
-			case "jta":
-				requiredFields.push({ field: "txtGlobalTimeout" as keyof typeof formData, label: "Global Timeout" })
-				break
-		}
-
-		// AOP Config, Advice 관련 필드 (aopConfigTransaction일 때만)
-		if (formData.chkAopConfigTransaction) {
-			requiredFields.push(
-				{ field: "txtPointCutExpression" as keyof typeof formData, label: "Pointcut Expression" },
-				{ field: "txtAdviceName" as keyof typeof formData, label: "Advice Name" },
-				{ field: "txtMethodName" as keyof typeof formData, label: "Method Name" },
-			)
-
-			// JavaConfig가 아닐 때에만 Pointcut Name 필수
-			if (formData.generationType !== ConfigGenerationType.JAVA_CONFIG) {
-				requiredFields.push({ field: "txtPointCutName" as keyof typeof formData, label: "Pointcut Name" })
+			const packageNameError = validatePackageName(formData.txtConfigPackage || "")
+			if (packageNameError) {
+				setValidationError(packageNameError)
+				return
 			}
 		}
 
-		const missingFields = requiredFields.filter(({ field }) => !formData[field]?.toString().trim())
+		// 2. File Name / Class Name 유효성 검증
+		const fileNameError = validateFileName(
+			formData.txtFileName || "",
+			formData.generationType === ConfigGenerationType.JAVA_CONFIG,
+		)
+		if (fileNameError) {
+			setValidationError(fileNameError)
+			return
+		}
 
-		if (missingFields.length > 0) {
-			const fieldNames = missingFields.map(({ label }) => label).join(", ")
-			setValidationError(`Please fill in the following required fields: ${fieldNames}`)
+		// 3. Missing Fields 유효성 검증
+		const requiredFields: Array<{ field: string; label: string }> = [
+			{ field: "generationType", label: "Generation Type" },
+			{ field: "txtTransactionName", label: "Transaction Manager Name" },
+			{ field: "txtDataSourceName", label: "Data Source Name" },
+		]
+		// 조건부로 txtFileName, txtConfigPackage 필드 추가
+		if (formData.generationType === ConfigGenerationType.JAVA_CONFIG) {
+			requiredFields.push(
+				{ field: "txtFileName", label: "Class Name" },
+				{ field: "txtConfigPackage", label: "Package Name" },
+			)
+		} else {
+			requiredFields.push({ field: "txtFileName", label: "File Name" })
+		}
+		// formType별 필수 필드 추가
+		switch (formType) {
+			case "datasource":
+				//requiredFields.push({ field: "txtTransactionTemplateName", label: "Transaction Template" })
+				break
+			case "jpa":
+				requiredFields.push(
+					{ field: "txtEntityManagerFactory", label: "Entity Manager Factory" },
+					{ field: "txtPackagesToScan", label: "Packages to Scan" },
+					{ field: "txtSpringDataJpaRepositoriesPackage", label: "Repository Package" },
+				)
+				break
+			case "jta":
+				requiredFields.push({ field: "txtGlobalTimeout", label: "Global Timeout" })
+				break
+		}
+		// AOP Config, Advice 관련 필드 (aopConfigTransaction일 때만)
+		if (formData.chkAopConfigTransaction) {
+			requiredFields.push(
+				{ field: "txtPointCutExpression", label: "Pointcut Expression" },
+				{ field: "txtAdviceName", label: "Advice Name" },
+				{ field: "txtMethodName", label: "Method Name" },
+			)
+			// JavaConfig가 아닐 때에만 Pointcut Name 필수
+			if (formData.generationType !== ConfigGenerationType.JAVA_CONFIG) {
+				requiredFields.push({ field: "txtPointCutName", label: "Pointcut Name" })
+			}
+		}
+		const missingFieldsMessage = validateRequiredFields(requiredFields, formData)
+		if (missingFieldsMessage) {
+			setValidationError(missingFieldsMessage)
+			return
+		}
+
+		// 4. 특수문자 유효성 검증
+		const notSpecialCharactersFields: Array<{ field: string; label: string }> = [
+			{ field: "txtTransactionTemplateName", label: "Transaction Template" },
+			{ field: "txtTransactionName", label: "Transaction Manager Name" },
+			{ field: "txtDataSourceName", label: "Data Source Name" },
+			{ field: "txtPointCutName", label: "Pointcut Name" },
+			{ field: "txtAdviceName", label: "Advice Name" },
+			{ field: "txtRollbackFor", label: "Rollback For" },
+			{ field: "txtNoRollbackFor", label: "No Rollback For" },
+			{ field: "cmbPropagation", label: "Propagation" },
+			{ field: "cmbIsolation", label: "Isolation" },
+			{ field: "txtEntityManagerFactory", label: "Entity Manager Factory" },
+			{ field: "cmbDialectName", label: "Dialect Name" },
+			{ field: "txtJtaImplementation", label: "JTA Implementation" },
+		]
+		const specialCharacterMessage = validateSpecialCharacters(notSpecialCharactersFields, formData)
+		if (specialCharacterMessage) {
+			setValidationError(specialCharacterMessage)
+			return
+		}
+
+		// 5. 숫자 유효성 검증
+		const numberFields: Array<{ field: string; label: string }> = [
+			{ field: "txtTimeout", label: "Timeout" },
+			{ field: "txtGlobalTimeout", label: "Global Timeout" },
+		]
+		const numberMessage = validateNumber(numberFields, formData)
+		if (numberMessage) {
+			setValidationError(numberMessage)
 			return
 		}
 

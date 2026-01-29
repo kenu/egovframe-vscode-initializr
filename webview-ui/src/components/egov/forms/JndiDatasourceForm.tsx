@@ -2,6 +2,12 @@ import React, { useState, useEffect } from "react"
 import { Button, TextField, RadioGroup, Link } from "../../ui"
 import { ConfigFormData, ConfigGenerationType, FormComponentProps } from "../types/templates"
 import { vscode } from "../../../utils/vscode"
+import {
+	validatePackageName,
+	validateFileName,
+	validateRequiredFields,
+	validateSpecialCharacters,
+} from "../../../utils/codeUtils"
 
 const JndiDatasourceForm: React.FC<FormComponentProps> = ({ onSubmit, onCancel, template, initialData }) => {
 	const [formData, setFormData] = useState<ConfigFormData>({
@@ -70,28 +76,53 @@ const JndiDatasourceForm: React.FC<FormComponentProps> = ({ onSubmit, onCancel, 
 	const handleSubmit = (e: React.FormEvent) => {
 		e.preventDefault()
 
-		// Validate required fields
-		const requiredFields: { field: keyof typeof formData; label: string }[] = [
-			{ field: "generationType" as keyof typeof formData, label: "Generation Type" },
-			{ field: "txtDatasourceName" as keyof typeof formData, label: "DataSource Name" },
-			{ field: "txtJndiName" as keyof typeof formData, label: "JNDI Name" },
-		]
+		// 1. Package Name 유효성 검증 (JavaConfig일 때만)
+		if (formData.generationType === ConfigGenerationType.JAVA_CONFIG) {
+			const packageNameError = validatePackageName(formData.txtConfigPackage || "")
+			if (packageNameError) {
+				setValidationError(packageNameError)
+				return
+			}
+		}
 
+		// 2. File Name / Class Name 유효성 검증
+		const fileNameError = validateFileName(
+			formData.txtFileName || "",
+			formData.generationType === ConfigGenerationType.JAVA_CONFIG,
+		)
+		if (fileNameError) {
+			setValidationError(fileNameError)
+			return
+		}
+
+		// 3. Missing Fields 유효성 검증
+		const requiredFields: { field: string; label: string }[] = [
+			{ field: "generationType", label: "Generation Type" },
+			{ field: "txtDatasourceName", label: "DataSource Name" },
+			{ field: "txtJndiName", label: "JNDI Name" },
+		]
 		// 조건부로 txtFileName, txtConfigPackage 필드 추가
 		if (formData.generationType === ConfigGenerationType.JAVA_CONFIG) {
 			requiredFields.push(
-				{ field: "txtFileName" as keyof typeof formData, label: "Class Name" },
-				{ field: "txtConfigPackage" as keyof typeof formData, label: "Package Name" },
+				{ field: "txtFileName", label: "Class Name" },
+				{ field: "txtConfigPackage", label: "Package Name" },
 			)
 		} else {
-			requiredFields.push({ field: "txtFileName" as keyof typeof formData, label: "File Name" })
+			requiredFields.push({ field: "txtFileName", label: "File Name" })
+		}
+		const missingFieldsMessage = validateRequiredFields(requiredFields, formData)
+		if (missingFieldsMessage) {
+			setValidationError(missingFieldsMessage)
+			return
 		}
 
-		const missingFields = requiredFields.filter(({ field }) => !formData[field]?.toString().trim())
-
-		if (missingFields.length > 0) {
-			const fieldNames = missingFields.map(({ label }) => label).join(", ")
-			setValidationError(`Please fill in the following required fields: ${fieldNames}`)
+		// 4. 특수문자 유효성 검증
+		const notSpecialCharactersFields: { field: string; label: string }[] = [
+			{ field: "txtDatasourceName", label: "DataSource Name" },
+		]
+		const specialCharacterMessage = validateSpecialCharacters(notSpecialCharactersFields, formData)
+		if (specialCharacterMessage) {
+			setValidationError(specialCharacterMessage)
 			return
 		}
 

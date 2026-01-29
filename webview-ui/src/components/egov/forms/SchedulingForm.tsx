@@ -2,6 +2,13 @@ import React, { useState, useEffect } from "react"
 import { Button, TextField, TextArea, Select, RadioGroup, ProgressRing, Link, Divider, Checkbox } from "../../ui"
 import { ConfigFormData, ConfigGenerationType, FormComponentProps } from "../types/templates"
 import { vscode } from "../../../utils/vscode"
+import {
+	validatePackageName,
+	validateFileName,
+	validateRequiredFields,
+	validateSpecialCharacters,
+	validateNumber,
+} from "../../../utils/codeUtils"
 
 const SchedulingForm: React.FC<FormComponentProps> = ({ template, onSubmit, onCancel, formType, initialData }) => {
 	// Get default file name based on generation type and form type
@@ -128,69 +135,111 @@ const SchedulingForm: React.FC<FormComponentProps> = ({ template, onSubmit, onCa
 	const handleSubmit = (e: React.FormEvent) => {
 		e.preventDefault()
 
-		// Validate required fields
-		const requiredFields: { field: keyof typeof formData; label: string }[] = [
-			{ field: "generationType" as keyof typeof formData, label: "Generation Type" },
-		]
+		// 1. Package Name 유효성 검증 (JavaConfig일 때만)
+		if (formData.generationType === ConfigGenerationType.JAVA_CONFIG) {
+			const packageNameError = validatePackageName(formData.txtConfigPackage || "")
+			if (packageNameError) {
+				setValidationError(packageNameError)
+				return
+			}
+		}
 
+		// 2. File Name / Class Name 유효성 검증
+		const fileNameError = validateFileName(
+			formData.txtFileName || "",
+			formData.generationType === ConfigGenerationType.JAVA_CONFIG,
+		)
+		if (fileNameError) {
+			setValidationError(fileNameError)
+			return
+		}
+
+		// 3. Missing Fields 유효성 검증
+		const requiredFields: Array<{ field: string; label: string }> = [{ field: "generationType", label: "Generation Type" }]
 		// 조건부로 txtFileName, txtConfigPackage 필드 추가
 		if (formData.generationType === ConfigGenerationType.JAVA_CONFIG) {
 			requiredFields.push(
-				{ field: "txtFileName" as keyof typeof formData, label: "Class Name" },
-				{ field: "txtConfigPackage" as keyof typeof formData, label: "Package Name" },
+				{ field: "txtFileName", label: "Class Name" },
+				{ field: "txtConfigPackage", label: "Package Name" },
 			)
 		} else {
-			requiredFields.push({ field: "txtFileName" as keyof typeof formData, label: "File Name" })
+			requiredFields.push({ field: "txtFileName", label: "File Name" })
 		}
-
 		// formType별 필수 필드 추가
 		switch (formType) {
 			case "beanJob":
 				requiredFields.push(
-					{ field: "txtJobName" as keyof typeof formData, label: "Job Name" },
-					{ field: "txtServiceClass" as keyof typeof formData, label: "Service Class" },
+					{ field: "txtJobName", label: "Job Name" },
+					{ field: "txtServiceClass", label: "Service Class" },
 				)
 				break
 			case "methodJob":
 				requiredFields.push(
-					{ field: "txtJobName" as keyof typeof formData, label: "Job Name" },
-					{ field: "txtServiceClass" as keyof typeof formData, label: "Service Class" },
-					{ field: "txtServiceName" as keyof typeof formData, label: "Service Name" },
-					{ field: "txtServiceMethod" as keyof typeof formData, label: "Service Method" },
-					{ field: "cboConcurrent" as keyof typeof formData, label: "Concurrent" },
+					{ field: "txtJobName", label: "Job Name" },
+					{ field: "txtServiceClass", label: "Service Class" },
+					{ field: "txtServiceName", label: "Service Name" },
+					{ field: "txtServiceMethod", label: "Service Method" },
+					{ field: "cboConcurrent", label: "Concurrent" },
 				)
 				break
 			case "simpleTrigger":
 				requiredFields.push(
-					{ field: "txtTriggerName" as keyof typeof formData, label: "Trigger Name" },
-					{ field: "cboJobDetailType" as keyof typeof formData, label: "Job Detail Type" },
-					{ field: "txtJobName" as keyof typeof formData, label: "Job Name" },
-					{ field: "txtStartDelay" as keyof typeof formData, label: "Start Delay" },
-					{ field: "txtRepeatInterval" as keyof typeof formData, label: "Repeat Interval" },
+					{ field: "txtTriggerName", label: "Trigger Name" },
+					{ field: "cboJobDetailType", label: "Job Detail Type" },
+					{ field: "txtJobName", label: "Job Name" },
+					{ field: "txtStartDelay", label: "Start Delay" },
+					{ field: "txtRepeatInterval", label: "Repeat Interval" },
 				)
 				break
 			case "cronTrigger":
 				requiredFields.push(
-					{ field: "txtTriggerName" as keyof typeof formData, label: "Trigger Name" },
-					{ field: "cboJobDetailType" as keyof typeof formData, label: "Job Detail Type" },
-					{ field: "txtJobName" as keyof typeof formData, label: "Job Name" },
-					{ field: "txtCronExpression" as keyof typeof formData, label: "Cron Expression" },
+					{ field: "txtTriggerName", label: "Trigger Name" },
+					{ field: "cboJobDetailType", label: "Job Detail Type" },
+					{ field: "txtJobName", label: "Job Name" },
+					{ field: "txtCronExpression", label: "Cron Expression" },
 				)
 				break
 			case "scheduler":
 				requiredFields.push(
-					{ field: "txtSchedulerName" as keyof typeof formData, label: "Scheduler Name" },
-					{ field: "cboTriggerType" as keyof typeof formData, label: "Trigger Type" },
-					{ field: "txtTriggerName" as keyof typeof formData, label: "Trigger Name" },
+					{ field: "txtSchedulerName", label: "Scheduler Name" },
+					{ field: "cboTriggerType", label: "Trigger Type" },
+					{ field: "txtTriggerName", label: "Trigger Name" },
 				)
 				break
 		}
+		const missingFieldsMessage = validateRequiredFields(requiredFields, formData)
+		if (missingFieldsMessage) {
+			setValidationError(missingFieldsMessage)
+			return
+		}
 
-		const missingFields = requiredFields.filter(({ field }) => !formData[field]?.toString().trim())
+		// 4. 특수문자 유효성 검증
+		const notSpecialCharactersFields: Array<{ field: string; label: string }> = [
+			{ field: "txtJobName", label: "Job Name" },
+			{ field: "txtPropertyName", label: "Property Name" },
+			{ field: "txtPropertyValue", label: "Property Value" },
+			{ field: "txtServiceName", label: "Service Name" },
+			{ field: "txtServiceMethod", label: "Service Method" },
+			{ field: "cboConcurrent", label: "Concurrent" },
+			{ field: "txtTriggerName", label: "Trigger Name" },
+			{ field: "txtJobDetailType", label: "Job Detail Type" },
+			{ field: "txtSchedulerName", label: "Scheduler Name" },
+			{ field: "cboTriggerType", label: "Trigger Type" },
+		]
+		const specialCharacterMessage = validateSpecialCharacters(notSpecialCharactersFields, formData)
+		if (specialCharacterMessage) {
+			setValidationError(specialCharacterMessage)
+			return
+		}
 
-		if (missingFields.length > 0) {
-			const fieldNames = missingFields.map(({ label }) => label).join(", ")
-			setValidationError(`Please fill in the following required fields: ${fieldNames}`)
+		// 5. 숫자 유효성 검증
+		const numberFields: Array<{ field: string; label: string }> = [
+			{ field: "txtStartDelay", label: "Start Delay" },
+			{ field: "txtRepeatInterval", label: "Repeat Interval" },
+		]
+		const numberMessage = validateNumber(numberFields, formData)
+		if (numberMessage) {
+			setValidationError(numberMessage)
 			return
 		}
 

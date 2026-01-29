@@ -1,5 +1,27 @@
 [
 	{
+		"displayName": "Cache > New Cache",
+		"templateFolder": "cache",
+		"templateFile": "cache.hbs",
+		"webView": "cache-cache-form.html",
+		"fileNameProperty": "txtFileName",
+		"javaConfigTemplate": "",
+		"yamlTemplate": "",
+		"propertiesTemplate": "",
+		"description": "Creates a general cache configuration file."
+	},
+	{
+		"displayName": "Cache > New Ehcache Configuration",
+		"templateFolder": "cache",
+		"templateFile": "ehcacheConfigForSpring.hbs",
+		"webView": "cache-ehcacheConfigForSpring-form.html",
+		"fileNameProperty": "txtFileName",
+		"javaConfigTemplate": "ehcacheConfigForSpring-java.hbs",
+		"yamlTemplate": "",
+		"propertiesTemplate": "",
+		"description": "Creates a file that configures the path to Ehcache to be provided to the CacheManager in a Spring environment."
+	},
+	{
 		"displayName": "Datasource > New Datasource",
 		"templateFolder": "datasource",
 		"templateFile": "datasource.hbs",

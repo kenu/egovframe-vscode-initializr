@@ -2,6 +2,13 @@ import { useState, useEffect } from "react"
 import { Button, TextField, TextArea, Select, RadioGroup, Checkbox, ProgressRing, Link, Divider } from "../../ui"
 import { ConfigGenerationType, ConfigFormData, FormComponentProps } from "../types/templates"
 import { vscode } from "../../../utils/vscode"
+import {
+	validatePackageName,
+	validateFileName,
+	validateRequiredFields,
+	validateSpecialCharacters,
+	validateNumber,
+} from "../../../utils/codeUtils"
 
 const LoggingForm: React.FC<FormComponentProps> = ({ onSubmit, onCancel, template, initialData, formType }) => {
 	const getDefaultFileName = (type: ConfigGenerationType) => {
@@ -130,73 +137,110 @@ const LoggingForm: React.FC<FormComponentProps> = ({ onSubmit, onCancel, templat
 	const handleSubmit = (e: React.FormEvent) => {
 		e.preventDefault()
 
-		// Validate required fields
-		const requiredFields: { field: keyof typeof formData; label: string }[] = [
-			{ field: "generationType" as keyof typeof formData, label: "Generation Type" },
-			{ field: "txtAppenderName" as keyof typeof formData, label: "Appender Name" },
-		]
-
-		// JDBC 제외 Conversion Pattern 필드
-		if (formType !== "jdbc") {
-			requiredFields.push({ field: "txtConversionPattern" as keyof typeof formData, label: "Conversion Pattern" })
+		// 1. Package Name 유효성 검증 (JavaConfig일 때만)
+		if (formData.generationType === ConfigGenerationType.JAVA_CONFIG) {
+			const packageNameError = validatePackageName(formData.txtConfigPackage || "")
+			if (packageNameError) {
+				setValidationError(packageNameError)
+				return
+			}
 		}
 
+		// 2. File Name / Class Name 유효성 검증
+		const fileNameError = validateFileName(
+			formData.txtFileName || "",
+			formData.generationType === ConfigGenerationType.JAVA_CONFIG,
+		)
+		if (fileNameError) {
+			setValidationError(fileNameError)
+			return
+		}
+
+		// 3. Missing Fields 유효성 검증
+		const requiredFields: Array<{ field: string; label: string }> = [
+			{ field: "generationType", label: "Generation Type" },
+			{ field: "txtAppenderName", label: "Appender Name" },
+		]
+		// JDBC 제외 Conversion Pattern 필드
+		if (formType !== "jdbc") {
+			requiredFields.push({ field: "txtConversionPattern", label: "Conversion Pattern" })
+		}
 		// 조건부로 txtFileName, txtConfigPackage 필드 추가
 		if (formData.generationType === ConfigGenerationType.JAVA_CONFIG) {
 			requiredFields.push(
-				{ field: "txtFileName" as keyof typeof formData, label: "Class Name" },
-				{ field: "txtConfigPackage" as keyof typeof formData, label: "Package Name" },
+				{ field: "txtFileName", label: "Class Name" },
+				{ field: "txtConfigPackage", label: "Package Name" },
 			)
 		} else {
-			requiredFields.push({ field: "txtFileName" as keyof typeof formData, label: "File Name" })
+			requiredFields.push({ field: "txtFileName", label: "File Name" })
 		}
-
 		// formType별 필수 필드 추가
 		switch (formType) {
 			case "file":
-				requiredFields.push({ field: "txtLogFileName" as keyof typeof formData, label: "Log File Name" })
+				requiredFields.push({ field: "txtLogFileName", label: "Log File Name" })
 				break
 			case "rollingFile":
 				requiredFields.push(
-					{ field: "txtLogFileName" as keyof typeof formData, label: "Log File Name" },
-					{ field: "txtLogFileNamePattern" as keyof typeof formData, label: "Log File Name Pattern" },
-					{ field: "txtMaxIndex" as keyof typeof formData, label: "Max Index" },
-					{ field: "txtMaxFileSize" as keyof typeof formData, label: "Max File Size" },
+					{ field: "txtLogFileName", label: "Log File Name" },
+					{ field: "txtLogFileNamePattern", label: "Log File Name Pattern" },
+					{ field: "txtMaxIndex", label: "Max Index" },
+					{ field: "txtMaxFileSize", label: "Max File Size" },
 				)
 				break
 			case "timeBasedRollingFile":
 				requiredFields.push(
-					{ field: "txtLogFileName" as keyof typeof formData, label: "Log File Name" },
-					{ field: "txtLogFileNamePattern" as keyof typeof formData, label: "Log File Name Pattern" },
-					{ field: "txtInterval" as keyof typeof formData, label: "Interval" },
+					{ field: "txtLogFileName", label: "Log File Name" },
+					{ field: "txtLogFileNamePattern", label: "Log File Name Pattern" },
+					{ field: "txtInterval", label: "Interval" },
 				)
 				break
 			case "jdbc":
 				requiredFields.push(
-					{ field: "txtTableName" as keyof typeof formData, label: "Table Name" },
-					{ field: "rdoConnectionType" as keyof typeof formData, label: "Connection Type" },
+					{ field: "txtTableName", label: "Table Name" },
+					{ field: "rdoConnectionType", label: "Connection Type" },
 				)
 				if (formData.rdoConnectionType === "DriverManager") {
 					requiredFields.push(
-						{ field: "txtDriver" as keyof typeof formData, label: "Driver" },
-						{ field: "txtUrl" as keyof typeof formData, label: "URL" },
-						{ field: "txtUser" as keyof typeof formData, label: "User" },
-						{ field: "txtPasswrd" as keyof typeof formData, label: "Password" },
+						{ field: "txtDriver", label: "Driver" },
+						{ field: "txtUrl", label: "URL" },
+						{ field: "txtUser", label: "User" },
+						{ field: "txtPasswrd", label: "Password" },
 					)
 				} else if (formData.rdoConnectionType === "ConnectionFactory") {
 					requiredFields.push(
-						{ field: "txtConnectionFactoryClass" as keyof typeof formData, label: "Connection Factory Class" },
-						{ field: "txtConnectionFactoryMethod" as keyof typeof formData, label: "Connection Factory Method" },
+						{ field: "txtConnectionFactoryClass", label: "Connection Factory Class" },
+						{ field: "txtConnectionFactoryMethod", label: "Connection Factory Method" },
 					)
 				}
 				break
 		}
+		const missingFieldsMessage = validateRequiredFields(requiredFields, formData)
+		if (missingFieldsMessage) {
+			setValidationError(missingFieldsMessage)
+			return
+		}
 
-		const missingFields = requiredFields.filter(({ field }) => !formData[field]?.toString().trim())
+		// 4. 특수문자 유효성 검증
+		const notSpecialCharactersFields: Array<{ field: string; label: string }> = [
+			{ field: "txtAppenderName", label: "Appender Name" },
+			{ field: "txtTableName", label: "Table Name" },
+			{ field: "rdoConnectionType", label: "Connection Type" },
+		]
+		const specialCharacterMessage = validateSpecialCharacters(notSpecialCharactersFields, formData)
+		if (specialCharacterMessage) {
+			setValidationError(specialCharacterMessage)
+			return
+		}
 
-		if (missingFields.length > 0) {
-			const fieldNames = missingFields.map(({ label }) => label).join(", ")
-			setValidationError(`Please fill in the following required fields: ${fieldNames}`)
+		// 5. 숫자 유효성 검증
+		const numberFields: Array<{ field: string; label: string }> = [
+			{ field: "txtMaxIndex", label: "Max Index" },
+			{ field: "txtMaxFileSize", label: "Max File Size" },
+			{ field: "txtInterval", label: "Interval" },
+		]
+		const numberMessage = validateNumber(numberFields, formData)
+		if (numberMessage) {
+			setValidationError(numberMessage)
 			return
 		}
 
