@@ -106,7 +106,6 @@ const CacheForm: React.FC<FormComponentProps> = ({ onSubmit, onCancel, template,
 
 		// 4. 특수문자 유효성 검증
 		const notSpecialCharactersFields: Array<{ field: string; label: string }> = [
-			{ field: "txtDiskStore", label: "Disk Store Path" },
 			{ field: "txtDftEternal", label: "Default Cache Eternal" },
 			{ field: "txtDftDiskPersistence", label: "Use Disk Storage" },
 			{ field: "txtCacheName", label: "Cache Name" },

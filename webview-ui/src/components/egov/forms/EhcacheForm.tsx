@@ -133,10 +133,7 @@ const EhcacheForm: React.FC<FormComponentProps> = ({ onSubmit, onCancel, templat
 		}
 
 		// 4. 특수문자 유효성 검증
-		const notSpecialCharactersFields: Array<{ field: string; label: string }> = [
-			{ field: "txtComponentScanBasePackage", label: "Component Scan Base Package" },
-			{ field: "txtConfigLocation", label: "Config Location" },
-		]
+		const notSpecialCharactersFields: Array<{ field: string; label: string }> = []
 		const specialCharacterMessage = validateSpecialCharacters(notSpecialCharactersFields, formData)
 		if (specialCharacterMessage) {
 			setValidationError(specialCharacterMessage)

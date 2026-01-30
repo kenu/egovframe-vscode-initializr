@@ -3,7 +3,7 @@ Configuration:
     JDBC:
       name: {{txtAppenderName}}
       tableName: {{txtTableName}}
-      {{#if rdoConnectionType === "ConnectionFactory"}}
+      {{#if (eq rdoConnectionType "ConnectionFactory")}}
       ConnectionFactory:
         class: "{{txtConnectionFactoryClass}}"
         method: "{{txtConnectionFactoryMethod}}"

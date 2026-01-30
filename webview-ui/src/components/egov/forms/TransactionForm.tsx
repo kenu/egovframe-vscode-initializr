@@ -201,7 +201,6 @@ const TransactionForm: React.FC<FormComponentProps> = ({ onSubmit, onCancel, tem
 			{ field: "cmbPropagation", label: "Propagation" },
 			{ field: "cmbIsolation", label: "Isolation" },
 			{ field: "txtEntityManagerFactory", label: "Entity Manager Factory" },
-			{ field: "cmbDialectName", label: "Dialect Name" },
 			{ field: "txtJtaImplementation", label: "JTA Implementation" },
 		]
 		const specialCharacterMessage = validateSpecialCharacters(notSpecialCharactersFields, formData)

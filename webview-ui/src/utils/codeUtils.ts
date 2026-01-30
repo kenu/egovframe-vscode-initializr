@@ -124,7 +124,7 @@ export function validateSpecialCharacters(
 
 	if (invalidFields.length > 0) {
 		const fieldNames = invalidFields.map(({ label }) => label).join(", ")
-		return `The following fields contain invalid special characters: ${fieldNames}. Only alphanumeric characters, hyphen (-), and underscore (_) are allowed.`
+		return `The following fields must contain only alphanumeric characters, hyphen (-), and underscore (_): ${fieldNames}.`
 	}
 
 	return null

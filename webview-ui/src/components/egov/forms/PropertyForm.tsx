@@ -128,9 +128,7 @@ const PropertyForm: React.FC<FormComponentProps> = ({ onSubmit, onCancel, templa
 		// 4. 특수문자 유효성 검증
 		const notSpecialCharactersFields: Array<{ field: string; label: string }> = [
 			{ field: "txtPropertyServiceName", label: "Property Service Name" },
-			{ field: "rdoType", label: "Type" },
 			{ field: "txtKey", label: "Key" },
-			{ field: "cboEncoding", label: "Encoding" },
 		]
 		const specialCharacterMessage = validateSpecialCharacters(notSpecialCharactersFields, formData)
 		if (specialCharacterMessage) {

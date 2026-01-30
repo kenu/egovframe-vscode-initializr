@@ -3,7 +3,7 @@
 <Configuration>
     <Appenders>
         <JDBC name="{{txtAppenderName}}" tableName="{{txtTableName}}">
-            {{#if rdoConnectionType === "ConnectionFactory"}}
+            {{#if (eq rdoConnectionType "ConnectionFactory")}}
             <!-- ConnectionFactory 설정 -->
             <ConnectionFactory 
                 class="{{txtConnectionFactoryClass}}"
